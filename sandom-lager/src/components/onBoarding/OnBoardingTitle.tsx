@@ -1,4 +1,4 @@
-import logoUrl from '../../assets/temp_logo.svg';
+import logoUrl from '../../assets/logo.png';
 
 type OnBoardingTitleProps = {
     description: string;
