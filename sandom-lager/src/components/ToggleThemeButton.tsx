@@ -13,7 +13,7 @@ export default function ToggleThemeButton({ className, iconSize = 18 }: ToggleTh
 		<button
 			type="button"
 			onClick={toggleTheme}
-			className={className ?? 'absolute top-4 right-4 p-2 rounded-md transition-colors'}
+			className={className ?? 'absolute top-4 right-4 p-2 rounded-md transition-colors cursor-pointer'}
 			aria-label="Toggle theme"
 			style={{
 				backgroundColor: 'var(--color-surface)',
