@@ -1,14 +1,21 @@
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { Moon, Sun } from 'lucide-react';
+import { useAuth0 } from '@auth0/auth0-react';
+
 
 export default function HomePage() {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useTheme();
+    const { user } = useAuth0();
+    // Get username from custom claim or fallback to nickname
+    const username = (user as Record<string, unknown>)?.[`https://sandom-lager.app/username`] as string | undefined || user?.username || user?.nickname;
 
     const handleLogout = () => {
         navigate('/login');
     };
+
+
 
     return (
         <div
@@ -21,7 +28,7 @@ export default function HomePage() {
                     style={{ backgroundColor: 'var(--color-surface)' }}
                 >
                     <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-3xl font-bold">Welcome!</h1>
+                        <h1 className="text-3xl font-bold">Velkommen!</h1>
                         <div className="flex gap-3">
                             <button
                                 onClick={toggleTheme}
@@ -46,7 +53,7 @@ export default function HomePage() {
                         </div>
                     </div>
                     <p style={{ color: 'var(--color-text-secondary)' }}>
-                        This is the main application. You are now logged in.
+                        Dette er hovedapplikasjonen. Du er logget inn som: <strong>{username}</strong>
                     </p>
                 </div>
             </div>

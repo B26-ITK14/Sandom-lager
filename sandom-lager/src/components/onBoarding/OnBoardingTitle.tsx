@@ -1,4 +1,4 @@
-import logoUrl from '../../assets/temp_logo.svg';
+import logoUrl from '../../assets/logo.png';
 
 type OnBoardingTitleProps = {
     description: string;
@@ -11,7 +11,7 @@ export default function OnBoardingTitle({ description }: OnBoardingTitleProps) {
                 <img
                     src={logoUrl}
                     alt="Sandom Lager Logo"
-                    className="w-24 h-24 mb-4 mx-auto"
+                    className="mb-4 mx-auto"
                 />
             </figure>
             <h1
