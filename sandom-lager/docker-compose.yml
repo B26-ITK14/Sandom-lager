@@ -38,7 +38,7 @@ services:
     container_name: sandom-backend
     restart: always
     ports:
-      - "5000:5000"
+      - "5001:5000"
     environment:
       DATABASE_URL: postgres://admin:admin@db:5432/sandomlager
     depends_on:
