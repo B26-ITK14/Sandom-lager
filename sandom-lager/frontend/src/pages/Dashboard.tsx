@@ -1,15 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { Moon, Sun } from 'lucide-react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useUsername } from '../hooks/useUsername';
 
 
 export default function HomePage() {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useTheme();
-    const { user } = useAuth0();
-    // Get username from custom claim or fallback to nickname
-    const username = (user as Record<string, unknown>)?.[`https://sandom-lager.app/username`] as string | undefined || user?.username || user?.nickname;
+    const username = useUsername();
 
     const handleLogout = () => {
         navigate('/login');
