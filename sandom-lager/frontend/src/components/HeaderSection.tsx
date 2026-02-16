@@ -26,7 +26,7 @@ export default function HeaderSection() {
         <>
             <section className="mb-6 flex flex-row items-center justify-between">
                 <button
-                    className="p-2 text-gray-600 hover:text-gray-900 cursor-pointer"
+                    className="py-2 pr-4 text-gray-600 hover:text-gray-900 cursor-pointer"
                     onClick={handleMenuClick}
                 >
                     <svg

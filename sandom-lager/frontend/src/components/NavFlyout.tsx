@@ -65,7 +65,7 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-8 hover:opacity-70"
+                        className="p-8 hover:opacity-70 cursor-pointer"
                         style={{ color: 'var(--color-text-primary)' }}
                     >
                         <X size={28} />
