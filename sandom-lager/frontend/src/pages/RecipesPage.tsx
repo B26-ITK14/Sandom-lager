@@ -1,6 +1,6 @@
 import Layout from "../components/Layout";
 
-export default function RecipePage() {
+export default function RecipesPage() {
     return (
         <Layout>
             <h1>Oppskrifter</h1>

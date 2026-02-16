@@ -4,11 +4,11 @@ import { NavFlyout } from './NavFlyout';
 
 // Map URL paths to display names
 const pageNames: Record<string, string> = {
-    '/': 'Dashboard',
+    '/': 'Dashbord',
     '/shopping-list': 'Handleliste',
     '/storage': 'Lager',
     '/settings': 'Innstillinger',
-    '/recipe': 'Oppskrifter',
+    '/recipes': 'Oppskrifter',
 };
 
 export default function HeaderSection() {
@@ -33,6 +33,7 @@ export default function HeaderSection() {
                         className="w-6 h-6"
                         fill="none"
                         stroke="currentColor"
+                        style={{ color: 'var(--color-text-primary)' }}  
                         viewBox="0 0 24 24"
                     >
                         <path

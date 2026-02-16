@@ -1,7 +1,6 @@
 import Layout from "../components/Layout";
 import { useUsername } from '../hooks/useName';
 import { Pencil } from 'lucide-react';
-import ToggleThemeButton from '../components/ToggleThemeButton';
 
 export default function SettingsPage() {
     const userName = useUsername();
@@ -44,7 +43,6 @@ export default function SettingsPage() {
                     Rediger profil <Pencil size={16} />
                 </button>
             </section>
-            <ToggleThemeButton />
         </Layout>
     )
 }
