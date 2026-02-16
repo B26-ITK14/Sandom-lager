@@ -1,6 +1,6 @@
 import { useTheme } from '../context/ThemeContext';
 import { Moon, Sun } from 'lucide-react';
-import { useUsername } from '../hooks/useUsername';
+import { useUsername } from '../hooks/useName';
 import Layout from '../components/Layout';
 
 

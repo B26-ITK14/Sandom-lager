@@ -1,6 +1,6 @@
 
 import { X, Search, Power } from 'lucide-react';
-import { useUsername } from '../hooks/useUsername';
+import { useUsername } from '../hooks/useName';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
