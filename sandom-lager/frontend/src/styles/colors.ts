@@ -6,6 +6,7 @@ export type ColorTokens = {
     textSecondary: string;
     background: string;
     surface: string;
+    secondarySurface: string;
     border: string;
     primary: string;
     primaryHover: string;
@@ -23,6 +24,7 @@ export const COLORS: Record<ColorMode, ColorTokens> = {
         textSecondary: "#6C7278",
         background: "#F3F4F6",
         surface: "#FFFFFF",
+        secondarySurface: "#F1F3F6",
         border: "#D1D5DB",
         primary: "#5965A9",
         primaryHover: "#4B569B",
@@ -38,6 +40,7 @@ export const COLORS: Record<ColorMode, ColorTokens> = {
         textSecondary: "#D1D5DB",
         background: "#111827",
         surface: "#1F2937",
+        secondarySurface: "#374151",
         border: "#374151",
         primary: "#9AA4FF",
         primaryHover: "#7F8BFF",
