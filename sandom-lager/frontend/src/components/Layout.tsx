@@ -3,17 +3,16 @@ import HeaderSection from './HeaderSection';
 
 interface LayoutProps {
     children: ReactNode;
-    currentPage?: string;
 }
 
-export default function Layout({ children, currentPage }: LayoutProps) {
+export default function Layout({ children }: LayoutProps) {
     return (
         <div
             className="min-h-screen px-4 py-8 transition-colors max-w-4xl mx-auto"
             style={{ backgroundColor: 'var(--color-background)' }}
         >
             <header>
-                <HeaderSection currentPage={currentPage} />
+                <HeaderSection />
             </header>
             <div>
                 {children}

@@ -1,12 +1,22 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { NavFlyout } from './NavFlyout';
 
-export default function HeaderSection({
-    currentPage,
-}: {
-    currentPage?: string;
-}) {
+// Map URL paths to display names
+const pageNames: Record<string, string> = {
+    '/': 'Dashboard',
+    '/shopping-list': 'Handleliste',
+    '/storage': 'Lager',
+    '/settings': 'Innstillinger',
+    '/recipe': 'Oppskrifter',
+};
+
+export default function HeaderSection() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const location = useLocation();
+
+    // Get page name from current URL path
+    const currentPage = pageNames[location.pathname] || 'Dashboard';
 
     const handleMenuClick = () => {
         setIsMenuOpen(!isMenuOpen);

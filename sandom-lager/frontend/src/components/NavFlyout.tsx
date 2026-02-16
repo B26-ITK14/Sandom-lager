@@ -117,15 +117,15 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         </li>
                         <li>
                             <button
-                                onClick={() => handleNavigation('/handleliste')}
+                                onClick={() => handleNavigation('/shopping-list')}
                                 className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${
-                                    location.pathname === '/handleliste' ? 'font-bold' : ''
+                                    location.pathname === '/shopping-list' ? 'font-bold' : ''
                                 }`}
                                 style={{
                                     color: 'var(--color-text-primary)',
                                 }}
                             >
-                                {location.pathname === '/handleliste' && (
+                                {location.pathname === '/shopping-list' && (
                                     <span
                                         className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
                                         style={{ backgroundColor: 'var(--color-primary)' }}
@@ -136,15 +136,15 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         </li>
                         <li>
                             <button
-                                onClick={() => handleNavigation('/oppskrifter')}
+                                onClick={() => handleNavigation('/recipes')}
                                 className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${
-                                    location.pathname === '/oppskrifter' ? 'font-bold' : ''
+                                    location.pathname === '/recipes' ? 'font-bold' : ''
                                 }`}
                                 style={{
                                     color: 'var(--color-text-primary)',
                                 }}
                             >
-                                {location.pathname === '/oppskrifter' && (
+                                {location.pathname === '/recipes' && (
                                     <span
                                         className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
                                         style={{ backgroundColor: 'var(--color-primary)' }}
@@ -155,15 +155,15 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         </li>
                         <li>
                             <button
-                                onClick={() => handleNavigation('/lager')}
+                                onClick={() => handleNavigation('/storage')}
                                 className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${
-                                    location.pathname === '/lager' ? 'font-bold' : ''
+                                    location.pathname === '/storage' ? 'font-bold' : ''
                                 }`}
                                 style={{
                                     color: 'var(--color-text-primary)',
                                 }}
                             >
-                                {location.pathname === '/lager' && (
+                                {location.pathname === '/storage' && (
                                     <span
                                         className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
                                         style={{ backgroundColor: 'var(--color-primary)' }}
@@ -174,15 +174,15 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         </li>
                         <li>
                             <button
-                                onClick={() => handleNavigation('/innstillinger')}
+                                onClick={() => handleNavigation('/settings')}
                                 className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${
-                                    location.pathname === '/innstillinger' ? 'font-bold' : ''
+                                    location.pathname === '/settings' ? 'font-bold' : ''
                                 }`}
                                 style={{
                                     color: 'var(--color-text-primary)',
                                 }}
                             >
-                                {location.pathname === '/innstillinger' && (
+                                {location.pathname === '/settings' && (
                                     <span
                                         className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
                                         style={{ backgroundColor: 'var(--color-primary)' }}
