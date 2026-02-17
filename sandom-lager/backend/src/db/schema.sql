@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'user', -- 'user', 'admin', 'manager'
-    created_at TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW(),
 );
 
 -- USER LOCATION ACCESS --
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS recipes (
     title TEXT NOT NULL,
     category TEXT NOT NULL,
     instructions TEXT, 
-    created_at TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW(),
 );
 
 -- RECIPE INGREDIENTS --
@@ -79,3 +79,40 @@ VALUES ('Gluten'),
        ('Sulfitter'),
        ('Lupin'),
        ('Bløtdyr');
+
+-- RECIPE ALLERGENS --
+CREATE TABLE IF NOT EXISTS recipe_allergens (
+    id SERIAL PRIMARY KEY,
+    recipe_id INT REFERENCES recipes(id) ON DELETE CASCADE,
+    allergen_id INT REFERENCES allergens(id) ON DELETE CASCADE,
+    UNIQUE(recipe_id, allergen_id)
+);
+
+-- INVENTORY --
+CREATE TABLE IF NOT EXISTS inventory (
+    id SERIAL PRIMARY KEY,
+    location_id INT REFERENCES locations(id) ON DELETE CASCADE,
+    ingredient_id INT REFERENCES ingredients(id) ON DELETE CASCADE,
+    quantity NUMERIC NOT NULL DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE(location_id, ingredient_id)
+);
+
+-- SHOPPING LIST --
+CREATE TABLE IF NOT EXISTS shopping_list (
+    id SERIAL PRIMARY KEY,
+    location_id INT REFERENCES locations(id) ON DELETE CASCADE,
+    ingredient_id INT REFERENCES ingredients(id) ON DELETE CASCADE,
+    needed_quantity NUMERIC NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+);
+
+-- LOGS --
+CREATE TABLE IF NOT EXISTS logs (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
+    action TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+);
+
+
