@@ -6,13 +6,14 @@
 -- LOCATIONS --
 CREATE TABLE IF NOT EXISTS locations (
     id SERIAL PRIMARY KEY,
-    name TEXT(255) NOT NULL UNIQUE,
+    name TEXT NOT NULL UNIQUE
 );
 
 -- Inserting default locations
 INSERT INTO locations (name)
 VALUES ('Sandom Retreatsenter'),
        ('Tomasgården');
+ON CONFLICT DO NOTHING;
 
 -- USERS --
 CREATE TABLE IF NOT EXISTS users (
@@ -21,7 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'user', -- 'user', 'admin', 'manager'
-    created_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- USER LOCATION ACCESS --
@@ -37,7 +38,7 @@ CREATE TABLE IF NOT EXISTS user_locations (
 CREATE TABLE IF NOT EXISTS ingredients (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
-    unit TEXT NOT NULL, -- 'kg', 'liter'
+    unit TEXT NOT NULL -- 'kg', 'liter'
 );
 
 -- RECIPES --
@@ -47,7 +48,7 @@ CREATE TABLE IF NOT EXISTS recipes (
     title TEXT NOT NULL,
     category TEXT NOT NULL,
     instructions TEXT, 
-    created_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- RECIPE INGREDIENTS --
@@ -55,13 +56,13 @@ CREATE TABLE recipe_ingredients (
     id SERIAL PRIMARY KEY,
     recipe_id INT REFERENCES recipes(id) ON DELETE CASCADE,
     ingredient_id INT REFERENCES ingredients(id) ON DELETE CASCADE,
-    quantity NUMERIC NOT NULL,
+    quantity NUMERIC NOT NULL
 );
 
  -- ALLERGENS --
 CREATE TABLE IF NOT EXISTS allergens (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL UNIQUE
 );
 
 INSERT INTO allergens (name)
@@ -104,7 +105,7 @@ CREATE TABLE IF NOT EXISTS shopping_list (
     location_id INT REFERENCES locations(id) ON DELETE CASCADE,
     ingredient_id INT REFERENCES ingredients(id) ON DELETE CASCADE,
     needed_quantity NUMERIC NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- LOGS --
@@ -112,7 +113,7 @@ CREATE TABLE IF NOT EXISTS logs (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id) ON DELETE SET NULL,
     action TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
 
