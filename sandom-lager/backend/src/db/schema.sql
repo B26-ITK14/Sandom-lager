@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS locations (
 -- Inserting default locations
 INSERT INTO locations (name)
 VALUES ('Sandom Retreatsenter'),
-       ('Tomasgården');
+       ('Tomasgården')
 ON CONFLICT DO NOTHING;
 
 -- USERS --
@@ -79,7 +79,8 @@ VALUES ('Gluten'),
        ('Sesamfrø'),
        ('Sulfitter'),
        ('Lupin'),
-       ('Bløtdyr');
+       ('Bløtdyr')
+ON CONFLICT DO NOTHING;
 
 -- RECIPE ALLERGENS --
 CREATE TABLE IF NOT EXISTS recipe_allergens (
