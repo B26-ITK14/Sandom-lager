@@ -2,11 +2,29 @@ import { useTheme } from '../context/ThemeContext';
 import { Moon, Sun } from 'lucide-react';
 import { useUsername } from '../hooks/useName';
 import Layout from '../components/Layout';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useEffect } from 'react';
 
 
 export default function HomePage() {
     const { theme, toggleTheme } = useTheme();
     const username = useUsername();
+    const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+
+    // Debugging: Log access token to verify Auth0 integration
+    useEffect(() => {
+        async function debugToken() {
+            try {
+                const token = await getAccessTokenSilently();
+                console.log("ACCESS TOKEN:", token);
+            } catch (error) {
+                console.error("Error fetching access token:", error);
+            }
+        }
+        if (isAuthenticated) {
+            debugToken();
+        }
+    }, [getAccessTokenSilently, isAuthenticated]);
 
     return (
         <Layout>
@@ -31,6 +49,8 @@ export default function HomePage() {
             <p style={{ color: 'var(--color-text-secondary)' }}>
                 Dette er hovedapplikasjonen. Du er logget inn som: <strong>{username}</strong>
             </p>
+
+
         </Layout>
     );
 }

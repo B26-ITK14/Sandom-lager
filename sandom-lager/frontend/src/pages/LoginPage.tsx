@@ -18,6 +18,7 @@ export default function LoginPage() {
     loginWithRedirect({
       authorizationParams: {
         screen_hint: "signup",
+        audience: "https://sandom-api",
       },
     });
   };

@@ -13,6 +13,7 @@ createRoot(document.getElementById("root")!).render(
       authorizationParams={{
         redirect_uri: window.location.origin,
         scope: "openid profile email username",
+        audience: "https://sandom-api"
       }}
     >
       <App />

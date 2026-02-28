@@ -1,4 +1,5 @@
 const express = require("express");
+const testRoutes = require("./routes/test.routes");
 
 const itemsRoutes = require("./routes/items.routes");
 
@@ -17,4 +18,19 @@ app.use("/items", itemsRoutes);
 
 app.listen(PORT, () => {
   console.log("Backend startet på port " + PORT);
+});
+
+// Secure test route
+app.use("/api", testRoutes);
+
+// Error handling middleware for JWT authentication errors and other server errors
+app.use((err, req, res, next) => {
+  if (err.name === "UnauthorizedError") {
+    return res.status(401).json({
+      message: "Invalid or missing token",
+    });
+  }
+
+  console.error(err);
+  res.status(500).json({ message: "Internal server error" });
 });
