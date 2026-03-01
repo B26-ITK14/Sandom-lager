@@ -20,8 +20,9 @@ CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     auth0_id TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
-    name TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'user', -- 'user', 'admin', 'manager'
+    name TEXT,
+    role TEXT NOT NULL DEFAULT 'user'
+    CHECK (role IN ('user', 'admin', 'manager')),
     created_at TIMESTAMP DEFAULT NOW()
 );
 
