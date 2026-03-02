@@ -30,19 +30,19 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
             {/* Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                    className="fixed inset-0 bg-black/10 backdrop-blur-sm z-40"
                     onClick={onClose}
                 />
             )}
 
             {/* Flyout */}
             <section
-                className={`fixed top-0 left-0 h-full w-full transition-transform duration-300 z-50 flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'
+                className={`fixed top-0 left-0 h-full w-full max-w-136 transition-transform duration-300 z-50 flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'
                     }`}
                 style={{ backgroundColor: 'var(--color-secondary-surface)' }}
             >
                 {/* Header with user info */}
-                <section 
+                <section
                     className="flex justify-between items-center pt-20 rounded-b-3xl"
                 >
                     <div
@@ -99,9 +99,8 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         <li>
                             <button
                                 onClick={() => handleNavigation('/')}
-                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${
-                                    location.pathname === '/' ? 'font-bold' : ''
-                                }`}
+                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${location.pathname === '/' ? 'font-bold' : ''
+                                    }`}
                                 style={{
                                     color: 'var(--color-text-primary)',
                                 }}
@@ -118,9 +117,8 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         <li>
                             <button
                                 onClick={() => handleNavigation('/shopping-list')}
-                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${
-                                    location.pathname === '/shopping-list' ? 'font-bold' : ''
-                                }`}
+                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${location.pathname === '/shopping-list' ? 'font-bold' : ''
+                                    }`}
                                 style={{
                                     color: 'var(--color-text-primary)',
                                 }}
@@ -137,9 +135,8 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         <li>
                             <button
                                 onClick={() => handleNavigation('/recipes')}
-                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${
-                                    location.pathname === '/recipes' ? 'font-bold' : ''
-                                }`}
+                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${location.pathname === '/recipes' ? 'font-bold' : ''
+                                    }`}
                                 style={{
                                     color: 'var(--color-text-primary)',
                                 }}
@@ -156,9 +153,8 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         <li>
                             <button
                                 onClick={() => handleNavigation('/storage')}
-                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${
-                                    location.pathname === '/storage' ? 'font-bold' : ''
-                                }`}
+                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${location.pathname === '/storage' ? 'font-bold' : ''
+                                    }`}
                                 style={{
                                     color: 'var(--color-text-primary)',
                                 }}
@@ -175,9 +171,8 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         <li>
                             <button
                                 onClick={() => handleNavigation('/settings')}
-                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${
-                                    location.pathname === '/settings' ? 'font-bold' : ''
-                                }`}
+                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${location.pathname === '/settings' ? 'font-bold' : ''
+                                    }`}
                                 style={{
                                     color: 'var(--color-text-primary)',
                                 }}
