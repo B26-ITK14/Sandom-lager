@@ -40,7 +40,7 @@ export default function HeaderSection() {
                         className="w-6 h-6"
                         fill="none"
                         stroke="currentColor"
-                        style={{ color: 'var(--color-text-primary)' }}  
+                        style={{ color: 'var(--color-header-text-primary)' }}  
                         viewBox="0 0 24 24"
                     >
                         <path
@@ -53,7 +53,7 @@ export default function HeaderSection() {
                 </button>
                 <h2
                     className="text-2xl font-bold"
-                    style={{ color: 'var(--color-text-primary)' }}>
+                    style={{ color: 'var(--color-header-text-primary)' }}>
                     {currentPage}
                 </h2>
                 <button className="p-2 text-gray-600 hover:text-gray-900">

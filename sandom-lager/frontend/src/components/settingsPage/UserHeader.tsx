@@ -14,19 +14,25 @@ export default function UserHeader() {
     return (
         <>
             {/* Profile section */}
-            <section className="flex flex-col items-center gap-4 mt-8">
+            <section className="flex flex-col items-center gap-4 ">
                 {/* Profile picture */}
-                <figure className="w-32 h-32 flex items-center justify-center">
+                <figure 
+                    className="overflow-hidden rounded-2xl p-1.5"
+                    style={{
+                        background: 'linear-gradient(var(--color-surface), var(--color-surface)) padding-box, linear-gradient(135deg, var(--color-primary-gradient-from), var(--color-primary-gradient-to)) border-box',
+                        border: '2px solid transparent',
+                    }}
+                >
                     <img
                         src="src/assets/temp_EmilB04.png"
                         alt="Profile Picture"
-                        className="w-full h-full object-cover"
+                        className="w-24 h-24 rounded-2xl object-cover"
                     />
                 </figure>
 
                 {/* User name */}
                 <h2
-                    className="text-2xl font-semibold mt-1"
+                    className="text-2xl font-semibold"
                     style={{ color: 'var(--color-text-primary)' }}
                 >
                     {userName}
@@ -34,7 +40,7 @@ export default function UserHeader() {
 
                 {/* Divider */}
                 <div
-                    className="w-full max-w-sm h-0.75 mt-1 rounded-full"
+                    className="w-full max-w-sm h-0.75 rounded-full"
                     style={{
                         backgroundColor: 'var(--color-primary)',
                         boxShadow: '0 4px 6px -1px var(--color-text-secondary), 0 2px 4px -1px var(--color-text-secondary)'
