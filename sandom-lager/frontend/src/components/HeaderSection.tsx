@@ -1,32 +1,31 @@
 /*
     * HeaderSection.tsx
-    * A header component for the main application pages, featuring a menu button, page title, and user profile picture. 
+    * A header component for the main application pages, featuring a menu button, page title, and notification bell. 
     * It also integrates a flyout navigation menu.
     * Author: Emil Berglund
 */
 
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Bell } from 'lucide-react';
 import { NavFlyout } from './NavFlyout';
-
-// Map URL paths to display names
-const pageNames: Record<string, string> = {
-    '/': 'Dashbord',
-    '/shopping-list': 'Handleliste',
-    '/storage': 'Lager',
-    '/settings': 'Innstillinger',
-    '/recipes': 'Oppskrifter',
-};
+import { NotificationFlyout } from './notifications';
+import { getDisplayName } from '../routes';
 
 export default function HeaderSection() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const location = useLocation();
 
     // Get page name from current URL path
-    const currentPage = pageNames[location.pathname] || 'Dashboard';
+    const currentPage = getDisplayName(location.pathname);
 
     const handleMenuClick = () => {
         setIsMenuOpen(!isMenuOpen);
+    };
+
+    const handleNotificationClick = () => {
+        setIsNotificationOpen(!isNotificationOpen);
     };
 
     return (
@@ -56,16 +55,19 @@ export default function HeaderSection() {
                     style={{ color: 'var(--color-header-text-primary)' }}>
                     {currentPage}
                 </h2>
-                <button className="p-2 text-gray-600 hover:text-gray-900">
-                    <img
-                        src="src/assets/temp_EmilB04.png"
-                        alt="Profile Picture"
-                        className="w-10 h-10 rounded-full"
-                    />
+                <button 
+                    className="p-2 hover:opacity-70 cursor-pointer relative"
+                    style={{ color: 'var(--color-header-text-primary)' }}
+                    onClick={handleNotificationClick}
+                >
+                    <Bell size={24} />
+                    {/* Uncomment to show notification badge */}
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                 </button>
             </section>
 
             <NavFlyout isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+            <NotificationFlyout isOpen={isNotificationOpen} onClose={() => setIsNotificationOpen(false)} />
         </>
     );
 }

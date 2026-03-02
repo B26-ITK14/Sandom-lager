@@ -9,6 +9,7 @@ import { X, Search, Power } from 'lucide-react';
 import { useUsername } from '../hooks/useName';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { getAllRoutes } from '../routes';
 
 interface NavFlyoutProps {
     isOpen: boolean;
@@ -102,96 +103,27 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                 {/* Navigation links */}
                 <nav className="flex-1 py-4 overflow-y-auto">
                     <ul className="space-y-2">
-                        <li>
-                            <button
-                                onClick={() => handleNavigation('/')}
-                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${location.pathname === '/' ? 'font-bold' : ''
+                        {getAllRoutes().map((route) => (
+                            <li key={route.nickname}>
+                                <button
+                                    onClick={() => handleNavigation(route.path)}
+                                    className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${
+                                        location.pathname === route.path ? 'font-bold' : ''
                                     }`}
-                                style={{
-                                    color: 'var(--color-text-primary)',
-                                }}
-                            >
-                                {location.pathname === '/' && (
-                                    <span
-                                        className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
-                                        style={{ backgroundColor: 'var(--color-primary)' }}
-                                    />
-                                )}
-                                Dashboard
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                onClick={() => handleNavigation('/shopping-list')}
-                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${location.pathname === '/shopping-list' ? 'font-bold' : ''
-                                    }`}
-                                style={{
-                                    color: 'var(--color-text-primary)',
-                                }}
-                            >
-                                {location.pathname === '/shopping-list' && (
-                                    <span
-                                        className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
-                                        style={{ backgroundColor: 'var(--color-primary)' }}
-                                    />
-                                )}
-                                Handleliste
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                onClick={() => handleNavigation('/recipes')}
-                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${location.pathname === '/recipes' ? 'font-bold' : ''
-                                    }`}
-                                style={{
-                                    color: 'var(--color-text-primary)',
-                                }}
-                            >
-                                {location.pathname === '/recipes' && (
-                                    <span
-                                        className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
-                                        style={{ backgroundColor: 'var(--color-primary)' }}
-                                    />
-                                )}
-                                Oppskrifter
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                onClick={() => handleNavigation('/storage')}
-                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${location.pathname === '/storage' ? 'font-bold' : ''
-                                    }`}
-                                style={{
-                                    color: 'var(--color-text-primary)',
-                                }}
-                            >
-                                {location.pathname === '/storage' && (
-                                    <span
-                                        className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
-                                        style={{ backgroundColor: 'var(--color-primary)' }}
-                                    />
-                                )}
-                                Lager
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                onClick={() => handleNavigation('/settings')}
-                                className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${location.pathname === '/settings' ? 'font-bold' : ''
-                                    }`}
-                                style={{
-                                    color: 'var(--color-text-primary)',
-                                }}
-                            >
-                                {location.pathname === '/settings' && (
-                                    <span
-                                        className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
-                                        style={{ backgroundColor: 'var(--color-primary)' }}
-                                    />
-                                )}
-                                Innstillinger
-                            </button>
-                        </li>
+                                    style={{
+                                        color: 'var(--color-text-primary)',
+                                    }}
+                                >
+                                    {location.pathname === route.path && (
+                                        <span
+                                            className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
+                                            style={{ backgroundColor: 'var(--color-primary)' }}
+                                        />
+                                    )}
+                                    {route.displayName}
+                                </button>
+                            </li>
+                        ))}
                     </ul>
                 </nav>
 
