@@ -1,3 +1,10 @@
+/*
+    * HeaderSection.tsx
+    * A header component for the main application pages, featuring a menu button, page title, and user profile picture. 
+    * It also integrates a flyout navigation menu.
+    * Author: Emil Berglund
+*/
+
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { NavFlyout } from './NavFlyout';

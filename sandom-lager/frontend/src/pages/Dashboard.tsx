@@ -1,3 +1,7 @@
+/*
+    * Dashboard.tsx
+ */
+
 import { useTheme } from '../context/ThemeContext';
 import { Moon, Sun } from 'lucide-react';
 import { useUsername } from '../hooks/useName';

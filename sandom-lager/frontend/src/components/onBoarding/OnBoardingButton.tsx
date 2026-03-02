@@ -1,3 +1,9 @@
+/*
+    * OnBoardingButton.tsx
+    * A versatile button component for onboarding screens, supporting both link and native button functionalities with multiple styling variants.   
+    * Author: Emil Berglund
+*/
+
 import { Link } from 'react-router-dom';
 import type { ButtonHTMLAttributes, CSSProperties } from 'react';
 

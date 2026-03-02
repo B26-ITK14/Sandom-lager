@@ -1,3 +1,9 @@
+/*
+    * NavFlyout.tsx
+    * A flyout navigation menu component that slides in from the left, providing user information, navigation links, and a logout option. 
+    * It also includes an overlay to focus attention on the menu when open.
+    * Author: Emil Berglund
+*/
 
 import { X, Search, Power } from 'lucide-react';
 import { useUsername } from '../hooks/useName';

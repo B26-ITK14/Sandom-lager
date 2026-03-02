@@ -1,3 +1,9 @@
+/*
+	* ToggleThemeButton.tsx
+	* A button component that allows users to toggle between light and dark themes, displaying an appropriate icon based on the current theme.
+	* Author: Emil Berglund
+*/
+
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 

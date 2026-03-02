@@ -1,3 +1,10 @@
+/*
+    * useName.ts
+    * Custom React hooks for retrieving and formatting user name information from Auth0 user data. 
+    * These hooks provide a consistent way to access the user's username, first name, last name, and full name across the application.
+    * Author: Emil Berglund
+ */
+
 import { useMemo } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 

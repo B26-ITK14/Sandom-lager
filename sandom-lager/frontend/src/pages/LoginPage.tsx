@@ -1,5 +1,11 @@
-import { LogIn, UserPlus } from "lucide-react";
+/*
+    * LoginPage.tsx
+    * A login page component that provides options for users to log in or register using Auth0, 
+    * featuring a welcoming title and theme toggle button.
+    * Author: Emil Berglund
+*/
 
+import { LogIn, UserPlus } from "lucide-react";
 import OnBoardingTitle from "../components/onBoarding/OnBoardingTitle";
 import ToggleThemeButton from "../components/ToggleThemeButton";
 
