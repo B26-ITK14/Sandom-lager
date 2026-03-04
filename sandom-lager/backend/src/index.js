@@ -3,6 +3,8 @@ const testRoutes = require("./routes/test.routes");
 
 const itemsRoutes = require("./routes/items.routes");
 
+const recipeIngredientsRoutes = require("./routes/recipeIngredients.routes");
+
 const PORT = process.env.PORT || 5000;
 
 const app = express();
@@ -20,8 +22,9 @@ app.listen(PORT, () => {
   console.log("Backend startet på port " + PORT);
 });
 
-// Secure test route
+// API routes
 app.use("/api", testRoutes);
+app.use("/api", recipeIngredientsRoutes);
 
 // Error handling middleware for JWT authentication errors and other server errors
 app.use((err, req, res, next) => {
