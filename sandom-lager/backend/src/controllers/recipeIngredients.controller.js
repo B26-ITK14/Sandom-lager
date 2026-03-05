@@ -50,18 +50,22 @@ async function addRecipeIngredient(req, res) {
 async function updateRecipeIngredient(req, res) {
     const { id } = req.params;
     const { quantity } = req.body;
-    try{
+    try {
         const result = await pool.query(
             `UPDATE recipe_ingredients
-            SET quantity = $1
-            WHERE id = $2
-            RETURNING *`, [quantity, id]
-        )
-        res.status(200).json(result.rows[0])
-    }catch (err){
+             SET quantity = $1
+             WHERE id = $2
+             RETURNING *`,
+            [quantity, id]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "Recipe ingredient not found" });
+        }
+        res.status(200).json(result.rows[0]);
+    } catch (err) {
         console.error(err);
         res.status(500).send("Database error");
-    }    
+    }
 }
 
 // DELETE /api/recipe-ingredients/:id

@@ -12,15 +12,15 @@ const {
     deleteRecipeIngredient 
 } = require("../controllers/recipeIngredients.controller");
 
-// GET - Krever user rolle
+// GET - All users allowed
 router.get("/recipes/:id/ingredients", 
     checkJwt(),
     syncUser,
-    requireRole("user"),
+    requireRole("user", "admin", "manager"),
     getRecipeIngredients
 );
 
-// POST - Krever admin eller manager
+// POST - Requires admin or manager role
 router.post("/recipes/:id/ingredients", 
     checkJwt(),
     syncUser,
@@ -28,7 +28,7 @@ router.post("/recipes/:id/ingredients",
     addRecipeIngredient
 );
 
-// PUT - Krever admin eller manager
+// PUT - Requires admin or manager role
 router.put("/recipe-ingredients/:id", 
     checkJwt(),
     syncUser,
@@ -36,7 +36,7 @@ router.put("/recipe-ingredients/:id",
     updateRecipeIngredient
 );
 
-// DELETE - Krever admin
+// DELETE - Requires admin role
 router.delete("/recipe-ingredients/:id", 
     checkJwt(),
     syncUser,
