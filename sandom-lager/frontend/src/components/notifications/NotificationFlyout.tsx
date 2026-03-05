@@ -49,31 +49,35 @@ export function NotificationFlyout({ isOpen, onClose }: NotificationFlyoutProps)
             {/* Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/10 backdrop-blur-sm z-40"
+                    className="fixed inset-0 bg-black/10 backdrop-blur-sm z-40 animate-fade-in"
                     onClick={onClose}
                 />
             )}
 
             {/* Flyout */}
             <section
-                className={`fixed top-0 right-0 h-full w-full max-w-md transition-transform duration-300 z-50 flex flex-col ${
+                className={`fixed top-0 right-0 h-full w-full max-w-md transition-transform duration-200 ease-out z-50 flex flex-col ${
                     isOpen ? 'translate-x-0' : 'translate-x-full'
                 }`}
                 style={{ backgroundColor: 'var(--color-surface)' }}
             >
-                <NotificationHeader unreadCount={unreadCount} onClose={onClose} />
+                <div className={isOpen ? 'animate-slide-in-right' : ''}>
+                    <NotificationHeader unreadCount={unreadCount} onClose={onClose} />
+                </div>
 
-                <div className="flex-1 overflow-y-auto">
+                <div className={`flex-1 overflow-y-auto ${isOpen ? 'animate-slide-in-right animate-delay-100' : ''}`}>
                     <NotificationList 
                         notifications={notifications} 
                         onNotificationClick={handleNotificationClick}
                     />
                 </div>
 
-                <NotificationFooter 
-                    hasNotifications={notifications.length > 0} 
-                    onMarkAllAsRead={handleMarkAllAsRead}
-                />
+                <div className={isOpen ? 'animate-slide-in-right animate-delay-200' : ''}>
+                    <NotificationFooter 
+                        hasNotifications={notifications.length > 0} 
+                        onMarkAllAsRead={handleMarkAllAsRead}
+                    />
+                </div>
             </section>
         </>
     );

@@ -10,6 +10,7 @@ import { useUsername } from '../hooks/useName';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getAllRoutes } from '../routes';
+import { version } from '../../package.json';
 
 interface NavFlyoutProps {
     isOpen: boolean;
@@ -37,20 +38,20 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
             {/* Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/10 backdrop-blur-sm z-40"
+                    className="fixed inset-0 bg-black/10 backdrop-blur-sm z-40 animate-fade-in"
                     onClick={onClose}
                 />
             )}
 
             {/* Flyout */}
             <section
-                className={`fixed top-0 left-0 h-full w-full max-w-136 transition-transform duration-300 z-50 flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'
+                className={`fixed top-0 left-0 h-full w-full max-w-136 z-50 flex flex-col transition-transform duration-500 ease-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
                     }`}
                 style={{ backgroundColor: 'var(--color-surface)' }}
             >
                 {/* Header with user info */}
                 <section
-                    className="flex justify-between items-center pt-20 rounded-b-3xl"
+                    className={`flex justify-between items-center pt-20 rounded-b-3xl ${isOpen ? 'animate-slide-in-left' : ''}`}
                 >
                     <div
                         className="flex items-center gap-3 py-6 px-8 rounded-br-3xl"
@@ -80,7 +81,7 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                 </section>
 
                 {/* Search bar */}
-                <div className="p-6">
+                <div className={`p-6 ${isOpen ? 'animate-slide-in-left animate-delay-100' : ''}`}>
                     <div className="relative">
                         <Search
                             size={20}
@@ -101,7 +102,7 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                 </div>
 
                 {/* Navigation links */}
-                <nav className="flex-1 py-4 overflow-y-auto">
+                <nav className={`flex-1 py-4 overflow-y-auto ${isOpen ? 'animate-slide-in-left animate-delay-100' : ''}`}>
                     <ul className="space-y-2">
                         {getAllRoutes().map((route) => (
                             <li key={route.nickname}>
@@ -140,10 +141,11 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         Logg ut
                     </button>
                     <p className="text-xs text-right" style={{ color: 'var(--color-text-secondary)' }}>
-                        Versjon x.x.x
+                        Versjon: {version ? version === '0.0.0' ? 'Under utvikling' : version : 'Ukjent'}
                     </p>
                 </div>
             </section>
         </>
     );
+
 }
