@@ -1,7 +1,6 @@
 const express = require("express");
 
 const testRoutes = require("./routes/test.routes");
-const itemsRoutes = require("./routes/items.routes");
 const recipesRoutes = require("./routes/recipes.routes");
 const recipeIngredientsRoutes = require("./routes/recipeIngredients.routes");
 
@@ -17,9 +16,6 @@ app.get("/", (req, res) => {
 });
 
 // Items API
-app.use("/items", itemsRoutes);
-
-// API routes
 app.use("/api", testRoutes);
 app.use("/api/recipes", recipesRoutes);
 app.use("/api", recipeIngredientsRoutes);

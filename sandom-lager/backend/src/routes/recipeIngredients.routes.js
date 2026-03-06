@@ -9,14 +9,13 @@ const {
     getRecipeIngredients,
     addRecipeIngredient,
     updateRecipeIngredient,
-    deleteRecipeIngredient 
+    deleteRecipeIngredient
 } = require("../controllers/recipeIngredients.controller");
 
 // GET - All users allowed
 router.get("/recipes/:id/ingredients", 
     checkJwt(),
     syncUser,
-    requireRole("user", "admin", "manager"),
     getRecipeIngredients
 );
 
