@@ -3,7 +3,7 @@
  */
 
 import Layout from "../components/Layout";
-import UserHeader from "../components/settings/UserHeader";
+import UserHeader from "../components/settings/SettingsUserHeader";
 import SettingsNavItem from "../components/settings/SettingsNavItem";
 import { ROUTES } from "../routes";
 

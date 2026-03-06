@@ -4,11 +4,9 @@
     * Author: Emil Berglund
 */
 
-
 import React from 'react';
 import { User, Bell, Lock, HelpCircle, Info, LogOut, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
 
 interface SettingsNavItemProps {
     title: string;

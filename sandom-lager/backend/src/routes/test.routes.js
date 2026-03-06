@@ -28,6 +28,20 @@ router.get("/test-admin",
   });
 });
 
+// Returns the current authenticated user's profile including their role
+router.get("/me",
+  checkJwt(),
+  syncUser,
+  (req, res) => {
+    res.json({
+      id: req.user.id,
+      name: req.user.name,
+      email: req.user.email,
+      role: req.user.role,
+    });
+  }
+);
+
 // Example of a role-protected route, if role is 'user', this route will be inaccessible
 router.get("/test-manager", 
   checkJwt(),
