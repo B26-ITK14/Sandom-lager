@@ -1,4 +1,3 @@
-
 /*
     * UserHeader.tsx
     * A user profile header component for the settings page, displaying the user's profile picture, name, and an option to edit the profile. 

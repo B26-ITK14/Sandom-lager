@@ -9,7 +9,7 @@ import { X, Search, Power } from 'lucide-react';
 import { useUsername } from '../hooks/useName';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getAllRoutes } from '../routes';
+import { getAllMainRoutes } from '../routes';
 import { version } from '../../package.json';
 
 interface NavFlyoutProps {
@@ -104,7 +104,7 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                 {/* Navigation links */}
                 <nav className={`flex-1 py-4 overflow-y-auto ${isOpen ? 'animate-slide-in-left animate-delay-100' : ''}`}>
                     <ul className="space-y-2">
-                        {getAllRoutes().map((route) => (
+                        {getAllMainRoutes().map((route) => (
                             <li key={route.nickname}>
                                 <button
                                     onClick={() => handleNavigation(route.path)}

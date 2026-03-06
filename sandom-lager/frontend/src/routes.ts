@@ -37,6 +37,21 @@ export const ROUTES: Record<string, Route> = {
         path: '/settings',
         displayName: 'Innstillinger',
     },
+    SETTINGS_ACCOUNT: {
+        nickname: 'settings-account',
+        path: '/settings/account',
+        displayName: 'Min konto',
+    },
+    SETTINGS_APPLICATIONS: {
+        nickname: 'settings-applications',
+        path: '/settings/applications',
+        displayName: 'Mine søknader',
+    },
+    SETTINGS_APP_SETTINGS: {
+        nickname: 'settings-app-settings',
+        path: '/settings/app-settings',
+        displayName: 'App innstillinger',
+    },
 } as const;
 
 // Helper function to get route by path
@@ -59,6 +74,11 @@ export const getDisplayName = (path: string): string => {
 export const getAllRoutes = (): Route[] => {
     return Object.values(ROUTES);
 };
+
+// Helper function to get all MAIN routes (excluding sub-routes)
+export const getAllMainRoutes = (): Route[] => {
+    return Object.values(ROUTES).filter(route => !route.path.includes('/settings/'));
+}
 
 // Type for route nicknames (useful for TypeScript)
 export type RouteNickname = typeof ROUTES[keyof typeof ROUTES]['nickname'];

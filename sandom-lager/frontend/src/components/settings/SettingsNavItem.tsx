@@ -1,6 +1,14 @@
+/*
+    * SettingsNavItem.tsx
+    * A reusable navigation item component for the settings page.
+    * Author: Emil Berglund
+*/
+
+
 import React from 'react';
 import { User, Bell, Lock, HelpCircle, Info, LogOut, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
 
 interface SettingsNavItemProps {
     title: string;
@@ -23,11 +31,15 @@ const figureIconMap: Record<SettingsNavItemProps['figureType'], React.ReactNode>
 export default function SettingsNavItem({ title, description, url, figureType, warning, style }: SettingsNavItemProps) {
     const navigate = useNavigate();
 
+    const handleClick = () => {
+        navigate(url);
+    };
+
     return (
         <button
             className="flex items-center w-full text-left gap-4 py-1 my-8 cursor-pointer"
             style={style}
-            onClick={() => navigate(url)}
+            onClick={handleClick}
         >
             {/* Icon */}
             <figure
