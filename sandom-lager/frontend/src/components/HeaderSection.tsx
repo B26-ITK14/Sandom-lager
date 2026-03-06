@@ -13,7 +13,7 @@ import { NotificationFlyout } from './notifications';
 import { getDisplayName } from '../routes';
 
 interface HeaderSectionProps {
-    notifications: boolean | true;
+    notifications?: boolean | true;
     backMenu?: boolean | false;
 }
 
