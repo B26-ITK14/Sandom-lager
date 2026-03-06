@@ -2,11 +2,14 @@ const express = require("express");
 require("dotenv").config();
 const testRoutes = require("./routes/test.routes");
 
-const itemsRoutes = require("./routes/items.routes");
+const testRoutes = require("./routes/test.routes");
+const recipesRoutes = require("./routes/recipes.routes");
+const recipeIngredientsRoutes = require("./routes/recipeIngredients.routes");
 
 const PORT = process.env.PORT || 3001;
 
 const app = express();
+
 app.use(express.json());
 
 // Allow requests from the Vite dev server
@@ -24,14 +27,9 @@ app.get("/", (req, res) => {
 });
 
 // Items API
-app.use("/items", itemsRoutes);
-
-app.listen(PORT, () => {
-  console.log("Backend startet på port " + PORT);
-});
-
-// Secure test route
 app.use("/api", testRoutes);
+app.use("/api/recipes", recipesRoutes);
+app.use("/api", recipeIngredientsRoutes);
 
 // Error handling middleware for JWT authentication errors and other server errors
 // express-jwt v8 throws InvalidTokenError (403) for bad tokens and UnauthorizedError (401) for missing tokens
@@ -46,4 +44,9 @@ app.use((err, req, res, next) => {
   }
 
   res.status(500).json({ message: "Internal server error" });
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Backend startet på port ${PORT}`);
 });
