@@ -3,6 +3,7 @@ const express = require("express");
 const testRoutes = require("./routes/test.routes");
 const recipesRoutes = require("./routes/recipes.routes");
 const recipeIngredientsRoutes = require("./routes/recipeIngredients.routes");
+const inventoryRoutes = require("./routes/inventory.routes");
 
 const PORT = process.env.PORT || 5000;
 
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 app.use("/api", testRoutes);
 app.use("/api/recipes", recipesRoutes);
 app.use("/api", recipeIngredientsRoutes);
+app.use("/api", inventoryRoutes);
 
 // Error handling middleware for JWT authentication errors and other server errors
 app.use((err, req, res, next) => {
