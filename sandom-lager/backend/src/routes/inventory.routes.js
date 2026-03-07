@@ -11,8 +11,8 @@ const { getInventory, createInventory, updateInventory, deleteInventory } = requ
 router.get(
     "/inventory", 
     checkJwt(),
-    requireRole("user"),
     syncUser,
+    requireRole("user", "manager", "admin"), // All roles can access
     getInventory
 );
 
