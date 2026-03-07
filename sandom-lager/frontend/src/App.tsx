@@ -8,6 +8,9 @@ import ShoppingListPage from "./pages/ShoppingListPage";
 import SettingsPage from "./pages/SettingsPage";
 import StoragePage from "./pages/StoragePage";
 import RecipesPage from "./pages/RecipesPage";
+import MyAccountPage from "./pages/settings/MyAccountPage";
+import MyApplicationsPage from "./pages/settings/MyApplicationsPage";
+import AppSettingsPage from "./pages/settings/AppSettingsPage";
 
 export default function App() {
   return (
@@ -58,6 +61,31 @@ export default function App() {
               </ProtectedRoute>
             }
           />  
+
+          <Route
+            path="/settings/account"
+            element={
+              <ProtectedRoute>
+                <MyAccountPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings/applications"
+            element={
+              <ProtectedRoute>
+                <MyApplicationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings/app-settings"
+            element={
+              <ProtectedRoute>
+                <AppSettingsPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/" replace />} />

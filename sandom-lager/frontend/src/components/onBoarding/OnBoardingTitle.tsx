@@ -1,3 +1,9 @@
+/*
+    * OnBoardingTitle.tsx
+    * A component for displaying the title and description on onboarding screens, featuring a logo and styled text.
+    * Author: Emil Berglund
+*/
+
 import logoUrl from '../../assets/logo.png';
 
 type OnBoardingTitleProps = {

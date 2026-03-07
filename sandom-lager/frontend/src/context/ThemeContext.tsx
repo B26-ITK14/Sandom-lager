@@ -1,3 +1,10 @@
+/*
+    * ThemeContext.tsx
+    * A React context for managing light and dark themes, including user preferences and system theme detection. 
+    * It provides a toggle function and applies theme colors as CSS variables.
+    * Author: Emil Berglund
+*/
+
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
