@@ -1,4 +1,4 @@
-const pool = require("../db");
+const pool = require("../db/pool");
 
 // GET api/inventory - Get all inventory items
 async function getInventory(req, res) {
