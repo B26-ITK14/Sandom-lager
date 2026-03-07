@@ -42,12 +42,10 @@ export function useUserRole(): UseUserRoleResult {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
-                console.log('[useUserRole] Response status:', response.status);
 
                 if (!response.ok) throw new Error(`Feil ved henting av rolle (${response.status})`);
 
                 const data = await response.json();
-                console.log('[useUserRole] Response data:', data);
 
                 if (!cancelled) setRole(data.role ?? null);
             } catch (err) {
