@@ -4,7 +4,7 @@
     * Author: Emil Berglund
 */
 
-import type { RouteNickname } from '../../routes';
+import type { RouteNickname } from '../../router/routes';
 
 export interface Notification {
     id: number;

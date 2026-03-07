@@ -8,6 +8,7 @@
 import { LogIn, UserPlus } from "lucide-react";
 import OnBoardingTitle from "../components/onBoarding/OnBoardingTitle";
 import ToggleThemeButton from "../components/ToggleThemeButton";
+import { AUTH0_AUDIENCE } from "../config/auth";
 
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -24,7 +25,7 @@ export default function LoginPage() {
     loginWithRedirect({
       authorizationParams: {
         screen_hint: "signup",
-        audience: "https://sandom-api",
+        audience: AUTH0_AUDIENCE,
       },
     });
   };

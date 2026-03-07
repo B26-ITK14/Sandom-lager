@@ -6,11 +6,11 @@
 */
 
 import { X, Search, Power } from 'lucide-react';
-import { useUsername } from '../hooks/useName';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useUsername } from '../hooks';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getAllMainRoutes } from '../routes';
+import { getAllMainRoutes } from '../router/nav';
 import { version } from '../../package.json';
+import { LogoutLoadingOverlay, useAppLogout } from '../auth';
 
 interface NavFlyoutProps {
     isOpen: boolean;
@@ -19,13 +19,12 @@ interface NavFlyoutProps {
 
 export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
     const username = useUsername();
-    const { logout } = useAuth0();
+    const { logoutUser, isLoggingOut } = useAppLogout(onClose);
     const navigate = useNavigate();
     const location = useLocation();
 
     const handleLogout = () => {
-        logout({ logoutParams: { returnTo: window.location.origin } });
-        onClose();
+        void logoutUser();
     };
 
     const handleNavigation = (path: string) => {
@@ -108,9 +107,8 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                             <li key={route.nickname}>
                                 <button
                                     onClick={() => handleNavigation(route.path)}
-                                    className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${
-                                        location.pathname === route.path ? 'font-bold' : ''
-                                    }`}
+                                    className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${location.pathname === route.path ? 'font-bold' : ''
+                                        }`}
                                     style={{
                                         color: 'var(--color-text-primary)',
                                     }}
@@ -132,6 +130,7 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                 <div className="p-6" >
                     <button
                         onClick={handleLogout}
+                        disabled={isLoggingOut}
                         className="flex items-center gap-2 font-bold rounded-md transition-colors mb-4 cursor-pointer"
                         style={{ color: 'var(--color-text-primary)' }}
                         onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-danger)'}
@@ -145,6 +144,8 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                     </p>
                 </div>
             </section>
+
+            <LogoutLoadingOverlay isVisible={isLoggingOut} />
         </>
     );
 

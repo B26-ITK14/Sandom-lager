@@ -5,7 +5,7 @@
     * Author: Emil Berglund
 */
 
-import { ROUTES } from '../../routes';
+import { ROUTES } from '../../router/routes';
 import type { Notification } from './types';
 
 export const mockNotifications: Notification[] = [
