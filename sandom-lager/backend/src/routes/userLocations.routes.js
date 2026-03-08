@@ -17,7 +17,6 @@ router.post(
     "/user-locations/request",
     checkJwt(),
     syncUser,
-    requireRole("user"),
     requestLocationAccess
 );
 

@@ -30,7 +30,7 @@ async function approveLocationAccess(req, res) {
         const { id } = req.params;
 
         const result = await pool.query(
-            "UPDATE user_locations SET status = 'approved' WHERE id = $1 RETURNING *",
+            "UPDATE user_locations SET access_status = 'approved' WHERE id = $1 RETURNING *",
             [id]
         );
 
@@ -52,7 +52,7 @@ async function denyLocationAccess(req, res) {
         const { id } = req.params;
 
         const result = await pool.query(
-            "UPDATE user_locations SET status = 'denied' WHERE id = $1 RETURNING *",
+            "UPDATE user_locations SET access_status = 'denied' WHERE id = $1 RETURNING *",
             [id]
         );
 
