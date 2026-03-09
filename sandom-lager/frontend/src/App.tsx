@@ -12,6 +12,10 @@ import MyAccountPage from "./pages/settings/MyAccountPage";
 import MyApplicationsPage from "./pages/settings/MyApplicationsPage";
 import AppSettingsPage from "./pages/settings/AppSettingsPage";
 
+import AdminPage from "./pages/AdminPage";
+import RequestAccessPage from "./pages/RequestAccessPage";
+import PendingApprovalPage from "./pages/PendingApprovalPage";
+
 export default function App() {
   return (
     <ThemeProvider>
@@ -19,6 +23,34 @@ export default function App() {
         <Routes>
           {/* Public route */}
           <Route path="/login" element={<LoginPage />} />
+          
+           {/* Onboarding – krever innlogging, men ikke godkjent lokasjon */}
+          <Route
+            path="/request-access"
+            element={
+              <ProtectedRoute>
+                <RequestAccessPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pending-approval"
+            element={
+              <ProtectedRoute>
+                <PendingApprovalPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Protected route */}
           <Route

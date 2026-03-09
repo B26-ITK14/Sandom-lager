@@ -52,6 +52,24 @@ export const ROUTES: Record<string, Route> = {
         path: '/settings/app-settings',
         displayName: 'App innstillinger',
     },
+
+    // ------------ Admin --------------//
+    ADMIN: {
+        nickname: 'admin',
+        path: '/admin',
+        displayName: 'Admin',
+    },
+    REQUEST_ACCESS: {
+        nickname: 'request-access',
+        path: '/request-access',
+        displayName: 'Søk om tilgang',
+    },
+    PENDING_APPROVAL: {
+        nickname: 'pending-approval',
+        path: '/pending-approval',
+        displayName: 'Venter på godkjenning',
+    },
+
 } as const;
 
 // Helper function to get route by path
@@ -75,9 +93,16 @@ export const getAllRoutes = (): Route[] => {
     return Object.values(ROUTES);
 };
 
+// ----- Oppdatert getAllmainRoutes -------
 // Helper function to get all MAIN routes (excluding sub-routes)
 export const getAllMainRoutes = (): Route[] => {
-    return Object.values(ROUTES).filter(route => !route.path.includes('/settings/'));
+    return Object.values(ROUTES).filter(
+        route =>
+            !route.path.includes('/settings/') &&
+            !route.path.includes('/admin') &&
+            !route.path.includes('/request-access') &&
+            !route.path.includes('/pending-approval')
+    );
 }
 
 // Type for route nicknames (useful for TypeScript)

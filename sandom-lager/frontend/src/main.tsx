@@ -15,6 +15,10 @@ createRoot(document.getElementById("root")!).render(
         scope: "openid profile email username",
         audience: "https://sandom-api"
       }}
+
+      // La til denne linjen for å bli redirected til "Admin siden"
+        cacheLocation="localstorage"
+
     >
       <App />
     </Auth0Provider>
