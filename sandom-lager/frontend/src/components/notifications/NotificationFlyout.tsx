@@ -7,7 +7,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getRouteByNickname } from '../../routes';
+import { getRouteByNickname } from '../../router/nav';
 import { NotificationHeader } from './NotificationHeader';
 import { NotificationList } from './NotificationList';
 import { NotificationFooter } from './NotificationFooter';

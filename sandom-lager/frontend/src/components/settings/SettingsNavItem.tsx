@@ -15,6 +15,7 @@ interface SettingsNavItemProps {
     figureType: 'account' | 'notification' | 'security' | 'help' | 'about' | 'logout';
     warning?: boolean;
     style?: React.CSSProperties;
+    onClick?: () => void;
 }
 
 const figureIconMap: Record<SettingsNavItemProps['figureType'], React.ReactNode> = {
@@ -26,10 +27,15 @@ const figureIconMap: Record<SettingsNavItemProps['figureType'], React.ReactNode>
     logout: <LogOut size={24} />,
 };
 
-export default function SettingsNavItem({ title, description, url, figureType, warning, style }: SettingsNavItemProps) {
+export default function SettingsNavItem({ title, description, url, figureType, warning, style, onClick }: SettingsNavItemProps) {
     const navigate = useNavigate();
 
     const handleClick = () => {
+        if (onClick) {
+            onClick();
+            return;
+        }
+
         navigate(url);
     };
 

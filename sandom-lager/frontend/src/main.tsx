@@ -4,16 +4,19 @@ import "./styles/App.css";
 import App from "./App.tsx";
 
 import { Auth0Provider } from "@auth0/auth0-react";
+import { AUTH0_AUDIENCE, AUTH0_SCOPE } from "./config/auth";
+import { env } from "./config/env";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Auth0Provider
-      domain={import.meta.env.VITE_AUTH0_DOMAIN}
-      clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
+      domain={env.VITE_AUTH0_DOMAIN}
+      clientId={env.VITE_AUTH0_CLIENT_ID}
+      cacheLocation="localstorage"
       authorizationParams={{
         redirect_uri: window.location.origin,
-        scope: "openid profile email username",
-        audience: "https://sandom-api"
+        scope: AUTH0_SCOPE,
+        audience: AUTH0_AUDIENCE,
       }}
     >
       <App />
