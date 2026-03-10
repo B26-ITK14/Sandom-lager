@@ -1,5 +1,7 @@
 const pool = require("../db/pool");
 
+import { logEvent } from "../services/logger";
+
 // GET /recipes - Get all recipes
 async function getAllRecipes(req, res) {
     try {
@@ -40,7 +42,18 @@ async function createRecipe(req, res) {
             "INSERT INTO recipes (title, category, instructions, location_id) VALUES ($1, $2, $3, $4) RETURNING *",
             [title, category, instructions, location_id]
         );
-        res.status(201).json(result.rows[0]);
+        
+        const recipe = result.rows[0];
+
+        // Log the recipe creation event
+        await logEvent(
+            "RECIPE_CREATED",
+            `Recipe created: ${recipe.title}`,
+            { recipeId: recipe.id }
+        );
+
+        res.status(201).json(recipe);
+        
     } catch (err) {
         console.error("createRecipe error:", err);
         res.status(500).json({ message: "Failed to create recipe" });
