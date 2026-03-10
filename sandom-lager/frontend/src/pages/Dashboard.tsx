@@ -2,11 +2,12 @@
  * Dashboard.tsx
  */
 
-import { useUsername } from "../hooks/useName";
+import { useUsername } from "../hooks";
 import Layout from "../components/Layout";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect } from "react";
 import ToggleThemeButton from "../components/ToggleThemeButton";
+import { AUTH0_AUDIENCE } from "../config/auth";
 
 export default function HomePage() {
     const username = useUsername();
@@ -16,7 +17,11 @@ export default function HomePage() {
     useEffect(() => {
         async function debugToken() {
             try {
-                const token = await getAccessTokenSilently();
+                const token = await getAccessTokenSilently({
+                    authorizationParams: {
+                        audience: AUTH0_AUDIENCE,
+                    },
+                });
                 console.log("ACCESS TOKEN:", token);
             } catch (error) {
                 console.error("Error fetching access token:", error);

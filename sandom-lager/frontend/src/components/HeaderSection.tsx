@@ -10,7 +10,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Bell, ArrowLeft } from 'lucide-react';
 import { NavFlyout } from './NavFlyout';
 import { NotificationFlyout } from './notifications';
-import { getDisplayName } from '../routes';
+import { getDisplayName } from '../router/nav';
 
 interface HeaderSectionProps {
     notifications?: boolean | true;

@@ -13,7 +13,7 @@ TODO: Update Auth0 to require firstname and lastname in login-process.
 */
 
 
-/**
+/*
  * Hook to get the formatted username from Auth0 user data
  * Returns username with first letter capitalized and rest lowercase
  */
@@ -33,7 +33,7 @@ export function useUsername(): string {
     return username;
 }
 
-/**
+/*
  * Hook to get the user's first name from Auth0 user data
  * Returns first name with first letter capitalized and rest lowercase
  */
@@ -54,7 +54,7 @@ export function useFirstName(): string {
     return firstName;
 }
 
-/**
+/*
  * Hook to get the user's last name from Auth0 user data
  * Returns last name with first letter capitalized and rest lowercase
  */
@@ -78,22 +78,11 @@ export function useLastName(): string {
  * Returns the full name or constructs it from first and last name
  */
 export function useFullName(): string {
-    const { user } = useAuth0();
-    
-    const fullName = useMemo(() => {
-        if (user?.name) {
-            return user.name;
-        }
-        
-        const firstName = user?.given_name || user?.name?.split(' ')[0] || '';
-        const lastName = user?.family_name || user?.name?.split(' ').slice(1).join(' ') || '';
-        
-        if (firstName && lastName) {
-            return `${firstName} ${lastName}`;
-        }
-        
-        return firstName || user?.username || user?.nickname || 'Bruker';
-    }, [user]);
+    const firstName = useFirstName();
+    const lastName = useLastName();
 
-    return fullName;
+    return useMemo(() => {
+        const fullName = lastName ? `${firstName} ${lastName}` : firstName;
+        return fullName.trim();
+    }, [firstName, lastName]);
 }

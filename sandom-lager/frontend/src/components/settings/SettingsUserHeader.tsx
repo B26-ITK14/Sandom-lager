@@ -7,8 +7,7 @@
 
 import { MapPin } from 'lucide-react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useUsername } from '../../hooks/useName';
-import { useUserRole } from '../../hooks/useUserRole';
+import { useUsername, useUserRole } from '../../hooks';
 
 export default function SettingsUserHeader() {
     const userName = useUsername();

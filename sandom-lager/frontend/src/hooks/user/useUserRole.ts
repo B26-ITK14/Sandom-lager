@@ -7,18 +7,18 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-
-type Role = 'admin' | 'manager' | 'user' | null;
+import { AUTH0_AUDIENCE } from '../../config/auth';
+import { fetchCurrentUserRole, type UserRole } from '../../api/user';
 
 interface UseUserRoleResult {
-    role: Role;
+    role: UserRole;
     loading: boolean;
     error: string | null;
 }
 
 export function useUserRole(): UseUserRoleResult {
     const { getAccessTokenSilently, isAuthenticated } = useAuth0();
-    const [role, setRole] = useState<Role>(null);
+    const [role, setRole] = useState<UserRole>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -34,22 +34,13 @@ export function useUserRole(): UseUserRoleResult {
             try {
                 const token = await getAccessTokenSilently({
                     authorizationParams: {
-                        audience: 'https://sandom-api',
+                        audience: AUTH0_AUDIENCE,
                     },
                 });
 
-                const response = await fetch('/api/me', {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                const userRole = await fetchCurrentUserRole(token);
 
-                console.log('[useUserRole] Response status:', response.status);
-
-                if (!response.ok) throw new Error(`Feil ved henting av rolle (${response.status})`);
-
-                const data = await response.json();
-                console.log('[useUserRole] Response data:', data);
-
-                if (!cancelled) setRole(data.role ?? null);
+                if (!cancelled) setRole(userRole);
             } catch (err) {
                 console.error('[useUserRole] Error:', err);
                 if (!cancelled) setError(err instanceof Error ? err.message : 'Ukjent feil');
