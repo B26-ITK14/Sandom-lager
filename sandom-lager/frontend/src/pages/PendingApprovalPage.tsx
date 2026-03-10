@@ -8,7 +8,8 @@
 import { useNavigate } from "react-router-dom";
 import { User, MapPin, Clock } from "lucide-react";
 import OnBoardingTitle from "../components/onBoarding/OnBoardingTitle";
-import { ROUTES } from "../routes";
+import { ROUTES } from "../router/routes";
+
 
 // TODO: Hent faktisk bruker og søknadsstatus fra context/API
 const MOCK_APPLICATION = {

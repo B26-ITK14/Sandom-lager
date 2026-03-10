@@ -119,7 +119,7 @@ export default function PendingCard({
                     <button
                         onClick={() => onApprove(request.id)}
                         disabled={isLoading}
-                        className="flex-1 rounded-xl px-4 py-2 text-xs font-semibold transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 rounded-xl px-4 py-2 text-xs font-semibold transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         style={{
                             backgroundColor: 'var(--color-primary)',
                             color: 'var(--color-on-primary)',
@@ -132,8 +132,8 @@ export default function PendingCard({
                     <button
                         onClick={() => onDeny(request.id)}
                         disabled={isLoading}
-                        className="flex-1 rounded-xl border px-4 py-2 text-xs font-semibold transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{
+                        className="flex-1 rounded-xl border px-4 py-2 text-xs font-semibold transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        style={{                            
                             borderColor: 'var(--color-danger)',
                             color: 'var(--color-danger)',
                             backgroundColor: 'transparent',

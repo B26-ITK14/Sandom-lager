@@ -18,10 +18,6 @@ createRoot(document.getElementById("root")!).render(
         scope: AUTH0_SCOPE,
         audience: AUTH0_AUDIENCE,
       }}
-
-      // La til denne linjen for å bli redirected til "Admin siden"
-        cacheLocation="localstorage"
-
     >
       <App />
     </Auth0Provider>

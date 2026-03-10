@@ -8,7 +8,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LocationSelector, { type Location } from "../components/onBoarding/LocationSelector";import OnBoardingTitle from "../components/onBoarding/OnBoardingTitle";
-import { ROUTES } from "../routes";
+import { ROUTES } from "../router/routes";
 
 // TODO: Bytt ut med API-kall når backend er klar
 const MOCK_LOCATIONS: Location[] = [

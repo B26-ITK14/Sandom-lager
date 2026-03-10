@@ -6,6 +6,7 @@
 */
 
 import { useState } from "react";
+import { useUserRole } from "../hooks/user/useUserRole";
 import { Users, CheckCircle, XCircle, Clock } from "lucide-react";
 import PendingCard, { type AccessRequest } from "../components/onBoarding/PendingCard";
 
@@ -53,9 +54,32 @@ const statCards = [
 ];
 
 export default function AdminPage() {
+    const { role, loading: roleLoading } = useUserRole();
     const [requests, setRequests] = useState<AccessRequest[]>(MOCK_REQUESTS);
     const [activeTab, setActiveTab] = useState<FilterTab>("pending");
     const [loadingId, setLoadingId] = useState<string | null>(null);
+
+    if (roleLoading) {
+        return (
+            <main
+                className="min-h-screen flex items-center justify-center"
+                style={{ backgroundColor: 'var(--color-background)' }}
+            >
+                <p style={{ color: 'var(--color-text-secondary)' }}>Laster...</p>
+            </main>
+        );
+    }
+
+    if (role !== "admin") {
+        return (
+            <main
+                className="min-h-screen flex items-center justify-center"
+                style={{ backgroundColor: 'var(--color-background)' }}
+            >
+                <p style={{ color: 'var(--color-danger)' }}>Du har ikke tilgang til denne siden.</p>
+            </main>
+        );
+    }
 
     const pendingCount = requests.filter((r) => r.status === "pending").length;
     const filtered = requests.filter((r) => activeTab === "all" ? true : r.status === activeTab);
@@ -143,7 +167,8 @@ export default function AdminPage() {
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-150"
+                            
+                            className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-150 cursor-pointer"
                             style={
                                 activeTab === tab
                                     ? {
