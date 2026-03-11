@@ -1,3 +1,10 @@
+/*
+    * SecurityPrivacyCard.tsx
+    * Card component for managing security and privacy settings like password changes, 2FA, and active sessions.
+    * Author: Emil Berglund
+    TODO: Two-factor authentication is currently just a placeholder. Implement actual 2FA setup and management flow, possibly integrating with Auth0's Guardian or a custom solution.
+*/
+
 import { useState } from 'react';
 import { Key, Smartphone, Monitor, Loader, CheckCircle, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth0 } from '@auth0/auth0-react';

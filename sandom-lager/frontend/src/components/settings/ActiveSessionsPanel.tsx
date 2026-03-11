@@ -1,3 +1,9 @@
+/*
+    * ActiveSessionsPanel.tsx
+    * Component for displaying and managing active user sessions, including device info and session revocation.
+    * Author: Emil Berglund
+*/
+
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Monitor, Smartphone, Tablet, X, Loader, AlertCircle, RefreshCw } from 'lucide-react';

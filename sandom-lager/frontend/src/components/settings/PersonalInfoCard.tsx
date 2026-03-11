@@ -1,3 +1,10 @@
+/*
+    * PersonalInfoCard.tsx
+    * Card component for displaying and editing personal information like name, username, email, and location.
+    * Author: Emil Berglund
+    TODO: Split into smaller components (e.g. ProfilePictureUploader, EditableField) for better separation of concerns and reusability.
+*/
+
 import { useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { User, Mail, MapPin, Camera, Save, X, Loader2 } from 'lucide-react';

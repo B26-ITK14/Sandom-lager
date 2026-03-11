@@ -1,3 +1,9 @@
+/*
+    * AccountDetailsCard.tsx
+    * Card component for displaying user account details like role, membership date, and status.
+    * Author: Emil Berglund
+*/
+
 import { Shield } from 'lucide-react';
 
 interface AccountDetailsCardProps {
