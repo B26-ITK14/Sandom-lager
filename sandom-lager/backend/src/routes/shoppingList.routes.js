@@ -1,51 +1,44 @@
 const express = require('express');
 const router = express.Router();
 
+const asyncHandler = require("../utils/asyncHandler");
+
 const { checkJwt } = require("../middleware/checkJwt");
 const { syncUser } = require("../middleware/syncUser");
 const { requireRole } = require("../middleware/requireRole");
 
-const {
-    getShoppingList,
-    createShoppingListItem,
-    updateShoppingListItem,
-    deleteShoppingListItem
-} = require("../controllers/shoppingList.controller");
+const shoppingListController = require("../controllers/shoppingList.controller");
+
+// Apply authentication and user synchronization middleware to all routes in this router
+router.use(checkJwt())
+router.use(syncUser)
 
 // GET - All users can read shopping list
 router.get(
     "/shopping-list",
-    checkJwt(),
-    syncUser,
     requireRole("user", "manager", "admin"),
-    getShoppingList
+    asyncHandler(shoppingListController.getShoppingList)
 );
 
 // POST - Admin and manager can create shopping list items
 router.post(
     "/shopping-list",
-    checkJwt(),
-    syncUser,
     requireRole("admin", "manager"),
-    createShoppingListItem
+    asyncHandler(shoppingListController.createShoppingListItem)
 );
 
 // PUT - Admin and manager can update shopping list items
 router.put(
     "/shopping-list/:id",
-    checkJwt(),
-    syncUser,
     requireRole("admin", "manager"),
-    updateShoppingListItem
+    asyncHandler(shoppingListController.updateShoppingListItem)
 );
 
 // DELETE - Admin can delete shopping list items
 router.delete(
     "/shopping-list/:id",
-    checkJwt(),
-    syncUser,
     requireRole("admin"),
-    deleteShoppingListItem
+    asyncHandler(shoppingListController.deleteShoppingListItem)
 );
 
 module.exports = router;
