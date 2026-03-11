@@ -8,6 +8,7 @@ const inventoryRoutes = require("./routes/inventory.routes");
 const userLocationsRoutes = require("./routes/userLocations.routes");
 const ingredientsRoutes = require("./routes/ingredients.routes");
 const shoppingListRoutes = require("./routes/shoppingList.routes");
+const testRoutes = require("./routes/test.routes");
 
 const PORT = process.env.PORT || 3001;
 

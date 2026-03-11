@@ -118,4 +118,15 @@ CREATE TABLE IF NOT EXISTS logs (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- USER SESSIONS --
+-- Tracks authenticated sessions by JWT ID (jti). Upserted on every request.
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id TEXT PRIMARY KEY,            -- JWT jti claim
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    ip_address TEXT,
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    last_seen_at TIMESTAMP DEFAULT NOW()
+);
+
 

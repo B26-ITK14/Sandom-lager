@@ -48,8 +48,7 @@ async function syncUser(req, res, next) {
         }
 
         // Find user in the database by Auth0 ID
-        let userResult = await pool.query("SELECT * FROM users WHERE auth0_id = $1", [auth0Id]
-        );
+        let userResult = await pool.query("SELECT * FROM users WHERE auth0_id = $1", [auth0Id]);
 
         let user = userResult.rows[0];
 
@@ -73,7 +72,20 @@ async function syncUser(req, res, next) {
         }
 
         // Attach user information to the request object
-        req.user = user; 
+        req.user = user;
+
+        // Track the session by JWT ID (jti) so we can list active sessions without the Management API
+        const jti = req.auth?.jti;
+        if (jti) {
+            const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || null;
+            const ua = req.headers['user-agent'] || null;
+            await pool.query(
+                `INSERT INTO user_sessions (id, user_id, ip_address, user_agent, created_at, last_seen_at)
+                 VALUES ($1, $2, $3, $4, NOW(), NOW())
+                 ON CONFLICT (id) DO UPDATE SET last_seen_at = NOW()`,
+                [jti, user.id, ip, ua]
+            );
+        }
 
         next();
     } catch (err) {
