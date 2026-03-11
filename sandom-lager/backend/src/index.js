@@ -9,6 +9,7 @@ const userLocationsRoutes = require("./routes/userLocations.routes");
 const ingredientsRoutes = require("./routes/ingredients.routes");
 const shoppingListRoutes = require("./routes/shoppingList.routes");
 const testRoutes = require("./routes/test.routes");
+const userRoutes = require("./routes/user.routes");
 
 const PORT = process.env.PORT || 3001;
 
@@ -32,6 +33,7 @@ app.get("/", (req, res) => {
 
 // Sandom API
 app.use("/api", testRoutes);
+app.use("/api", userRoutes);
 app.use("/api/recipes", recipesRoutes);
 app.use("/api", recipeIngredientsRoutes);
 app.use("/api", inventoryRoutes);
