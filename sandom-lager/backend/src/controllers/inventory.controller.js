@@ -25,19 +25,35 @@ async function getInventory(req, res) {
     }
 }
 
-// POST api/inventory - Add a new inventory item
+// POST api/inventory
 async function createInventory(req, res) {
     try {
         const { ingredient_id, location_id, quantity } = req.body;
 
-        // Validate required fields
         if (!ingredient_id || !location_id || quantity === undefined) {
-            return res.status(400).json({ message: "Missing required fields: ingredient_id, location_id, quantity" });
+            return res.status(400).json({
+                message: "Missing required fields: ingredient_id, location_id, quantity"
+            });
         }
 
         const result = await pool.query(
-            "INSERT INTO inventory (ingredient_id, location_id, quantity) VALUES ($1, $2, $3) RETURNING *",
+            `INSERT INTO inventory (ingredient_id, location_id, quantity) 
+             VALUES ($1, $2, $3) 
+             RETURNING *`,
             [ingredient_id, location_id, quantity]
+        );
+
+        const ingredientResult = await pool.query(
+            `SELECT name FROM ingredients WHERE id = $1`,
+            [ingredient_id]
+        );
+
+        const ingredientName =
+            ingredientResult.rows[0]?.name || ingredient_id;
+
+        await logAction(
+            req.user,
+            `La til inventar: ${ingredientName} (${quantity})`
         );
 
         res.status(201).json(result.rows[0]);
@@ -48,33 +64,42 @@ async function createInventory(req, res) {
     }
 }
 
-// PUT api/inventory/:id - Update an existing inventory item
+// PUT api/inventory/:id
 async function updateInventory(req, res) {
     try {
         const { id } = req.params;
-        const { quantity } = req.body;  
+        const { quantity } = req.body;
 
-        // Validate required fields
         if (quantity === undefined) {
-            return res.status(400).json({ message: "Missing required field: quantity" });
+            return res.status(400).json({
+                message: "Missing required field: quantity"
+            });
         }
 
         const result = await pool.query(
-            "UPDATE inventory SET quantity = $1 WHERE id = $2 RETURNING *",
+            `UPDATE inventory inv
+             SET quantity = $1
+             FROM ingredients i
+             WHERE inv.id = $2
+             AND inv.ingredient_id = i.id
+             RETURNING inv.id, inv.quantity, i.name`,
             [quantity, id]
         );
 
         if (result.rows.length === 0) {
-            return res.status(404).json({ message: "Inventory item not found" });
+            return res.status(404).json({
+                message: "Inventory item not found"
+            });
         }
 
-        //Log the inventory update event
+        const item = result.rows[0];
+
         await logAction(
             req.user,
-            `Inventar oppdatert: ID ${id}, ny mengde: ${quantity}`
+            `Oppdaterte inventar: ${item.name} → ny mengde ${item.quantity}`
         );
 
-        res.json(result.rows[0]);
+        res.json(item);
 
     } catch (err) {
         console.error("updateInventory error:", err);
@@ -82,26 +107,47 @@ async function updateInventory(req, res) {
     }
 }
 
-// DELETE api/inventory/:id - Delete an inventory item
+// DELETE api/inventory/:id
 async function deleteInventory(req, res) {
     try {
         const { id } = req.params;
 
-        const result = await pool.query("DELETE FROM inventory WHERE id = $1 RETURNING *", [id]);
+        const result = await pool.query(
+            `DELETE FROM inventory WHERE id = $1 RETURNING *`,
+            [id]
+        );
 
-        // If no inventory item is found with the given ID, return a 404 error
         if (result.rows.length === 0) {
-            return res.status(404).json({ message: "Inventory item not found" });
+            return res.status(404).json({
+                message: "Inventory item not found"
+            });
         }
 
-         res.json({
+        const deleted = result.rows[0];
+
+        const ingredientResult = await pool.query(
+            `SELECT name FROM ingredients WHERE id = $1`,
+            [deleted.ingredient_id]
+        );
+
+        const ingredientName =
+            ingredientResult.rows[0]?.name || deleted.ingredient_id;
+
+        await logAction(
+            req.user,
+            `Slettet inventar: ${ingredientName}`
+        );
+
+        res.json({
             message: "Inventory item deleted",
-            deleted: result.rows[0]
-            })
+            deleted
+        });
 
     } catch (err) {
         console.error("deleteInventory error:", err);
-        res.status(500).json({ message: "Failed to delete inventory item" });
+        res.status(500).json({
+            message: "Failed to delete inventory item"
+        });
     }
 }
 

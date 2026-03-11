@@ -2,10 +2,12 @@ const pool = require('../db/pool');
 
 async function logAction(user, action) {
     try {
-
         const message = `${user.name} ${action}`;
 
-        console.log(`[LOG] ${message}`);
+        //Format time for logging
+        const timestamp = new Date().toLocaleString('no-NO')
+
+        console.log(`[LOG] [${timestamp}] ${message}`);
 
         await pool.query(
             `INSERT INTO logs (user_id, action)
