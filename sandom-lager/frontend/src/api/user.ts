@@ -11,7 +11,15 @@ export type { UserRole };
 
 type MeResponse = {
     role?: UserRole;
+    name?: string;
 };
+
+export async function fetchMe(accessToken: string): Promise<{ role: UserRole; name: string }> {
+    const data = await apiFetchJson<MeResponse>("/api/me", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return { role: data.role ?? null, name: data.name ?? '' };
+}
 
 /**
  * Triggers an Auth0 password reset email for the given email address.

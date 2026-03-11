@@ -5,22 +5,32 @@
 */
 
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import SettingsLayout from "../../components/settings/SettingsLayout";
 import PersonalInfoCard from '../../components/settings/PersonalInfoCard';
 import AccountDetailsCard from '../../components/settings/AccountDetailsCard';
 import SecurityPrivacyCard from '../../components/settings/SecurityPrivacyCard';
-import { useUsername, useFullName, useUserRole } from '../../hooks';
-import { updateName } from '../../api/user';
+import { useUsername, useUserRole } from '../../hooks';
+import { updateName, fetchMe } from '../../api/user';
 
 export default function MyAccountPage() {
     const { user, getAccessTokenSilently } = useAuth0();
     const username = useUsername();
-    const fullName = useFullName();
     const { role } = useUserRole();
 
-    const [displayName, setDisplayName] = useState(fullName);
+    const [displayName, setDisplayName] = useState('');
+
+    // Fetch the authoritative name from the DB on mount — the Auth0 SDK caches
+    // the ID token so user.name stays stale until re-login.
+    useEffect(() => {
+        let cancelled = false;
+        getAccessTokenSilently()
+            .then((token) => fetchMe(token))
+            .then(({ name }) => { if (!cancelled) setDisplayName(name); })
+            .catch(() => {});
+        return () => { cancelled = true; };
+    }, [getAccessTokenSilently]);
 
     const email = user?.email ?? 'N/A';
     const memberSince = user?.updated_at
