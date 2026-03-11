@@ -1,4 +1,5 @@
 const pool = require("../db/pool");
+const { logAction } = require("../utils/logger");
 
 // GET api/inventory - Get all inventory items
 async function getInventory(req, res) {
@@ -66,6 +67,12 @@ async function updateInventory(req, res) {
         if (result.rows.length === 0) {
             return res.status(404).json({ message: "Inventory item not found" });
         }
+
+        //Log the inventory update event
+        await logAction(
+            req.user,
+            `Inventar oppdatert: ID ${id}, ny mengde: ${quantity}`
+        );
 
         res.json(result.rows[0]);
 

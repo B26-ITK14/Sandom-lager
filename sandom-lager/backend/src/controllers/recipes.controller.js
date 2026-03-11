@@ -1,6 +1,5 @@
 const pool = require("../db/pool");
-
-import { logEvent } from "../services/logger";
+const { logAction } = require("../utils/logger");
 
 // GET /recipes - Get all recipes
 async function getAllRecipes(req, res) {
@@ -46,10 +45,9 @@ async function createRecipe(req, res) {
         const recipe = result.rows[0];
 
         // Log the recipe creation event
-        await logEvent(
-            "RECIPE_CREATED",
-            `Recipe created: ${recipe.title}`,
-            { recipeId: recipe.id }
+        await logAction(
+            req.user,
+            `Oppskrift opprettet: ${recipe.title}`
         );
 
         res.status(201).json(recipe);
@@ -81,6 +79,12 @@ async function updateRecipe(req, res) {
             return res.status(404).json({ message: "Recipe not found" });
         }
 
+        // Log the recipe update event
+        await logAction(
+            req.user,
+            `Oppskrift ${id} oppdatert`
+        );
+
         res.json(result.rows[0]);
     } catch (err) {
         console.error("updateRecipe error:", err);
@@ -102,6 +106,12 @@ async function deleteRecipe(req, res) {
         if (result.rowCount === 0) {
             return res.status(404).json({ message: "Recipe not found" });
         }
+        
+        // Log the recipe deletion event
+        await logAction(
+            req.user,
+            `Oppskrift ${id} slettet`
+        );
 
         return res.json({ message: "Recipe deleted" });
 
