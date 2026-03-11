@@ -7,10 +7,11 @@
 
 import { MapPin } from 'lucide-react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useUsername, useUserRole } from '../../hooks';
+import { useUserRole } from '../../hooks';
+import { useUppercaseUsername } from '../../hooks/user/useName';
 
 export default function SettingsUserHeader() {
-    const userName = useUsername();
+    const userName = useUppercaseUsername();
     const { user } = useAuth0();
     const { role, loading: roleLoading } = useUserRole();
 
