@@ -5,32 +5,19 @@
 */
 
 
-import { useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import SettingsLayout from "../../components/settings/SettingsLayout";
 import PersonalInfoCard from '../../components/settings/PersonalInfoCard';
 import AccountDetailsCard from '../../components/settings/AccountDetailsCard';
 import SecurityPrivacyCard from '../../components/settings/SecurityPrivacyCard';
-import { useUsername, useUserRole } from '../../hooks';
-import { updateName, fetchMe } from '../../api/user';
+import { useUsername } from '../../hooks';
+import { updateName } from '../../api/user';
+import { useUser } from '../../context/UserContext';
 
 export default function MyAccountPage() {
     const { user, getAccessTokenSilently } = useAuth0();
     const username = useUsername();
-    const { role } = useUserRole();
-
-    const [displayName, setDisplayName] = useState('');
-
-    // Fetch the authoritative name from the DB on mount — the Auth0 SDK caches
-    // the ID token so user.name stays stale until re-login.
-    useEffect(() => {
-        let cancelled = false;
-        getAccessTokenSilently()
-            .then((token) => fetchMe(token))
-            .then(({ name }) => { if (!cancelled) setDisplayName(name); })
-            .catch(() => {});
-        return () => { cancelled = true; };
-    }, [getAccessTokenSilently]);
+    const { name: displayName, role, setName: setDisplayName } = useUser();
 
     const email = user?.email ?? 'N/A';
     const memberSince = user?.updated_at
@@ -38,9 +25,16 @@ export default function MyAccountPage() {
         : 'N/A';
 
     const handleSavePersonalInfo = async (data: { name: string; username: string; location: string }) => {
-        const token = await getAccessTokenSilently();
-        await updateName(data.name, token);
-        setDisplayName(data.name);
+        console.log('[MyAccountPage] handleSavePersonalInfo called with:', data);
+        try {
+            const token = await getAccessTokenSilently();
+            await updateName(data.name, token);
+            setDisplayName(data.name);
+            console.log('[MyAccountPage] Name updated successfully →', data.name);
+        } catch (err) {
+            console.error('[MyAccountPage] Failed to update name:', err);
+            throw err;
+        }
     };
 
     return (

@@ -37,23 +37,50 @@ export default function PersonalInfoCard({
     const [displayEmail, setDisplayEmail] = useState(email);
     const [editedEmail, setEditedEmail] = useState(email);
     const [emailError, setEmailError] = useState('');
+    const [nameError, setNameError] = useState('');
 
     const handleSave = async () => {
+        const emailChanged = isPasswordUser && editedEmail.trim() !== displayEmail && editedEmail.trim() !== '';
+        const nameChanged = editedName.trim() !== name.trim();
+        const usernameChanged = editedUsername.trim() !== username.trim();
+        const locationChanged = editedLocation.trim() !== location.trim();
+        const profileChanged = nameChanged || usernameChanged || locationChanged;
+
+        // Nothing changed — close without any API calls
+        if (!emailChanged && !profileChanged) {
+            setIsEditing(false);
+            return;
+        }
+
         setEmailError('');
+        setNameError('');
         setIsSaving(true);
-        try {
-            if (isPasswordUser && editedEmail.trim() && editedEmail.trim() !== displayEmail) {
+
+        let emailOk = true;
+        let nameOk = true;
+
+        if (emailChanged) {
+            try {
                 const token = await getAccessTokenSilently();
                 await requestEmailChange(editedEmail.trim(), token);
                 setDisplayEmail(editedEmail.trim());
+            } catch (err) {
+                setEmailError(err instanceof Error ? err.message : 'Kunne ikke oppdatere e-post');
+                emailOk = false;
             }
-            await onSave({ name: editedName, username: editedUsername, location: editedLocation });
-            setIsEditing(false);
-        } catch (err) {
-            setEmailError(err instanceof Error ? err.message : 'Kunne ikke lagre');
-        } finally {
-            setIsSaving(false);
         }
+
+        if (profileChanged) {
+            try {
+                await onSave({ name: editedName, username: editedUsername, location: editedLocation });
+            } catch (err) {
+                setNameError(err instanceof Error ? err.message : 'Kunne ikke oppdatere navn');
+                nameOk = false;
+            }
+        }
+
+        setIsSaving(false);
+        if (emailOk && nameOk) setIsEditing(false);
     };
 
     const handleCancel = () => {
@@ -62,6 +89,7 @@ export default function PersonalInfoCard({
         setEditedLocation(location);
         setEditedEmail(displayEmail);
         setEmailError('');
+        setNameError('');
         setIsEditing(false);
     };
 
@@ -150,17 +178,22 @@ export default function PersonalInfoCard({
                         Navn
                     </label>
                     {isEditing ? (
-                        <input
-                            type="text"
-                            value={editedName}
-                            onChange={(e) => setEditedName(e.target.value)}
-                            className="w-full px-4 py-2 rounded-lg"
-                            style={{
-                                backgroundColor: 'var(--color-background)',
-                                color: 'var(--color-text-primary)',
-                                border: '1px solid var(--color-border)',
-                            }}
-                        />
+                        <>
+                            <input
+                                type="text"
+                                value={editedName}
+                                onChange={(e) => { setEditedName(e.target.value); setNameError(''); }}
+                                className="w-full px-4 py-2 rounded-lg"
+                                style={{
+                                    backgroundColor: 'var(--color-background)',
+                                    color: 'var(--color-text-primary)',
+                                    border: nameError ? '1px solid #ef4444' : '1px solid var(--color-border)',
+                                }}
+                            />
+                            {nameError && (
+                                <p className="text-xs mt-1 px-1" style={{ color: '#ef4444' }}>{nameError}</p>
+                            )}
+                        </>
                     ) : (
                         <p className="px-4 py-2" style={{ color: 'var(--color-text-secondary)' }}>
                             {name}

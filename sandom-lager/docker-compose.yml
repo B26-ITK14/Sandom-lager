@@ -48,6 +48,8 @@ services:
       DATABASE_URL: postgres://admin:admin@db:5432/sandomlager
       AUTH0_DOMAIN: sandomstiftelsen.eu.auth0.com
       AUTH0_AUDIENCE: https://sandom-api
+      AUTH0_M2M_CLIENT_ID: ${AUTH0_M2M_CLIENT_ID}
+      AUTH0_M2M_CLIENT_SECRET: ${AUTH0_M2M_CLIENT_SECRET}
     depends_on:
       - db
 
