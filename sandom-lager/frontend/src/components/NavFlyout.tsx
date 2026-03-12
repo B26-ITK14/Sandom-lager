@@ -61,11 +61,13 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         className="flex items-center gap-3 py-6 px-8 rounded-br-3xl"
                         style={{ backgroundColor: 'var(--color-surface)' }}
                     >
-                        <img
-                            src={imageSrc}
-                            alt="Profile Picture"
-                            className="w-14 h-14 rounded-full"
-                        />
+                        <div className="w-14 aspect-square overflow-hidden rounded-full">
+                            <img
+                                src={imageSrc}
+                                alt="Profile Picture"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
                         <div>
                             <p className="font-bold text-lg" style={{ color: 'var(--color-text-primary)' }}>
                                 {username}
