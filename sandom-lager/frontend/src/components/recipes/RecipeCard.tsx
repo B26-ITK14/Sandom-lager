@@ -10,6 +10,8 @@ interface RecipeCardProps {
 }
 
 // TODO: Add image support and click handling to navigate to recipe details page
+// TODO: Add checkbox for selecting recipes for shopping list generation
+// TODO: Add allergy information based on recipe data
 
 export default function RecipeCard({ recipe }: RecipeCardProps) {
 
