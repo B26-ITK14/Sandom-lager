@@ -5,9 +5,9 @@
 */
 
 import { Key } from 'lucide-react';
-import PasswordChangeButton from './PasswordChangeButton';
-import TwoFactorAuthButton from './TwoFactorAuthButton';
-import ActiveSessionsToggle from './ActiveSessionsToggle';
+import PasswordChangeButton from './securityPrivacy/PasswordChangeButton';
+import TwoFactorAuthButton from './securityPrivacy/TwoFactorAuthButton';
+import ActiveSessionsToggle from './securityPrivacy/ActiveSessionsToggle';
 
 export default function SecurityPrivacyCard() {
     return (

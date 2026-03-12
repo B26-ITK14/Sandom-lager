@@ -7,7 +7,7 @@
 
 import { useAuth0 } from '@auth0/auth0-react';
 import SettingsLayout from "../../components/settings/SettingsLayout";
-import PersonalInfoCard from '../../components/settings/PersonalInfoCard';
+import PersonalInfoCard from '../../components/settings/accountSettings/PersonalInfoCard';
 import AccountDetailsCard from '../../components/settings/accountSettings/AccountDetailsCard';
 import SecurityPrivacyCard from '../../components/settings/accountSettings/SecurityPrivacyCard';
 

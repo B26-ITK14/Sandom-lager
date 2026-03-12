@@ -7,8 +7,8 @@
 import { useState } from 'react';
 import { Key, Loader, CheckCircle, AlertCircle, X } from 'lucide-react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { env } from '../../../config/env';
-import { requestPasswordChange } from '../../../api/user';
+import { env } from '../../../../config/env';
+import { requestPasswordChange } from '../../../../api/user';
 
 export default function PasswordChangeButton() {
     const { user } = useAuth0();

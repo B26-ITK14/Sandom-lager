@@ -7,8 +7,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { X, Loader, AlertCircle, RefreshCw } from 'lucide-react';
-import { AUTH0_AUDIENCE } from '../../../config/auth';
-import { fetchSessions, revokeSession, type Auth0Session } from '../../../api/user';
+import { AUTH0_AUDIENCE } from '../../../../config/auth';
+import { fetchSessions, revokeSession, type Auth0Session } from '../../../../api/user';
 import { parseUserAgent, getDeviceIcon, formatRelative } from './sessionUtils';
 
 export default function ActiveSessionsPanel() {
