@@ -16,6 +16,7 @@ const {
 router.get("/recipes/:id/ingredients", 
     checkJwt(),
     syncUser,
+    requireRole("user", "admin", "manager"),
     getRecipeIngredients
 );
 
