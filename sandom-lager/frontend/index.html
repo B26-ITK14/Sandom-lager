@@ -5,6 +5,15 @@
     <!-- Icon here-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sandom Lager</title>
+    <script>
+      (function () {
+        try {
+          var fs = JSON.parse(localStorage.getItem('app:fontSize'));
+          var sizes = { small: '87.5%', medium: '100%', large: '112.5%' };
+          if (sizes[fs]) document.documentElement.style.fontSize = sizes[fs];
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

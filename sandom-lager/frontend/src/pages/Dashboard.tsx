@@ -2,15 +2,15 @@
  * Dashboard.tsx
  */
 
-import { useUsername } from "../hooks";
 import Layout from "../components/Layout";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect } from "react";
 import ToggleThemeButton from "../components/ToggleThemeButton";
 import { AUTH0_AUDIENCE } from "../config/auth";
+import { useUppercaseUsername } from "../hooks/user/useName";
 
 export default function HomePage() {
-    const username = useUsername();
+    const username = useUppercaseUsername();
     const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
     // Debugging: Log access token to verify Auth0 integration
