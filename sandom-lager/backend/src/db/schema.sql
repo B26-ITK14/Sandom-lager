@@ -26,6 +26,16 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- USER SESSIONS --
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id TEXT PRIMARY KEY,                          -- JWT jti claim
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    ip_address TEXT,
+    user_agent TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    last_seen_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 -- USER LOCATION ACCESS --
 CREATE TABLE IF NOT EXISTS user_locations (
     id SERIAL PRIMARY KEY,

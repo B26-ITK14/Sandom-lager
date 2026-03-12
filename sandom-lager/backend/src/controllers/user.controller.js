@@ -51,9 +51,13 @@ async function getSessions(req, res) {
     console.log(`[getSessions] Fetching sessions for user id: ${req.user.id}`);
     try {
         const result = await pool.query(
-            `SELECT id, ip_address, user_agent, created_at, last_seen_at
-             FROM user_sessions
-             WHERE user_id = $1
+            `SELECT * FROM (
+               SELECT DISTINCT ON (ip_address, user_agent)
+                 id, ip_address, user_agent, created_at, last_seen_at
+               FROM user_sessions
+               WHERE user_id = $1
+               ORDER BY ip_address, user_agent, last_seen_at DESC
+             ) deduped
              ORDER BY last_seen_at DESC`,
             [req.user.id]
         );
@@ -82,15 +86,19 @@ async function revokeSession(req, res) {
     const { sessionId } = req.params;
     console.log(`[revokeSession] user id: ${req.user.id}, sessionId: ${sessionId}`);
     try {
+        // Delete all sessions from the same device (same ip+user_agent) as the given session ID
         const result = await pool.query(
-            "DELETE FROM user_sessions WHERE id = $1 AND user_id = $2",
-            [sessionId, req.user.id]
+            `DELETE FROM user_sessions
+             WHERE user_id = $1
+               AND ip_address = (SELECT ip_address FROM user_sessions WHERE id = $2 AND user_id = $1)
+               AND user_agent  = (SELECT user_agent  FROM user_sessions WHERE id = $2 AND user_id = $1)`,
+            [req.user.id, sessionId]
         );
         if (result.rowCount === 0) {
             console.warn(`[revokeSession] No session found or access denied — sessionId: ${sessionId}, user: ${req.user.id}`);
             return res.status(403).json({ message: "Ingen tilgang til denne sesjonen" });
         }
-        console.log(`[revokeSession] Session ${sessionId} revoked for user id: ${req.user.id}`);
+        console.log(`[revokeSession] ${result.rowCount} session row(s) revoked for device of sessionId ${sessionId}, user id: ${req.user.id}`);
         res.sendStatus(204);
     } catch (err) {
         console.error("[revokeSession] error:", err.message);

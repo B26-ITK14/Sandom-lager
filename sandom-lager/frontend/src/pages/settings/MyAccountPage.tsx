@@ -8,8 +8,8 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import SettingsLayout from "../../components/settings/SettingsLayout";
 import PersonalInfoCard from '../../components/settings/PersonalInfoCard';
-import AccountDetailsCard from '../../components/settings/AccountDetailsCard';
-import SecurityPrivacyCard from '../../components/settings/SecurityPrivacyCard';
+import AccountDetailsCard from '../../components/settings/accountSettings/AccountDetailsCard';
+import SecurityPrivacyCard from '../../components/settings/accountSettings/SecurityPrivacyCard';
 import { useUsername } from '../../hooks';
 import { updateName } from '../../api/user';
 import { useUser } from '../../context/UserContext';

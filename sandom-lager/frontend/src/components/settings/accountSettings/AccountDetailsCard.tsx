@@ -34,7 +34,7 @@ export default function AccountDetailsCard({ role, memberSince }: AccountDetails
                         className="px-3 py-1 rounded-full text-sm font-medium capitalize"
                         style={{ backgroundColor: 'var(--color-background)', color: 'var(--color-primary)' }}
                     >
-                        {role || 'user'}
+                        {role || 'N/A'}
                     </span>
                 </div>
                 <div className="flex justify-between items-center">

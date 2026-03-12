@@ -69,8 +69,10 @@ async function syncUser(req, res, next) {
         // Attach user information to the request object
         req.user = user;
 
-        // Track the session by JWT ID (jti) so we can list active sessions without the Management API
-        const jti = req.auth?.jti;
+        // Track the session by JWT ID (jti) so we can list active sessions without the Management API.
+        // Auth0 access tokens do not always include a jti claim, so fall back to a
+        // deterministic id built from sub + iat — unique per issued token (per login).
+        const jti = req.auth?.jti ?? `${req.auth.sub}:${req.auth.iat}`;
         if (jti) {
             const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || null;
             const ua = req.headers['user-agent'] || null;
