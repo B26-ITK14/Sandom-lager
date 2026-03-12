@@ -110,7 +110,7 @@ export default function PersonalInfoCard({
                 </div>
                 {!isEditing ? (
                     <button
-                        onClick={() => { setEditedEmail(displayEmail); setIsEditing(true); }}
+                        onClick={() => { setEditedName(name); setEditedUsername(username); setEditedLocation(location); setEditedEmail(displayEmail); setIsEditing(true); }}
                         className="px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
                         style={{
                             backgroundColor: 'var(--color-primary)',

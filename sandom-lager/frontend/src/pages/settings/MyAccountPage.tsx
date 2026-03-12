@@ -10,14 +10,16 @@ import SettingsLayout from "../../components/settings/SettingsLayout";
 import PersonalInfoCard from '../../components/settings/PersonalInfoCard';
 import AccountDetailsCard from '../../components/settings/accountSettings/AccountDetailsCard';
 import SecurityPrivacyCard from '../../components/settings/accountSettings/SecurityPrivacyCard';
-import { useUsername } from '../../hooks';
+
 import { updateName } from '../../api/user';
 import { useUser } from '../../context/UserContext';
+import { useUsername } from '../../hooks';
 
 export default function MyAccountPage() {
-    const { user, getAccessTokenSilently } = useAuth0();
     const username = useUsername();
-    const { name: displayName, role, setName: setDisplayName } = useUser();
+    const { user, getAccessTokenSilently } = useAuth0();
+    const { name: displayName, role, blocked, setName: setDisplayName } = useUser();
+
 
     const email = user?.email ?? 'N/A';
     const memberSince = user?.updated_at
@@ -46,7 +48,7 @@ export default function MyAccountPage() {
                     email={email}
                     onSave={handleSavePersonalInfo}
                 />
-                <AccountDetailsCard role={role} memberSince={memberSince} />
+                <AccountDetailsCard role={role} memberSince={memberSince} blocked={blocked} />
                 <SecurityPrivacyCard />
             </div>
         </SettingsLayout>
