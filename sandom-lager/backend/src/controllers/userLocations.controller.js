@@ -1,4 +1,5 @@
 const pool = require("../db/pool");
+const ApiError = require("../utils/ApiError");
 
 // POST api/user-locations/request - User requests access to a location
 async function requestLocationAccess(req, res) {

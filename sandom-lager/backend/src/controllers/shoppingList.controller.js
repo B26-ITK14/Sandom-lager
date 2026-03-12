@@ -1,4 +1,5 @@
 const pool = require('../db/pool');
+const ApiError = require('../utils/ApiError');
 
 // GET /api/shopping-list - Get all shopping list items
 async function getShoppingList(req, res) {

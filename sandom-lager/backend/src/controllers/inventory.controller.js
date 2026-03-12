@@ -1,34 +1,30 @@
 const pool = require("../db/pool");
+const ApiError = require("../utils/ApiError");
 const { logAction } = require("../utils/logger");
 
 // GET api/inventory - Get all inventory items
 async function getInventory(req, res) {
-    try {
-        const result = await pool.query(
-            `SELECT 
-            inv.id,
-            inv.quantity,
-            i.name AS ingredient,
-            i.unit,
-            l.name AS location
-            FROM inventory inv
-            JOIN ingredients i ON inv.ingredient_id = i.id
-            JOIN locations l ON inv.location_id = l.id
-            ORDER BY inv.id DESC`
+    
+    const result = await pool.query(
+        `SELECT 
+        inv.id,
+        inv.quantity,
+        i.name AS ingredient,
+        i.unit,
+        l.name AS location
+        FROM inventory inv
+        JOIN ingredients i ON inv.ingredient_id = i.id
+        JOIN locations l ON inv.location_id = l.id
+        ORDER BY inv.id DESC`
         );
 
         res.json(result.rows);
-
-    } catch (err) {
-        console.error("getInventory error:", err);
-        res.status(500).json({ message: "Failed to fetch inventory" });
-    }
 }
 
 // POST api/inventory
 async function createInventory(req, res) {
-    try {
-        const { ingredient_id, location_id, quantity } = req.body;
+    
+    const { ingredient_id, location_id, quantity } = req.body;
 
         if (!ingredient_id || !location_id || quantity === undefined) {
             return res.status(400).json({
@@ -58,10 +54,6 @@ async function createInventory(req, res) {
 
         res.status(201).json(result.rows[0]);
 
-    } catch (err) {
-        console.error("createInventory error:", err);
-        res.status(500).json({ message: "Failed to create inventory item" });
-    }
 }
 
 // PUT api/inventory/:id

@@ -1,4 +1,5 @@
 const pool = require("../db/pool");
+const ApiError = require("../utils/ApiError");
 
 // GET /api/recipes/:id/ingredients
 // Henter alle ingredienser for en spesifikk oppskrift

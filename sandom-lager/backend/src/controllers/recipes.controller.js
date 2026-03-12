@@ -1,5 +1,6 @@
 const pool = require("../db/pool");
 const { logAction } = require("../utils/logger");
+const ApiError = require("../utils/ApiError");
 
 // GET /recipes
 async function getAllRecipes(req, res) {

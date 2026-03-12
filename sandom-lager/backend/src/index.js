@@ -1,7 +1,10 @@
 const express = require("express");
 require("dotenv").config();
 
+const ErrorHandler = require("./middleware/errorHandler");
+const ApiError = require("./utils/ApiError");
 
+// Routes
 const recipesRoutes = require("./routes/recipes.routes");
 const recipeIngredientsRoutes = require("./routes/recipeIngredients.routes");
 const inventoryRoutes = require("./routes/inventory.routes");
@@ -21,16 +24,18 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "http://localhost:5173");
     res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+
     if (req.method === "OPTIONS") return res.sendStatus(204);
+
     next();
 });
 
-// Test route
+// Health check endpoint
 app.get("/", (req, res) => {
   res.send("Backend kjører - Sandom Lager");
 });
 
-// Sandom API
+// Sandom API endpoints
 app.use("/api", testRoutes);
 app.use("/api/recipes", recipesRoutes);
 app.use("/api", recipeIngredientsRoutes);
@@ -39,20 +44,27 @@ app.use("/api", userLocationsRoutes);
 app.use("/api", ingredientsRoutes);
 app.use("/api", shoppingListRoutes);
 
+// 404 handler for unknown routes
+app.use((req, res, next) => {
+  next(new ApiError(404, "Route not found"));
+});
+
 // Error handling middleware for JWT authentication errors and other server errors
 // express-jwt v8 throws InvalidTokenError (403) for bad tokens and UnauthorizedError (401) for missing tokens
 app.use((err, req, res, next) => {
-  console.error("[error handler]", err.name, err.message);
-
   if (err.name === "UnauthorizedError" || err.name === "InvalidTokenError") {
     return res.status(401).json({
+      success: false,
       message: "Invalid or missing token",
       detail: err.message,
     });
   }
 
-  res.status(500).json({ message: "Internal server error" });
+  next(err);
 });
+
+// Global error handler
+app.use(ErrorHandler);
 
 // Start server
 app.listen(PORT, () => {

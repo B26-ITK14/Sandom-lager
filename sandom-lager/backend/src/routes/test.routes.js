@@ -9,7 +9,7 @@ const { requireRole } = require("../middleware/requireRole");
 router.use(checkJwt())
 router.use(syncUser)
 
-// Use Postman or similar tool to test these endpoints with a valid JWT in the Authorization header
+// Use Postman to test these endpoints with a valid JWT in the Authorization header
 router.get("/test-secure", 
   (req, res) => {
   res.json({ 
