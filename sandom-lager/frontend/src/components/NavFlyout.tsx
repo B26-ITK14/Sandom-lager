@@ -5,8 +5,8 @@
     * Author: Emil Berglund
 */
 
-import { X, Search, Power } from 'lucide-react';
-import { useUsername } from '../hooks';
+import { X, Power } from 'lucide-react';
+import { useUppercaseUsername } from '../hooks/user/useName';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getAllMainRoutes } from '../router/nav';
 import { version } from '../../package.json';
@@ -18,7 +18,7 @@ interface NavFlyoutProps {
 }
 
 export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
-    const username = useUsername();
+    const username = useUppercaseUsername();
     const { logoutUser, isLoggingOut } = useAppLogout(onClose);
     const navigate = useNavigate();
     const location = useLocation();
@@ -78,27 +78,6 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         <X size={28} />
                     </button>
                 </section>
-
-                {/* Search bar */}
-                <div className={`p-6 ${isOpen ? 'animate-slide-in-left animate-delay-100' : ''}`}>
-                    <div className="relative">
-                        <Search
-                            size={20}
-                            className="absolute left-4 top-1/2 transform -translate-y-1/2"
-                            style={{ color: 'var(--color-text-secondary)' }}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Søk etter noe.."
-                            className="w-full pl-12 pr-4 py-3 rounded-full border"
-                            style={{
-                                backgroundColor: 'var(--color-background)',
-                                borderColor: 'var(--color-border)',
-                                color: 'var(--color-text-primary)',
-                            }}
-                        />
-                    </div>
-                </div>
 
                 {/* Navigation links */}
                 <nav className={`flex-1 py-4 overflow-y-auto ${isOpen ? 'animate-slide-in-left animate-delay-100' : ''}`}>
