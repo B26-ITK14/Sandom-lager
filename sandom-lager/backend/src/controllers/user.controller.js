@@ -1,6 +1,9 @@
 const pool = require("../db/pool");
 const { callManagementApi } = require("../lib/auth0Management");
 
+const MAX_PROFILE_PICTURE_BYTES = 5 * 1024 * 1024;
+const PROFILE_PICTURE_PATTERN = /^data:image\/(png|jpeg|jpg|gif|webp);base64,[A-Za-z0-9+/=]+$/;
+
 // GET /me - Returns the current authenticated user's profile
 async function getMe(req, res) {
     console.log(`[getMe] user id: ${req.user.id}, role: ${req.user.role}`);
@@ -9,6 +12,7 @@ async function getMe(req, res) {
         name: req.user.name,
         email: req.user.email,
         role: req.user.role,
+        profilePicture: req.user.profile_picture || null,
     });
 }
 
@@ -156,4 +160,36 @@ async function updateEmail(req, res) {
     }
 }
 
-module.exports = { getMe, updateName, getSessions, revokeSession, updateEmail };
+// PATCH /me/profile-picture - Stores a base64 image for the current user
+async function updateProfilePicture(req, res) {
+    const { profilePicture } = req.body;
+    console.log(`[updateProfilePicture] user id: ${req.user.id}`);
+
+    if (!profilePicture || typeof profilePicture !== "string") {
+        console.warn('[updateProfilePicture] Validation failed: profilePicture missing or invalid type');
+        return res.status(400).json({ message: "Profilbildet er påkrevd" });
+    }
+
+    if (!PROFILE_PICTURE_PATTERN.test(profilePicture)) {
+        console.warn('[updateProfilePicture] Validation failed: unsupported file format');
+        return res.status(400).json({ message: "Kun JPG, PNG, GIF og WEBP er tillatt" });
+    }
+
+    const base64Payload = profilePicture.split(',')[1] || '';
+    const byteSize = Buffer.from(base64Payload, 'base64').length;
+    if (byteSize > MAX_PROFILE_PICTURE_BYTES) {
+        console.warn(`[updateProfilePicture] Validation failed: file too large (${byteSize} bytes)`);
+        return res.status(400).json({ message: "Profilbildet kan maks være 5 MB" });
+    }
+
+    try {
+        await pool.query("UPDATE users SET profile_picture = $1 WHERE id = $2", [profilePicture, req.user.id]);
+        console.log(`[updateProfilePicture] Profile picture updated for user id: ${req.user.id}`);
+        res.json({ profilePicture });
+    } catch (err) {
+        console.error("[updateProfilePicture] error:", err.message);
+        res.status(500).json({ message: "Kunne ikke oppdatere profilbildet" });
+    }
+}
+
+module.exports = { getMe, updateName, getSessions, revokeSession, updateEmail, updateProfilePicture };

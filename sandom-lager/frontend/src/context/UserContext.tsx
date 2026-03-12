@@ -17,10 +17,12 @@ interface UserContextValue {
     name: string;
     role: UserRole;
     blocked: boolean;
+    profilePicture: string | null;
     loading: boolean;
     error: string | null;
     /** Optimistic local update — call after a successful name-change API call */
     setName: (name: string) => void;
+    setProfilePicture: (profilePicture: string | null) => void;
     /** Full re-fetch from the backend — use sparingly */
     refresh: () => void;
 }
@@ -32,6 +34,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const [name, setName] = useState('');
     const [role, setRole] = useState<UserRole>(null);
     const [blocked, setBlocked] = useState(false);
+    const [profilePicture, setProfilePicture] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -55,10 +58,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             })
             .then((data) => {
                 if (!cancelled) {
-                    console.log('[UserContext] fetchMe success →', { name: data.name, role: data.role, blocked: data.blocked });
+                    console.log('[UserContext] fetchMe success →', { name: data.name, role: data.role, blocked: data.blocked, profilePicture: !!data.profilePicture });
                     setName(data.name);
                     setRole(data.role);
                     setBlocked(data.blocked);
+                    setProfilePicture(data.profilePicture);
                     setLoading(false);
                 }
             })
@@ -78,7 +82,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => load(), [authLoading, isAuthenticated]);
 
     return (
-        <UserContext.Provider value={{ name, role, blocked, loading, error, setName, refresh: load }}>
+        <UserContext.Provider value={{ name, role, blocked, profilePicture, loading, error, setName, setProfilePicture, refresh: load }}>
             {children}
         </UserContext.Provider>
     );

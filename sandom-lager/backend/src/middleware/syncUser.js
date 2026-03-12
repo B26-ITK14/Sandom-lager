@@ -4,9 +4,12 @@
 
 // Middleware to synchronize user information from Auth0 with the database
 const pool = require("../db/pool");
+const { ensureUserSchema } = require("../db/pool");
 
 async function syncUser(req, res, next) {
     try {
+        await ensureUserSchema();
+
         const auth0Id = req.auth?.sub;
         
         // The Auth0 ID is crucial for identifying the user in the database

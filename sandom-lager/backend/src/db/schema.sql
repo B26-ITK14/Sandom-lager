@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
     auth0_id TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
     name TEXT,
+    profile_picture TEXT,
     role TEXT NOT NULL DEFAULT 'user'
     CHECK (role IN ('user', 'admin', 'manager')),
     created_at TIMESTAMP DEFAULT NOW()

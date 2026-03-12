@@ -6,11 +6,13 @@
 */
 
 import { X, Power } from 'lucide-react';
+import { useAuth0 } from '@auth0/auth0-react';
 import { useUppercaseUsername } from '../hooks/user/useName';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getAllMainRoutes } from '../router/nav';
 import { version } from '../../package.json';
 import { LogoutLoadingOverlay, useAppLogout } from '../auth';
+import { useUser } from '../context/UserContext';
 
 interface NavFlyoutProps {
     isOpen: boolean;
@@ -19,9 +21,12 @@ interface NavFlyoutProps {
 
 export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
     const username = useUppercaseUsername();
+    const { user } = useAuth0();
+    const { profilePicture } = useUser();
     const { logoutUser, isLoggingOut } = useAppLogout(onClose);
     const navigate = useNavigate();
     const location = useLocation();
+    const imageSrc = profilePicture ?? user?.picture ?? 'src/assets/temp_EmilB04.png';
 
     const handleLogout = () => {
         void logoutUser();
@@ -57,7 +62,7 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         style={{ backgroundColor: 'var(--color-surface)' }}
                     >
                         <img
-                            src="src/assets/temp_EmilB04.png"
+                            src={imageSrc}
                             alt="Profile Picture"
                             className="w-14 h-14 rounded-full"
                         />

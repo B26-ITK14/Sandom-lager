@@ -2,22 +2,28 @@
     * PersonalInfoCard.tsx
     * Card component for displaying and editing personal information like name, username, email, and location.
     * Author: Emil Berglund
-    TODO: Implement username editing and validation, location editing, and profile picture upload.
+    TODO: Implement username editing and validation and location editing.
 */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import type { ChangeEvent } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { User, MapPin, Mail, Save, X, Loader2 } from 'lucide-react';
-import { requestEmailChange } from '../../../api/user';
+import { requestEmailChange, updateProfilePicture } from '../../../api/user';
 import ProfilePictureSection from './personalInfo/ProfilePictureSection';
 import EditableField from './personalInfo/EditableField';
 import EmailField from './personalInfo/EmailField';
+
+const MAX_PROFILE_PICTURE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_PROFILE_PICTURE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
 interface PersonalInfoCardProps {
     name: string;
     username: string;
     email: string;
+    profilePicture: string | null;
     location?: string;
+    onProfilePictureSave: (profilePicture: string | null) => void;
     onSave: (data: { name: string; username: string; location: string }) => Promise<void>;
 }
 
@@ -25,7 +31,9 @@ export default function PersonalInfoCard({
     name,
     username,
     email,
+    profilePicture,
     location = 'N/A',
+    onProfilePictureSave,
     onSave,
 }: PersonalInfoCardProps) {
     const { getAccessTokenSilently, user: authUser } = useAuth0();
@@ -36,30 +44,74 @@ export default function PersonalInfoCard({
     const [editedName, setEditedName] = useState(name);
     const [editedUsername, setEditedUsername] = useState(username);
     const [editedLocation, setEditedLocation] = useState(location);
+    const [displayProfilePicture, setDisplayProfilePicture] = useState(profilePicture);
+    const [editedProfilePicture, setEditedProfilePicture] = useState(profilePicture);
 
     const [displayEmail, setDisplayEmail] = useState(email);
     const [editedEmail, setEditedEmail] = useState(email);
     const [emailError, setEmailError] = useState('');
     const [nameError, setNameError] = useState('');
+    const [profilePictureError, setProfilePictureError] = useState('');
+
+    useEffect(() => {
+        setDisplayProfilePicture(profilePicture);
+        setEditedProfilePicture(profilePicture);
+    }, [profilePicture]);
+
+    const handleProfilePictureChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        event.target.value = '';
+
+        if (!file) return;
+
+        if (!ALLOWED_PROFILE_PICTURE_TYPES.includes(file.type)) {
+            setProfilePictureError('Kun JPG, PNG, GIF og WEBP er tillatt');
+            return;
+        }
+
+        if (file.size > MAX_PROFILE_PICTURE_BYTES) {
+            setProfilePictureError('Profilbildet kan maks være 5 MB');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            const result = typeof reader.result === 'string' ? reader.result : '';
+            if (!result) {
+                setProfilePictureError('Kunne ikke lese profilbildet');
+                return;
+            }
+
+            setEditedProfilePicture(result);
+            setProfilePictureError('');
+        };
+        reader.onerror = () => {
+            setProfilePictureError('Kunne ikke lese profilbildet');
+        };
+        reader.readAsDataURL(file);
+    };
 
     const handleSave = async () => {
         const emailChanged = isPasswordUser && editedEmail.trim() !== displayEmail && editedEmail.trim() !== '';
         const nameChanged = editedName.trim() !== name.trim();
         const usernameChanged = editedUsername.trim() !== username.trim();
         const locationChanged = editedLocation.trim() !== location.trim();
+        const profilePictureChanged = editedProfilePicture !== displayProfilePicture;
         const profileChanged = nameChanged || usernameChanged || locationChanged;
 
-        if (!emailChanged && !profileChanged) {
+        if (!emailChanged && !profileChanged && !profilePictureChanged) {
             setIsEditing(false);
             return;
         }
 
         setEmailError('');
         setNameError('');
+        setProfilePictureError('');
         setIsSaving(true);
 
         let emailOk = true;
         let nameOk = true;
+        let profilePictureOk = true;
 
         if (emailChanged) {
             try {
@@ -81,17 +133,31 @@ export default function PersonalInfoCard({
             }
         }
 
+        if (profilePictureChanged) {
+            try {
+                const token = await getAccessTokenSilently();
+                await updateProfilePicture(editedProfilePicture ?? '', token);
+                setDisplayProfilePicture(editedProfilePicture);
+                onProfilePictureSave(editedProfilePicture);
+            } catch (err) {
+                setProfilePictureError(err instanceof Error ? err.message : 'Kunne ikke oppdatere profilbildet');
+                profilePictureOk = false;
+            }
+        }
+
         setIsSaving(false);
-        if (emailOk && nameOk) setIsEditing(false);
+        if (emailOk && nameOk && profilePictureOk) setIsEditing(false);
     };
 
     const handleCancel = () => {
         setEditedName(name);
         setEditedUsername(username);
         setEditedLocation(location);
+        setEditedProfilePicture(displayProfilePicture);
         setEditedEmail(displayEmail);
         setEmailError('');
         setNameError('');
+        setProfilePictureError('');
         setIsEditing(false);
     };
 
@@ -141,7 +207,12 @@ export default function PersonalInfoCard({
             </div>
 
             <div className="space-y-4">
-                <ProfilePictureSection isEditing={isEditing} />
+                <ProfilePictureSection
+                    imageSrc={editedProfilePicture}
+                    isEditing={isEditing}
+                    error={profilePictureError}
+                    onFileChange={handleProfilePictureChange}
+                />
 
                 <EditableField
                     label="Navn"

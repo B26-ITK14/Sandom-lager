@@ -18,7 +18,14 @@ import { useUsername } from '../../hooks';
 export default function MyAccountPage() {
     const username = useUsername();
     const { user, getAccessTokenSilently } = useAuth0();
-    const { name: displayName, role, blocked, setName: setDisplayName } = useUser();
+    const {
+        name: displayName,
+        role,
+        blocked,
+        profilePicture,
+        setName: setDisplayName,
+        setProfilePicture,
+    } = useUser();
 
 
     const email = user?.email ?? 'N/A';
@@ -46,6 +53,8 @@ export default function MyAccountPage() {
                     name={displayName}
                     username={username}
                     email={email}
+                    profilePicture={profilePicture ?? user?.picture ?? null}
+                    onProfilePictureSave={setProfilePicture}
                     onSave={handleSavePersonalInfo}
                 />
                 <AccountDetailsCard role={role} memberSince={memberSince} blocked={blocked} />
