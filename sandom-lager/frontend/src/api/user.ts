@@ -12,13 +12,14 @@ export type { UserRole };
 type MeResponse = {
     role?: UserRole;
     name?: string;
+    blocked?: boolean;
 };
 
-export async function fetchMe(accessToken: string): Promise<{ role: UserRole; name: string }> {
+export async function fetchMe(accessToken: string): Promise<{ role: UserRole; name: string; blocked: boolean }> {
     const data = await apiFetchJson<MeResponse>("/api/me", {
         headers: { Authorization: `Bearer ${accessToken}` },
     });
-    return { role: data.role ?? null, name: data.name ?? '' };
+    return { role: data.role ?? null, name: data.name ?? '', blocked: data.blocked ?? false };
 }
 
 /**
@@ -39,6 +40,7 @@ export async function updateName(name: string, accessToken: string): Promise<voi
         throw new Error((data as { message?: string }).message ?? `Kunne ikke oppdatere navn (${response.status})`);
     }
 }
+
 
 export async function requestPasswordChange(email: string, domain: string, clientId: string): Promise<void> {
     const response = await fetch(`https://${domain}/dbconnections/change_password`, {

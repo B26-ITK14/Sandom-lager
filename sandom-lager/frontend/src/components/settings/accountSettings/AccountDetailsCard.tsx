@@ -9,9 +9,10 @@ import { Shield } from 'lucide-react';
 interface AccountDetailsCardProps {
     role: string | null | undefined;
     memberSince: string;
+    blocked: boolean;
 }
 
-export default function AccountDetailsCard({ role, memberSince }: AccountDetailsCardProps) {
+export default function AccountDetailsCard({ role, memberSince, blocked }: AccountDetailsCardProps) {
     return (
         <section
             className="rounded-2xl p-6 lg:col-start-2 lg:row-start-1"
@@ -44,8 +45,8 @@ export default function AccountDetailsCard({ role, memberSince }: AccountDetails
                 <div className="flex justify-between items-center">
                     <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Status</span>
                     <span className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-primary)' }}>
-                        <span className="w-2 h-2 rounded-full bg-green-500" />
-                        Aktiv
+                        <span className={`w-2 h-2 rounded-full ${blocked ? 'bg-red-500' : 'bg-green-500'}`} />
+                        {blocked ? 'Inaktiv' : 'Aktiv'}
                     </span>
                 </div>
             </div>

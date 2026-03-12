@@ -16,6 +16,7 @@ import type { UserRole } from '../api/user';
 interface UserContextValue {
     name: string;
     role: UserRole;
+    blocked: boolean;
     loading: boolean;
     error: string | null;
     /** Optimistic local update — call after a successful name-change API call */
@@ -30,6 +31,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const { getAccessTokenSilently, isAuthenticated, isLoading: authLoading } = useAuth0();
     const [name, setName] = useState('');
     const [role, setRole] = useState<UserRole>(null);
+    const [blocked, setBlocked] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -53,9 +55,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             })
             .then((data) => {
                 if (!cancelled) {
-                    console.log('[UserContext] fetchMe success →', { name: data.name, role: data.role });
+                    console.log('[UserContext] fetchMe success →', { name: data.name, role: data.role, blocked: data.blocked });
                     setName(data.name);
                     setRole(data.role);
+                    setBlocked(data.blocked);
                     setLoading(false);
                 }
             })
@@ -75,7 +78,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => load(), [authLoading, isAuthenticated]);
 
     return (
-        <UserContext.Provider value={{ name, role, loading, error, setName, refresh: load }}>
+        <UserContext.Provider value={{ name, role, blocked, loading, error, setName, refresh: load }}>
             {children}
         </UserContext.Provider>
     );
