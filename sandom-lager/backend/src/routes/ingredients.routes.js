@@ -1,61 +1,51 @@
 const express = require("express");
 const router = express.Router();
 
+const asyncHandler = require("../utils/asyncHandler");
+
 const { checkJwt } = require("../middleware/checkJwt");
 const { syncUser } = require("../middleware/syncUser");
 const { requireRole } = require("../middleware/requireRole");
 
-const {
-    getIngredients,
-    getIngredientById,
-    createIngredient,
-    updateIngredient,
-    deleteIngredient
-} = require("../controllers/ingredients.controller");
+const ingredientsController = require("../controllers/ingredients.controller");
+
+// Apply authentication and user synchronization middleware to all routes in this router
+router.use(checkJwt())
+router.use(syncUser)
 
 // GET - All users can read ingredients
 router.get(
     "/ingredients",
-    checkJwt(),
-    syncUser,
     requireRole("user", "manager", "admin"), 
-    getIngredients
+    asyncHandler(ingredientsController.getIngredients)
 );
 
 // GET - All users can read ingredient by ID
 router.get(
     "/ingredients/:id",
-    checkJwt(),
-    syncUser,
     requireRole("user", "manager", "admin"),
-    getIngredientById
+    asyncHandler(ingredientsController.getIngredientById)
 );
 
 // POST - Admin and manager can create ingredients
 router.post(
     "/ingredients",
-    checkJwt(),
-    syncUser,
     requireRole("admin", "manager"),
-    createIngredient
+    asyncHandler(ingredientsController.createIngredient)
 );
 
 // PUT - Admin and manager can update ingredients
 router.put(
     "/ingredients/:id",
-    checkJwt(),
-    syncUser,
     requireRole("admin", "manager"),
-    updateIngredient
+    asyncHandler(ingredientsController.updateIngredient)
 );
 
 // DELETE - Admin can delete ingredients
 router.delete(
     "/ingredients/:id",
-    checkJwt(),
-    syncUser,
     requireRole("admin"),
-    deleteIngredient
+    asyncHandler(ingredientsController.deleteIngredient)
 );
 
 module.exports = router;
