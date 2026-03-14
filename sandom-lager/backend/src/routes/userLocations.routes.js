@@ -9,7 +9,8 @@ const {
     requestLocationAccess,
     approveLocationAccess,
     denyLocationAccess,
-    getMyLocationAccess, 
+    getMyLocationAccess,
+     getAllLocationAccess 
 } = require("../controllers/userLocations.controller");
 
 // POST - User requests access to location
@@ -46,4 +47,12 @@ router.get(
     getMyLocationAccess
 );
 
+// GET - Admin henter alle søknader
+router.get(
+    "/user-locations",
+    checkJwt(),
+    syncUser,
+    requireRole("admin"),
+    getAllLocationAccess
+);
 module.exports = router;
