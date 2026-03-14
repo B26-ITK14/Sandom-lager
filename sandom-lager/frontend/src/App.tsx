@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
+import { SelectedRecipesProvider } from "./context/SelectedRecipesContext";
 import { ProtectedRoute } from "./auth";
 
 import LoginPage from "./pages/LoginPage";
@@ -16,6 +17,7 @@ export default function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
+        <SelectedRecipesProvider>
         <Routes>
           {/* Public route */}
           <Route path="/login" element={<LoginPage />} />
@@ -90,6 +92,7 @@ export default function App() {
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </SelectedRecipesProvider>
       </BrowserRouter>
     </ThemeProvider>
   );

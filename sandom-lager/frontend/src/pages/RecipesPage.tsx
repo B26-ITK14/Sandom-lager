@@ -7,9 +7,11 @@ import Layout from "../components/Layout";
 import LoadingSpinner from "../components/LoadingSpinner";
 import RecipeCard from "../components/recipes/RecipeCard";
 import { useRecipes } from "../hooks";
+import { useSelectedRecipes } from "../context/SelectedRecipesContext";
 
 export default function RecipesPage() {
     const { recipes, loading, error } = useRecipes();
+    const { selectedIds, toggleSelected } = useSelectedRecipes();
     const [search, setSearch] = useState("");
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [filterOpen, setFilterOpen] = useState(false);
@@ -137,7 +139,11 @@ export default function RecipesPage() {
                     <ol className="grid grid-cols-2 gap-3 list-none p-0">
                         {filtered.map((recipe) => (
                             <li key={recipe.id}>
-                                <RecipeCard recipe={recipe} />
+                                <RecipeCard
+                                    recipe={recipe}
+                                    selected={selectedIds.has(recipe.id)}
+                                    onToggle={() => toggleSelected(recipe.id)}
+                                />
                             </li>
                         ))}
                     </ol>
