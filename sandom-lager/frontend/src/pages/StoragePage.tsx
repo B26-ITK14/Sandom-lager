@@ -24,9 +24,17 @@ function parseQuantityValue(quantity: string) {
 
 export default function StoragePage() {
     const [selectedFilter, setSelectedFilter] = useState(FILTER_OPTIONS[0]);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const filterdProducts = useMemo(() => {
-        const products = [...MOCK_PRODUCTS];
+        const normalizedQuery = searchQuery.trim().toLowerCase();
+        const products = MOCK_PRODUCTS.filter((product) => {
+            if (!normalizedQuery) {
+                return true;
+            }
+
+            return product.name.toLowerCase().includes(normalizedQuery);
+        });
 
         if (selectedFilter === "Mengde: lite -> mye") {
             return products.sort(
@@ -41,7 +49,7 @@ export default function StoragePage() {
         }
 
         return products;
-    }, [selectedFilter]);
+    }, [searchQuery, selectedFilter]);
 
     return (
         <Layout>
@@ -57,6 +65,8 @@ export default function StoragePage() {
                             placeholder="Søk på lageret"
                             className="w-full border-none bg-transparent text-base outline-none"
                             style={{ color: "#6f7278" }}
+                            value={searchQuery}
+                            onChange={(event) => setSearchQuery(event.target.value)}
                         />
                     </div>
 

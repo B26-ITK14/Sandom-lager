@@ -4,7 +4,7 @@ type ProductCardProps = {
     highlighted?: boolean;
 };
 
-import { Pencil, Star, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 export default function ProductCard({ name, quantity, highlighted = false }: ProductCardProps) {
     return (
@@ -22,14 +22,6 @@ export default function ProductCard({ name, quantity, highlighted = false }: Pro
             </section>
 
             <section className="flex items-center gap-3">
-                <button
-                    type="button"
-                    className="grid h-11 w-11 place-items-center rounded-full"
-                    style={{ backgroundColor: "#d5d7db", color: "#000" }}
-                    aria-label={`Marker ${name} som favoritt`}
-                >
-                    <Star size={20} />
-                </button>
                 <button
                     type="button"
                     className="grid h-11 w-11 place-items-center rounded-full"
