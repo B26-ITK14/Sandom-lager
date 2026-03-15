@@ -13,8 +13,9 @@ import MyApplicationsPage from "./pages/settings/MyApplicationsPage";
 import AppSettingsPage from "./pages/settings/AppSettingsPage";
 
 import AdminPage from "./pages/AdminPage";
-import RequestAccessPage from "./pages/onboarding/RequestAccessPage";
-import PendingApprovalPage from "./pages/onboarding/PendingApprovalPage";
+import RequestAccessPage from "./pages/onboarding/RequestAccessPage"; // ← beholder din sti
+import PendingApprovalPage from "./pages/onboarding/PendingApprovalPage"; // ← beholder din sti
+import { ROUTES } from "./router/routes"; // ← beholder deres tillegg
 
 export default function App() {
   return (
@@ -24,9 +25,9 @@ export default function App() {
           {/* Public route */}
           <Route path="/login" element={<LoginPage />} />
           
-           {/* Onboarding – krever innlogging, men ikke godkjent lokasjon */}
+          {/* Onboarding – krever innlogging, men ikke godkjent lokasjon */}
           <Route
-            path="/request-access"
+            path={ROUTES.REQUEST_ACCESS.path}
             element={
               <ProtectedRoute requireLocation={false}>
                 <RequestAccessPage />
@@ -34,7 +35,7 @@ export default function App() {
             }
           />
           <Route
-            path="/pending-approval"
+            path={ROUTES.PENDING_APPROVAL.path}
             element={
               <ProtectedRoute requireLocation={false}>
                 <PendingApprovalPage />
@@ -44,7 +45,7 @@ export default function App() {
 
           {/* Admin */}
           <Route
-            path="/admin"
+            path={ROUTES.ADMIN.path}
             element={
               <ProtectedRoute requireLocation={false}>
                 <AdminPage />
@@ -52,9 +53,9 @@ export default function App() {
             }
           />
 
-          {/* Protected route */}
+          {/* Protected routes */}
           <Route
-            path="/"
+            path={ROUTES.DASHBOARD.path}
             element={
               <ProtectedRoute>
                 <HomePage />
@@ -62,7 +63,7 @@ export default function App() {
             }
           />
           <Route
-            path="/shopping-list"
+            path={ROUTES.SHOPPING_LIST.path}
             element={
               <ProtectedRoute>
                 <ShoppingListPage />
@@ -70,7 +71,7 @@ export default function App() {
             }
           />
           <Route
-            path="/settings"
+            path={ROUTES.SETTINGS.path}
             element={
               <ProtectedRoute>
                 <SettingsPage />
@@ -78,7 +79,7 @@ export default function App() {
             }
           />
           <Route
-            path="/storage"
+            path={ROUTES.STORAGE.path}
             element={
               <ProtectedRoute>
                 <StoragePage />
@@ -86,16 +87,15 @@ export default function App() {
             }
           />
           <Route
-            path="/recipes"
+            path={ROUTES.RECIPES.path}
             element={
               <ProtectedRoute>
                 <RecipesPage />
               </ProtectedRoute>
             }
-          />  
-
+          />
           <Route
-            path="/settings/account"
+            path={ROUTES.SETTINGS_ACCOUNT.path}
             element={
               <ProtectedRoute>
                 <MyAccountPage />
@@ -103,7 +103,7 @@ export default function App() {
             }
           />
           <Route
-            path="/settings/applications"
+            path={ROUTES.SETTINGS_APPLICATIONS.path}
             element={
               <ProtectedRoute>
                 <MyApplicationsPage />
@@ -111,7 +111,7 @@ export default function App() {
             }
           />
           <Route
-            path="/settings/app-settings"
+            path={ROUTES.SETTINGS_APP_SETTINGS.path}
             element={
               <ProtectedRoute>
                 <AppSettingsPage />
