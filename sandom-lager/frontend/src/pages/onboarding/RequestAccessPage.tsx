@@ -5,22 +5,38 @@
     * Author: Khalid Osman
 */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import LocationSelector, { type Location } from "../components/onBoarding/LocationSelector";import OnBoardingTitle from "../components/onBoarding/OnBoardingTitle";
-import { ROUTES } from "../router/routes";
-
-// TODO: Bytt ut med API-kall når backend er klar
-const MOCK_LOCATIONS: Location[] = [
-    { id: "sandom", name: "Sandom Retreatsenter" },
-    { id: "tomasgarden", name: "Tomasgården" },
-];
+import { useAuth0 } from "@auth0/auth0-react";
+import LocationSelector, { type Location } from "../../components/onBoarding/LocationSelector";
+import OnBoardingTitle from "../../components/onBoarding/OnBoardingTitle";
+import { ROUTES } from "../../router/routes";
+import { fetchLocations, requestLocationAccess } from "../../api/userLocations";
 
 export default function RequestAccessPage() {
     const navigate = useNavigate();
+    const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0();
+    const [locations, setLocations] = useState<Location[]>([]);
     const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!isAuthenticated || isLoading) return; 
+        async function loadLocations() {
+            try {
+                const token = await getAccessTokenSilently();
+                const data = await fetchLocations(token);
+                setLocations(data.map((l: { id: number; name: string }) => ({
+                    id: String(l.id),
+                    name: l.name,
+                })));
+            } catch (err) {
+                setError("Kunne ikke laste lokasjoner.");
+            }
+        }
+        loadLocations();
+    }, [getAccessTokenSilently, isAuthenticated, isLoading]); 
 
     async function handleSubmit() {
         if (!selectedLocation) {
@@ -30,8 +46,8 @@ export default function RequestAccessPage() {
         setError(null);
         setIsSubmitting(true);
         try {
-            // TODO: await api.post("/user-locations", { locationId: selectedLocation });
-            await new Promise((res) => setTimeout(res, 800));
+            const token = await getAccessTokenSilently();
+            await requestLocationAccess(token, Number(selectedLocation));
             navigate(ROUTES.PENDING_APPROVAL.path);
         } catch {
             setError("Noe gikk galt. Prøv igjen.");
@@ -70,7 +86,7 @@ export default function RequestAccessPage() {
                             Velg sted
                         </label>
                         <LocationSelector
-                            locations={MOCK_LOCATIONS}
+                            locations={locations}
                             selectedId={selectedLocation}
                             onChange={setSelectedLocation}
                             disabled={isSubmitting}

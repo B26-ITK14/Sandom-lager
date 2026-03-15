@@ -9,6 +9,7 @@ const userLocationsRoutes = require("./routes/userLocations.routes");
 const ingredientsRoutes = require("./routes/ingredients.routes");
 const shoppingListRoutes = require("./routes/shoppingList.routes");
 const testRoutes = require("./routes/test.routes"); 
+const locationsRoutes = require("./routes/locations.routes");
 
 const PORT = process.env.PORT || 3001;
 
@@ -38,6 +39,7 @@ app.use("/api", inventoryRoutes);
 app.use("/api", userLocationsRoutes);
 app.use("/api", ingredientsRoutes);
 app.use("/api", shoppingListRoutes);
+app.use("/api", locationsRoutes);
 
 // Error handling middleware for JWT authentication errors and other server errors
 // express-jwt v8 throws InvalidTokenError (403) for bad tokens and UnauthorizedError (401) for missing tokens

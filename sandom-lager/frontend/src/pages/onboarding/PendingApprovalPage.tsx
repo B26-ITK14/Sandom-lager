@@ -5,27 +5,42 @@
     * Author: Khalid Osman
 */
 
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 import { User, MapPin, Clock } from "lucide-react";
-import OnBoardingTitle from "../components/onBoarding/OnBoardingTitle";
-import { ROUTES } from "../router/routes";
-
-
-// TODO: Hent faktisk bruker og søknadsstatus fra context/API
-const MOCK_APPLICATION = {
-    userName: "Test Bruker",
-    locationName: "Tomasgården",
-    status: "Ikke spesifisert",
-};
-
-const infoRows = [
-    { icon: User, label: "Navn", value: MOCK_APPLICATION.userName },
-    { icon: MapPin, label: "Sted", value: MOCK_APPLICATION.locationName },
-    { icon: Clock, label: "Tilgang", value: MOCK_APPLICATION.status },
-];
+import OnBoardingTitle from "../../components/onBoarding/OnBoardingTitle";
+import { ROUTES } from "../../router/routes";
+import { fetchMyLocationAccess } from "../../api/userLocations";
 
 export default function PendingApprovalPage() {
     const navigate = useNavigate();
+    const { getAccessTokenSilently, user } = useAuth0();
+    const [locationName, setLocationName] = useState<string>("Laster...");
+    const [status, setStatus] = useState<string>("Laster...");
+
+    useEffect(() => {
+        async function loadStatus() {
+            try {
+                const token = await getAccessTokenSilently();
+                const data = await fetchMyLocationAccess(token);
+                if (data.length > 0) {
+                    setLocationName(data[0].location_name);
+                    setStatus(data[0].access_status);
+                }
+            } catch {
+                setLocationName("Ukjent");
+                setStatus("Ukjent");
+            }
+        }
+        loadStatus();
+    }, [getAccessTokenSilently]);
+
+    const infoRows = [
+        { icon: User, label: "Navn", value: user?.name ?? "Ukjent" },
+        { icon: MapPin, label: "Sted", value: locationName },
+        { icon: Clock, label: "Tilgang", value: status },
+    ];
 
     return (
         <main

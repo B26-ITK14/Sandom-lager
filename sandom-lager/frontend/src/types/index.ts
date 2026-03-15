@@ -77,3 +77,12 @@ export interface InventoryItem {
     quantity: number;
     updated_at: string;
 }
+
+export interface UserLocationResponse {
+    id: number;
+    access_status: "pending" | "approved" | "denied";
+    created_at: string;
+    user_name: string;
+    email: string;
+    location_name: string;
+}

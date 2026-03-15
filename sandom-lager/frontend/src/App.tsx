@@ -13,8 +13,8 @@ import MyApplicationsPage from "./pages/settings/MyApplicationsPage";
 import AppSettingsPage from "./pages/settings/AppSettingsPage";
 
 import AdminPage from "./pages/AdminPage";
-import RequestAccessPage from "./pages/RequestAccessPage";
-import PendingApprovalPage from "./pages/PendingApprovalPage";
+import RequestAccessPage from "./pages/onboarding/RequestAccessPage";
+import PendingApprovalPage from "./pages/onboarding/PendingApprovalPage";
 
 export default function App() {
   return (
@@ -28,7 +28,7 @@ export default function App() {
           <Route
             path="/request-access"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requireLocation={false}>
                 <RequestAccessPage />
               </ProtectedRoute>
             }
@@ -36,7 +36,7 @@ export default function App() {
           <Route
             path="/pending-approval"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requireLocation={false}>
                 <PendingApprovalPage />
               </ProtectedRoute>
             }
@@ -46,7 +46,7 @@ export default function App() {
           <Route
             path="/admin"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requireLocation={false}>
                 <AdminPage />
               </ProtectedRoute>
             }

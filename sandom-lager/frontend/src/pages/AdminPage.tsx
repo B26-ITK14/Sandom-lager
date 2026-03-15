@@ -10,6 +10,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useUserRole } from "../hooks/user/useUserRole";
 import { Users, CheckCircle, XCircle, Clock } from "lucide-react";
 import PendingCard, { type AccessRequest } from "../components/onBoarding/PendingCard";
+import type { UserLocationResponse } from "../types"; // ← NY
 
 type FilterTab = "all" | "pending" | "approved" | "denied";
 
@@ -45,10 +46,9 @@ export default function AdminPage() {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!res.ok) throw new Error("Feil ved henting av søknader");
-                const data = await res.json();
+                const data: UserLocationResponse[] = await res.json(); // ← ENDRET: any → UserLocationResponse[]
 
-                // Mapper backend-felt til AccessRequest-interface
-                const mapped: AccessRequest[] = data.map((r: any) => ({
+                const mapped: AccessRequest[] = data.map((r: UserLocationResponse) => ({ // ← ENDRET: any → UserLocationResponse
                     id: String(r.id),
                     userName: r.user_name,
                     email: r.email,
