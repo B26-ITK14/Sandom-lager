@@ -1,22 +1,23 @@
-import { useMemo } from 'react';
+/*
+    * appVersion.ts
+    * Custom React hook for retrieving the application's version information from package-lock.json.
+    * This hook provides a simple interface to access the app version and determine if it's in development mode.
+*/
+
+
 import { version as packageLockVersion } from '../../../package-lock.json';
 
 export interface AppVersionInfo {
 	raw: string | null;
 	display: string;
-	isDevelopment: boolean;
 }
 
 export function useAppVersion(): AppVersionInfo {
-	return useMemo(() => {
 		const raw = packageLockVersion ?? null;
-		const isDevelopment = raw === null || raw === '0.0.0';
 
 		return {
 			raw,
-			display: isDevelopment ? 'Under utvikling' : raw,
-			isDevelopment,
+			display: raw
 		};
-	}, []);
 }
 

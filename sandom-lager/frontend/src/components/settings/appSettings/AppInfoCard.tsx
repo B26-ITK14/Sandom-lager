@@ -5,9 +5,11 @@
 */
 
 import { useAppVersion } from '../../../hooks/version/appVersion';
+import { useAppStability, stabilityLabels } from '../../../hooks/version/appStability';
 
 export default function AppInfoCard() {
     const { display } = useAppVersion();
+    const { status } = useAppStability();
 
     return (
         <section className="rounded-2xl p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
@@ -26,7 +28,7 @@ export default function AppInfoCard() {
                         border: '1px solid var(--color-border)',
                     }}
                 >
-                    Stabil
+                    {stabilityLabels[status]}
                 </span>
             </div>
         </section>
