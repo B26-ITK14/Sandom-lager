@@ -14,6 +14,9 @@ interface EditableFieldProps {
     isEditing: boolean;
     error?: string;
     type?: string;
+    inputName?: string;
+    inputId?: string;
+    autoComplete?: string;
 }
 
 export default function EditableField({
@@ -24,6 +27,9 @@ export default function EditableField({
     isEditing,
     error,
     type = 'text',
+    inputName,
+    inputId,
+    autoComplete,
 }: EditableFieldProps) {
     return (
         <div>
@@ -33,7 +39,10 @@ export default function EditableField({
             {isEditing ? (
                 <>
                     <input
+                        id={inputId}
+                        name={inputName}
                         type={type}
+                        autoComplete={autoComplete}
                         value={editedValue}
                         onChange={(e) => onChange(e.target.value)}
                         className="w-full px-4 py-2 rounded-lg"

@@ -11,7 +11,7 @@ import PersonalInfoCard from '../../components/settings/accountSettings/Personal
 import AccountDetailsCard from '../../components/settings/accountSettings/AccountDetailsCard';
 import SecurityPrivacyCard from '../../components/settings/accountSettings/SecurityPrivacyCard';
 
-import { updateName } from '../../api/user';
+import { updateName, updateUsername } from '../../api/user';
 import { useUser } from '../../context/UserContext';
 import { useUsername } from '../../hooks';
 
@@ -20,12 +20,16 @@ export default function MyAccountPage() {
     const { user, getAccessTokenSilently } = useAuth0();
     const {
         name: displayName,
+        username: persistedUsername,
         role,
         blocked,
         profilePicture,
         setName: setDisplayName,
+        setUsername,
         setProfilePicture,
     } = useUser();
+
+    const displayUsername = persistedUsername ?? username;
 
 
     const email = user?.email ?? 'N/A';
@@ -37,11 +41,34 @@ export default function MyAccountPage() {
         console.log('[MyAccountPage] handleSavePersonalInfo called with:', data);
         try {
             const token = await getAccessTokenSilently();
-            await updateName(data.name, token);
-            setDisplayName(data.name);
-            console.log('[MyAccountPage] Name updated successfully →', data.name);
+            const trimmedName = data.name.trim();
+            const trimmedUsername = data.username.trim();
+            const currentPersistedUsername = (persistedUsername ?? '').trim();
+
+            console.log('[MyAccountPage] Username save check →', {
+                editedUsername: trimmedUsername,
+                persistedUsername: currentPersistedUsername,
+                authFallbackUsername: username.trim(),
+            });
+
+            if (trimmedName !== displayName.trim()) {
+                await updateName(trimmedName, token);
+                setDisplayName(trimmedName);
+                console.log('[MyAccountPage] Name updated successfully →', trimmedName);
+            } else {
+                console.log('[MyAccountPage] Name unchanged, skipping backend update');
+            }
+
+            if (trimmedUsername !== currentPersistedUsername) {
+                console.log('[MyAccountPage] Username changed in DB context, calling backend update');
+                const savedUsername = await updateUsername(trimmedUsername, token);
+                setUsername(savedUsername);
+                console.log('[MyAccountPage] Username updated successfully →', savedUsername);
+            } else {
+                console.log('[MyAccountPage] Username unchanged in DB, skipping backend update');
+            }
         } catch (err) {
-            console.error('[MyAccountPage] Failed to update name:', err);
+            console.error('[MyAccountPage] Failed to update profile:', err);
             throw err;
         }
     };
@@ -51,7 +78,7 @@ export default function MyAccountPage() {
             <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(340px,38%)] lg:items-stretch">
                 <PersonalInfoCard
                     name={displayName}
-                    username={username}
+                    username={displayUsername}
                     email={email}
                     profilePicture={profilePicture ?? user?.picture ?? null}
                     onProfilePictureSave={setProfilePicture}

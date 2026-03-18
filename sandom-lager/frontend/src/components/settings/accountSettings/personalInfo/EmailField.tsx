@@ -16,6 +16,9 @@ interface EmailFieldProps {
     isPasswordUser: boolean;
     originalEmail: string;
     error?: string;
+    inputName?: string;
+    inputId?: string;
+    autoComplete?: string;
 }
 
 export default function EmailField({
@@ -27,6 +30,9 @@ export default function EmailField({
     isPasswordUser,
     originalEmail,
     error,
+    inputName,
+    inputId,
+    autoComplete,
 }: EmailFieldProps) {
     return (
         <div>
@@ -36,7 +42,10 @@ export default function EmailField({
             {isEditing && isPasswordUser ? (
                 <div>
                     <input
+                        id={inputId}
+                        name={inputName}
                         type="email"
+                        autoComplete={autoComplete}
                         value={editedEmail}
                         onChange={(e) => onChange(e.target.value)}
                         className="w-full px-4 py-2 rounded-lg"
