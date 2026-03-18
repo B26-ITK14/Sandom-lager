@@ -4,8 +4,14 @@ import "./styles/App.css";
 import App from "./App.tsx";
 
 import { Auth0Provider } from "@auth0/auth0-react";
+import type { AppState } from "@auth0/auth0-react";
 import { AUTH0_AUDIENCE, AUTH0_SCOPE } from "./config/auth";
 import { env } from "./config/env";
+
+const onRedirectCallback = (appState?: AppState) => {
+  const target = appState?.returnTo ?? window.location.pathname;
+  window.history.replaceState({}, document.title, target);
+};
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -13,6 +19,7 @@ createRoot(document.getElementById("root")!).render(
       domain={env.VITE_AUTH0_DOMAIN}
       clientId={env.VITE_AUTH0_CLIENT_ID}
       cacheLocation="localstorage"
+      onRedirectCallback={onRedirectCallback}
       authorizationParams={{
         redirect_uri: window.location.origin,
         scope: AUTH0_SCOPE,

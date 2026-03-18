@@ -216,4 +216,10 @@ async function updateProfilePicture(req, res) {
     }
 }
 
-module.exports = { getMe, updateName, updateEmail, updateProfilePicture, updateUsername };
+module.exports = {
+    getMe,
+    updateName,
+    updateEmail,
+    updateProfilePicture,
+    updateUsername,
+};
