@@ -77,6 +77,18 @@ async function syncUser(req, res, next) {
         // Auth0 access tokens do not always include a jti claim, so fall back to a
         // deterministic id built from sub + iat — unique per issued token (per login).
         const jti = req.auth?.jti ?? `${req.auth.sub}:${req.auth.iat}`;
+
+        if (jti) {
+            const revokedCheck = await pool.query(
+                "SELECT 1 FROM revoked_sessions WHERE id = $1 AND user_id = $2 LIMIT 1",
+                [jti, user.id]
+            );
+            if (revokedCheck.rows.length > 0) {
+                console.warn(`[syncUser] Revoked session attempted access jti: ${jti}, user id: ${user.id}`);
+                return res.status(401).json({ message: "Sesjonen er avsluttet. Logg inn på nytt." });
+            }
+        }
+
         if (jti) {
             const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || null;
             const ua = req.headers['user-agent'] || null;

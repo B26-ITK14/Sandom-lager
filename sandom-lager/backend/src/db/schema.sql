@@ -42,6 +42,14 @@ CREATE TABLE IF NOT EXISTS user_sessions (
     last_seen_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+-- REVOKED SESSIONS --
+-- Sessions listed here are denied on subsequent requests (force logout).
+CREATE TABLE IF NOT EXISTS revoked_sessions (
+    id TEXT PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    revoked_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 -- USER LOCATION ACCESS --
 CREATE TABLE IF NOT EXISTS user_locations (
     id SERIAL PRIMARY KEY,
@@ -143,6 +151,12 @@ CREATE TABLE IF NOT EXISTS user_sessions (
     user_agent TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
     last_seen_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS revoked_sessions (
+    id TEXT PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    revoked_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 

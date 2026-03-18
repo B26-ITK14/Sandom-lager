@@ -109,6 +109,7 @@ export interface Auth0Session {
     created_at: string;
     updated_at: string;
     last_interaction_at?: string;
+    is_current?: boolean;
     device?: SessionDevice;
     clients?: { client_id: string; name?: string }[];
 }
@@ -128,6 +129,20 @@ export async function revokeSession(sessionId: string, accessToken: string): Pro
     if (!response.ok && response.status !== 204) {
         throw new Error(`Kunne ikke avslutte sesjon (${response.status})`);
     }
+}
+
+export async function revokeOtherSessions(accessToken: string): Promise<number> {
+    const response = await fetch('/api/me/sessions/others', {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Kunne ikke avslutte andre sesjoner (${response.status})`);
+    }
+
+    const data = await response.json().catch(() => ({}));
+    return (data as { revoked?: number }).revoked ?? 0;
 }
 
 

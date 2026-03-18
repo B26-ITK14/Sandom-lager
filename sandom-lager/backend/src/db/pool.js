@@ -18,7 +18,13 @@ function ensureUserSchema() {
 
       CREATE UNIQUE INDEX IF NOT EXISTS users_username_unique_idx
       ON users (LOWER(username))
-      WHERE username IS NOT NULL
+      WHERE username IS NOT NULL;
+
+      CREATE TABLE IF NOT EXISTS revoked_sessions (
+        id TEXT PRIMARY KEY,
+        user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        revoked_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
     `).catch((error) => {
       userSchemaPromise = null;
       throw error;
