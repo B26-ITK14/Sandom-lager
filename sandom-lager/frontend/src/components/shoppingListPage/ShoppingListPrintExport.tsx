@@ -5,7 +5,7 @@ interface Props {
     items: ShoppingListItem[];
 }
 
-export default function ShoppingListActions({ items }: Props) {
+export default function ShoppingListPrintExport({ items }: Props) {
 
     const exportToExcel = () => {
 
@@ -19,7 +19,7 @@ export default function ShoppingListActions({ items }: Props) {
     return (
         <div className="flex gap-3">
 
-            // Button to trigger print 
+            {/* Button to trigger print */}
             <button
                 onClick={() => window.print()}
                 className="py-2 px-4 rounded-md"
@@ -30,7 +30,7 @@ export default function ShoppingListActions({ items }: Props) {
                 Skriv ut
             </button>
 
-
+            {/* Button to trigger Excel export */}
             <button
                 onClick={exportToExcel}
                 className="py-2 px-4 rounded-md"

@@ -64,10 +64,10 @@ export interface RecipeIngredient {
 
 export interface ShoppingListItem {
     id: number;
-    location_id: number;
-    ingredient_id: number;
+    ingredient: string;
     needed_quantity: number;
-    created_at: string;
+    location: string;
+    unit: IngredientUnit;
 }
 
 export interface InventoryItem {
