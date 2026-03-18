@@ -51,6 +51,7 @@ async function syncUser(req, res, next) {
             const profile = await userInfoResponse.json();
             const email = profile.email;
             const name = profile.name || profile.nickname || null;
+            const profilePicture = profile.picture || null;
 
             console.log(`[syncUser] Auth0 profile fetched → email: ${email}, name: ${name}`);
 
@@ -60,8 +61,8 @@ async function syncUser(req, res, next) {
             }
 
             const insertResult = await pool.query(
-                "INSERT INTO users (auth0_id, email, name, role) VALUES ($1, $2, $3, 'user') RETURNING *",
-                [auth0Id, email, name]
+                "INSERT INTO users (auth0_id, email, name, profile_picture, role) VALUES ($1, $2, $3, $4, 'user') RETURNING *",
+                [auth0Id, email, name, profilePicture]
             );
             user = insertResult.rows[0];
             console.log(`[syncUser] New user created → id: ${user.id}, role: ${user.role}`);

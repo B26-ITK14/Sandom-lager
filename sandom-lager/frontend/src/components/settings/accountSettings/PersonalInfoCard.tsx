@@ -3,6 +3,7 @@
     * Card component for displaying and editing personal information like name, username, email, and location.
     * Author: Emil Berglund
     TODO: Implement username editing and validation and location editing.
+    TODO: Move functions to own folder and split into smaller components if it gets too big.
 */
 
 import { useEffect, useState } from 'react';
@@ -136,9 +137,10 @@ export default function PersonalInfoCard({
         if (profilePictureChanged) {
             try {
                 const token = await getAccessTokenSilently();
-                await updateProfilePicture(editedProfilePicture ?? '', token);
-                setDisplayProfilePicture(editedProfilePicture);
-                onProfilePictureSave(editedProfilePicture);
+                const savedProfilePicture = await updateProfilePicture(editedProfilePicture ?? '', token);
+                setDisplayProfilePicture(savedProfilePicture);
+                setEditedProfilePicture(savedProfilePicture);
+                onProfilePictureSave(savedProfilePicture);
             } catch (err) {
                 setProfilePictureError(err instanceof Error ? err.message : 'Kunne ikke oppdatere profilbildet');
                 profilePictureOk = false;

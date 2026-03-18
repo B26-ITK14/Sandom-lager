@@ -7,13 +7,28 @@ const PROFILE_PICTURE_PATTERN = /^data:image\/(png|jpeg|jpg|gif|webp);base64,[A-
 // GET /me - Returns the current authenticated user's profile
 async function getMe(req, res) {
     console.log(`[getMe] user id: ${req.user.id}, role: ${req.user.role}`);
-    res.json({
-        id: req.user.id,
-        name: req.user.name,
-        email: req.user.email,
-        role: req.user.role,
-        profilePicture: req.user.profile_picture || null,
-    });
+    try {
+        const result = await pool.query(
+            "SELECT id, name, email, role, profile_picture FROM users WHERE id = $1",
+            [req.user.id]
+        );
+
+        const user = result.rows[0];
+        if (!user) {
+            return res.status(404).json({ message: "Bruker ikke funnet" });
+        }
+
+        res.json({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            profilePicture: user.profile_picture || null,
+        });
+    } catch (err) {
+        console.error("[getMe] error:", err.message);
+        res.status(500).json({ message: "Kunne ikke hente brukerprofil" });
+    }
 }
 
 // PATCH /me/name - Updates the user's display name in the DB and syncs to Auth0
@@ -123,9 +138,12 @@ async function updateProfilePicture(req, res) {
     }
 
     try {
-        await pool.query("UPDATE users SET profile_picture = $1 WHERE id = $2", [profilePicture, req.user.id]);
+        const result = await pool.query(
+            "UPDATE users SET profile_picture = $1 WHERE id = $2 RETURNING profile_picture",
+            [profilePicture, req.user.id]
+        );
         console.log(`[updateProfilePicture] Profile picture updated for user id: ${req.user.id}`);
-        res.json({ profilePicture });
+        res.json({ profilePicture: result.rows[0]?.profile_picture || null });
     } catch (err) {
         console.error("[updateProfilePicture] error:", err.message);
         res.status(500).json({ message: "Kunne ikke oppdatere profilbildet" });

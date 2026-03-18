@@ -125,7 +125,7 @@ export async function requestEmailChange(newEmail: string, accessToken: string):
     }
 }
 
-export async function updateProfilePicture(profilePicture: string, accessToken: string): Promise<void> {
+export async function updateProfilePicture(profilePicture: string, accessToken: string): Promise<string | null> {
     const response = await fetch('/api/me/profile-picture', {
         method: 'PATCH',
         headers: {
@@ -139,4 +139,7 @@ export async function updateProfilePicture(profilePicture: string, accessToken: 
         const data = await response.json().catch(() => ({}));
         throw new Error((data as { message?: string }).message ?? `Kunne ikke oppdatere profilbildet (${response.status})`);
     }
+
+    const data = await response.json().catch(() => ({}));
+    return (data as { profilePicture?: string | null }).profilePicture ?? null;
 }
