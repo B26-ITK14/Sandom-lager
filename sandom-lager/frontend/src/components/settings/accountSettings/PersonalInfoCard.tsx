@@ -11,12 +11,10 @@ import type { ChangeEvent } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { User, MapPin, Mail, Save, X, Loader2 } from 'lucide-react';
 import { requestEmailChange, updateProfilePicture } from '../../../api/user';
+import { readFileAsDataUrl, validateProfilePictureFile } from './personalInfo/personalInfoUtils';
 import ProfilePictureSection from './personalInfo/ProfilePictureSection';
 import EditableField from './personalInfo/EditableField';
 import EmailField from './personalInfo/EmailField';
-
-const MAX_PROFILE_PICTURE_BYTES = 5 * 1024 * 1024;
-const ALLOWED_PROFILE_PICTURE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
 interface PersonalInfoCardProps {
     name: string;
@@ -66,31 +64,20 @@ export default function PersonalInfoCard({
 
         if (!file) return;
 
-        if (!ALLOWED_PROFILE_PICTURE_TYPES.includes(file.type)) {
-            setProfilePictureError('Kun JPG, PNG, GIF og WEBP er tillatt');
+        const validationError = validateProfilePictureFile(file);
+        if (validationError) {
+            setProfilePictureError(validationError);
             return;
         }
 
-        if (file.size > MAX_PROFILE_PICTURE_BYTES) {
-            setProfilePictureError('Profilbildet kan maks være 5 MB');
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = () => {
-            const result = typeof reader.result === 'string' ? reader.result : '';
-            if (!result) {
+        void readFileAsDataUrl(file)
+            .then((result) => {
+                setEditedProfilePicture(result);
+                setProfilePictureError('');
+            })
+            .catch(() => {
                 setProfilePictureError('Kunne ikke lese profilbildet');
-                return;
-            }
-
-            setEditedProfilePicture(result);
-            setProfilePictureError('');
-        };
-        reader.onerror = () => {
-            setProfilePictureError('Kunne ikke lese profilbildet');
-        };
-        reader.readAsDataURL(file);
+            });
     };
 
     const handleSave = async () => {
