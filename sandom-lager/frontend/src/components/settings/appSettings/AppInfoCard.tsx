@@ -4,13 +4,19 @@
     * Author: Emil Berglund
 */
 
+import { useAppVersion } from '../../../hooks/version/appVersion';
+
 export default function AppInfoCard() {
+    const { display } = useAppVersion();
+
     return (
         <section className="rounded-2xl p-6" style={{ backgroundColor: 'var(--color-surface)' }}>
             <div className="flex items-center justify-between">
                 <div>
                     <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Sandom Lager</p>
-                    <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-secondary)' }}>Versjon 1.0.0</p>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-secondary)' }}>
+                        Versjon: {display}
+                    </p>
                 </div>
                 <span
                     className="px-2.5 py-1 rounded-full text-xs font-medium"
