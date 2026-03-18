@@ -40,6 +40,11 @@ type SaveHandlerDeps = {
     setIsEditing: (value: boolean) => void;
 };
 
+export type SaveResult = {
+    status: 'success' | 'error' | 'noop';
+    message: string;
+};
+
 type CancelHandlerDeps = {
     name: string;
     username: string;
@@ -62,6 +67,62 @@ type ProfilePictureChangeDeps = {
     setEditedProfilePicture: (value: string | null) => void;
     setProfilePictureError: (value: string) => void;
 };
+
+function promptCredentialManagers(identifier: { username: string; email: string }): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+    const usernameValue = identifier.username.trim();
+    const emailValue = identifier.email.trim();
+    if (!usernameValue && !emailValue) return;
+
+    const form = document.createElement('form');
+    form.setAttribute('autocomplete', 'on');
+    form.style.position = 'fixed';
+    form.style.left = '-9999px';
+    form.style.top = '0';
+    form.style.width = '1px';
+    form.style.height = '1px';
+    form.style.opacity = '0';
+
+    const usernameInput = document.createElement('input');
+    usernameInput.type = 'text';
+    usernameInput.name = 'username';
+    usernameInput.autocomplete = 'username';
+    usernameInput.value = usernameValue || emailValue;
+
+    const emailInput = document.createElement('input');
+    emailInput.type = 'email';
+    emailInput.name = 'email';
+    emailInput.autocomplete = 'email';
+    emailInput.value = emailValue;
+
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+    });
+
+    form.appendChild(usernameInput);
+    form.appendChild(emailInput);
+    form.appendChild(submitButton);
+    document.body.appendChild(form);
+
+    usernameInput.dispatchEvent(new Event('input', { bubbles: true }));
+    usernameInput.dispatchEvent(new Event('change', { bubbles: true }));
+    emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+    emailInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+    if (typeof form.requestSubmit === 'function') {
+        form.requestSubmit(submitButton);
+    } else {
+        submitButton.click();
+    }
+
+    window.setTimeout(() => {
+        form.remove();
+    }, 0);
+}
 
 export function validateProfilePictureFile(file: File): string | null {
     if (!ALLOWED_PROFILE_PICTURE_TYPES.includes(file.type)) {
@@ -121,7 +182,7 @@ export function handleProfilePictureChange(
         });
 }
 
-export async function handleSave(deps: SaveHandlerDeps): Promise<void> {
+export async function handleSave(deps: SaveHandlerDeps): Promise<SaveResult> {
     const emailChanged = deps.isPasswordUser && deps.editedEmail.trim() !== deps.displayEmail && deps.editedEmail.trim() !== '';
     const nameChanged = deps.editedName.trim() !== deps.name.trim();
     const usernameChanged = deps.editedUsername.trim() !== deps.username.trim();
@@ -131,7 +192,7 @@ export async function handleSave(deps: SaveHandlerDeps): Promise<void> {
 
     if (!emailChanged && !profileChanged && !profilePictureChanged) {
         deps.setIsEditing(false);
-        return;
+        return { status: 'noop', message: '' };
     }
 
     deps.setEmailError('');
@@ -143,14 +204,19 @@ export async function handleSave(deps: SaveHandlerDeps): Promise<void> {
     let emailOk = true;
     let nameOk = true;
     let profilePictureOk = true;
+    let firstErrorMessage = '';
+    const successParts: string[] = [];
 
     if (emailChanged) {
         try {
             const token = await deps.getAccessTokenSilently();
             await deps.requestEmailChangeFn(deps.editedEmail.trim(), token);
             deps.setDisplayEmail(deps.editedEmail.trim());
+            successParts.push('E-post oppdatert');
         } catch (err) {
-            deps.setEmailError(err instanceof Error ? err.message : 'Kunne ikke oppdatere e-post');
+            const message = err instanceof Error ? err.message : 'Kunne ikke oppdatere e-post';
+            deps.setEmailError(message);
+            if (!firstErrorMessage) firstErrorMessage = message;
             emailOk = false;
         }
     }
@@ -169,7 +235,11 @@ export async function handleSave(deps: SaveHandlerDeps): Promise<void> {
             } else {
                 deps.setNameError(message);
             }
+            if (!firstErrorMessage) firstErrorMessage = message;
             nameOk = false;
+        }
+        if (nameOk) {
+            successParts.push('Profilinformasjon oppdatert');
         }
     }
 
@@ -180,16 +250,35 @@ export async function handleSave(deps: SaveHandlerDeps): Promise<void> {
             deps.setDisplayProfilePicture(savedProfilePicture);
             deps.setEditedProfilePicture(savedProfilePicture);
             deps.onProfilePictureSave(savedProfilePicture);
+            successParts.push('Profilbilde oppdatert');
         } catch (err) {
-            deps.setProfilePictureError(err instanceof Error ? err.message : 'Kunne ikke oppdatere profilbildet');
+            const message = err instanceof Error ? err.message : 'Kunne ikke oppdatere profilbildet';
+            deps.setProfilePictureError(message);
+            if (!firstErrorMessage) firstErrorMessage = message;
             profilePictureOk = false;
         }
+    }
+
+    if (emailOk && nameOk && (emailChanged || usernameChanged)) {
+        promptCredentialManagers({
+            username: deps.editedUsername,
+            email: deps.editedEmail,
+        });
     }
 
     deps.setIsSaving(false);
     if (emailOk && nameOk && profilePictureOk) {
         deps.setIsEditing(false);
+        return {
+            status: 'success',
+            message: successParts.length > 0 ? successParts.join(' • ') : 'Endringer lagret',
+        };
     }
+
+    return {
+        status: 'error',
+        message: firstErrorMessage || 'Kunne ikke lagre endringene',
+    };
 }
 
 export function handleCancel(deps: CancelHandlerDeps): void {

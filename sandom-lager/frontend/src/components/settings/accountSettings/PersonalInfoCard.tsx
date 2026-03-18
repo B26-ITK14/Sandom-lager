@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
+import type { FormEvent } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { User, MapPin, Mail, Save, X, Loader2 } from "lucide-react";
 import { requestEmailChange, updateProfilePicture } from "../../../api/user";
@@ -13,6 +14,7 @@ import {
     handleCancel as handleCancelUtil,
     handleProfilePictureChange as handleProfilePictureChangeUtil,
     handleSave as handleSaveUtil,
+    type SaveResult,
 } from "./personalInfo/personalInfoUtils";
 import ProfilePictureSection from "./personalInfo/ProfilePictureSection";
 import EditableField from "./personalInfo/EditableField";
@@ -60,6 +62,7 @@ export default function PersonalInfoCard({
     const [nameError, setNameError] = useState("");
     const [usernameError, setUsernameError] = useState("");
     const [profilePictureError, setProfilePictureError] = useState("");
+    const [saveFeedback, setSaveFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
     useEffect(() => {
         setDisplayProfilePicture(profilePicture);
@@ -74,7 +77,7 @@ export default function PersonalInfoCard({
     };
 
     const handleSave = async () => {
-        await handleSaveUtil({
+        const result: SaveResult = await handleSaveUtil({
             isPasswordUser,
             editedEmail,
             displayEmail,
@@ -101,6 +104,14 @@ export default function PersonalInfoCard({
             setIsSaving,
             setIsEditing,
         });
+
+        if (result.status === "success") {
+            setSaveFeedback({ type: "success", message: result.message });
+        }
+
+        if (result.status === "error") {
+            setSaveFeedback({ type: "error", message: result.message });
+        }
     };
 
     const handleCancel = () => {
@@ -121,6 +132,12 @@ export default function PersonalInfoCard({
             setProfilePictureError,
             setIsEditing,
         });
+        setSaveFeedback(null);
+    };
+
+    const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        void handleSave();
     };
 
     return (
@@ -140,11 +157,13 @@ export default function PersonalInfoCard({
                 </div>
                 {!isEditing ? (
                     <button
+                        type="button"
                         onClick={() => {
                             setEditedName(name);
                             setEditedUsername(username);
                             setEditedLocation(location);
                             setEditedEmail(displayEmail);
+                            setSaveFeedback(null);
                             setIsEditing(true);
                         }}
                         className="px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
@@ -158,6 +177,7 @@ export default function PersonalInfoCard({
                 ) : (
                     <div className="flex gap-2">
                         <button
+                            type="button"
                             onClick={handleCancel}
                             className="p-2 rounded-lg transition-colors cursor-pointer"
                             style={{ backgroundColor: "var(--color-background)" }}
@@ -165,7 +185,8 @@ export default function PersonalInfoCard({
                             <X size={20} style={{ color: "var(--color-text-secondary)" }} />
                         </button>
                         <button
-                            onClick={handleSave}
+                            type="submit"
+                            form="personal-info-form"
                             disabled={isSaving}
                             className="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-70"
                             style={{
@@ -184,7 +205,19 @@ export default function PersonalInfoCard({
                 )}
             </div>
 
-            <div className="space-y-4">
+            <form id="personal-info-form" autoComplete="on" className="space-y-4" onSubmit={handleFormSubmit}>
+                {saveFeedback && (
+                    <p
+                        className="text-sm rounded-lg px-3 py-2"
+                        style={{
+                            color: saveFeedback.type === "success" ? "#166534" : "#991b1b",
+                            backgroundColor: saveFeedback.type === "success" ? "#dcfce7" : "#fee2e2",
+                        }}
+                    >
+                        {saveFeedback.message}
+                    </p>
+                )}
+
                 <ProfilePictureSection
                     imageSrc={editedProfilePicture}
                     isEditing={isEditing}
@@ -202,6 +235,8 @@ export default function PersonalInfoCard({
                     }}
                     isEditing={isEditing}
                     error={nameError}
+                    inputName="name"
+                    autoComplete="name"
                 />
 
                 <EditableField
@@ -214,6 +249,9 @@ export default function PersonalInfoCard({
                     }}
                     isEditing={isEditing}
                     error={usernameError}
+                    inputId="account-username"
+                    inputName="username"
+                    autoComplete="username"
                 />
 
                 <EmailField
@@ -230,6 +268,9 @@ export default function PersonalInfoCard({
                     isPasswordUser={isPasswordUser}
                     originalEmail={email}
                     error={emailError}
+                    inputId="account-email"
+                    inputName="email"
+                    autoComplete="email"
                 />
 
                 <EditableField
@@ -243,8 +284,10 @@ export default function PersonalInfoCard({
                     editedValue={editedLocation}
                     onChange={setEditedLocation}
                     isEditing={isEditing}
+                    inputName="address-level2"
+                    autoComplete="address-level2"
                 />
-            </div>
+            </form>
         </section>
     );
 }
