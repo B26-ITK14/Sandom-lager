@@ -15,6 +15,7 @@ import type { UserRole } from '../api/user';
 
 interface UserContextValue {
     name: string;
+    username: string | null;
     role: UserRole;
     blocked: boolean;
     profilePicture: string | null;
@@ -22,6 +23,7 @@ interface UserContextValue {
     error: string | null;
     /** Optimistic local update — call after a successful name-change API call */
     setName: (name: string) => void;
+    setUsername: (username: string | null) => void;
     setProfilePicture: (profilePicture: string | null) => void;
     /** Full re-fetch from the backend — use sparingly */
     refresh: () => void;
@@ -32,6 +34,7 @@ const UserContext = createContext<UserContextValue | null>(null);
 export function UserProvider({ children }: { children: React.ReactNode }) {
     const { getAccessTokenSilently, isAuthenticated, isLoading: authLoading } = useAuth0();
     const [name, setName] = useState('');
+    const [username, setUsername] = useState<string | null>(null);
     const [role, setRole] = useState<UserRole>(null);
     const [blocked, setBlocked] = useState(false);
     const [profilePicture, setProfilePicture] = useState<string | null>(null);
@@ -60,6 +63,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 if (!cancelled) {
                     console.log('[UserContext] fetchMe success →', { name: data.name, role: data.role, blocked: data.blocked, profilePicture: !!data.profilePicture });
                     setName(data.name);
+                    setUsername(data.username);
                     setRole(data.role);
                     setBlocked(data.blocked);
                     setProfilePicture(data.profilePicture);
@@ -82,7 +86,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => load(), [authLoading, isAuthenticated]);
 
     return (
-        <UserContext.Provider value={{ name, role, blocked, profilePicture, loading, error, setName, setProfilePicture, refresh: load }}>
+        <UserContext.Provider value={{ name, username, role, blocked, profilePicture, loading, error, setName, setUsername, setProfilePicture, refresh: load }}>
             {children}
         </UserContext.Provider>
     );

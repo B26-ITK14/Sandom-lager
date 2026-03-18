@@ -9,7 +9,7 @@ async function getMe(req, res) {
     console.log(`[getMe] user id: ${req.user.id}, role: ${req.user.role}`);
     try {
         const result = await pool.query(
-            "SELECT id, name, email, role, profile_picture FROM users WHERE id = $1",
+            "SELECT id, name, email, username, role, profile_picture FROM users WHERE id = $1",
             [req.user.id]
         );
 
@@ -22,12 +22,78 @@ async function getMe(req, res) {
             id: user.id,
             name: user.name,
             email: user.email,
+            username: user.username || null,
             role: user.role,
             profilePicture: user.profile_picture || null,
         });
     } catch (err) {
         console.error("[getMe] error:", err.message);
         res.status(500).json({ message: "Kunne ikke hente brukerprofil" });
+    }
+}
+
+// PATCH /me/username - Updates the user's username in DB and Auth0
+async function updateUsername(req, res) {
+    const { username } = req.body;
+    console.log(`[updateUsername] user id: ${req.user.id}, requested username: "${username}"`);
+
+    if (!username || typeof username !== "string") {
+        console.warn('[updateUsername] Validation failed: username missing or invalid type');
+        return res.status(400).json({ message: "Brukernavn er påkrevd" });
+    }
+
+    const trimmed = username.trim();
+    if (trimmed.length < 3 || trimmed.length > 30) {
+        console.warn(`[updateUsername] Validation failed: invalid length (${trimmed.length})`);
+        return res.status(400).json({ message: "Brukernavn må være mellom 3 og 30 tegn" });
+    }
+
+    if (!/^[A-Za-z0-9._-]+$/.test(trimmed)) {
+        console.warn('[updateUsername] Validation failed: invalid characters');
+        return res.status(400).json({ message: "Brukernavn kan kun inneholde bokstaver, tall, punktum, bindestrek og understrek" });
+    }
+
+    const auth0Id = req.auth?.sub;
+    if (!auth0Id?.startsWith("auth0|")) {
+        console.warn(`[updateUsername] Rejected: sub "${auth0Id}" is not a username/password account`);
+        return res.status(400).json({ message: "Brukernavn kan kun endres for brukernavn/passord-kontoer" });
+    }
+
+    try {
+        const takenResult = await pool.query(
+            "SELECT id FROM users WHERE LOWER(username) = LOWER($1) AND id <> $2 LIMIT 1",
+            [trimmed, req.user.id]
+        );
+
+        if (takenResult.rows.length > 0) {
+            console.warn(`[updateUsername] Username already taken: ${trimmed}`);
+            return res.status(409).json({ message: "Brukernavnet er allerede tatt. Velg et annet brukernavn." });
+        }
+
+        await callManagementApi(`/users/${encodeURIComponent(auth0Id)}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: trimmed }),
+        });
+        console.log(`[updateUsername] Auth0 Management API synced for sub: ${auth0Id}`);
+
+        const updateResult = await pool.query(
+            "UPDATE users SET username = $1 WHERE id = $2 RETURNING username",
+            [trimmed, req.user.id]
+        );
+
+        res.json({ username: updateResult.rows[0]?.username || null });
+    } catch (err) {
+        if (err && err.code === "23505") {
+            console.warn(`[updateUsername] Unique constraint violation for username: ${trimmed}`);
+            return res.status(409).json({ message: "Brukernavnet er allerede tatt. Velg et annet brukernavn." });
+        }
+        if (err instanceof Error && err.message.includes("Management API error")) {
+            console.error("[updateUsername] Auth0 sync failed:", err.message);
+            return res.status(502).json({ message: "Kunne ikke oppdatere brukernavn i Auth0" });
+        }
+        console.error("[updateUsername] error:", err.message);
+        res.status(500).json({ message: "Kunne ikke oppdatere brukernavn" });
     }
 }
 
@@ -150,4 +216,4 @@ async function updateProfilePicture(req, res) {
     }
 }
 
-module.exports = { getMe, updateName, updateEmail, updateProfilePicture };
+module.exports = { getMe, updateName, updateEmail, updateProfilePicture, updateUsername };

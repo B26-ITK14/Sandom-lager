@@ -12,17 +12,19 @@ export type { UserRole };
 type MeResponse = {
     role?: UserRole;
     name?: string;
+    username?: string | null;
     blocked?: boolean;
     profilePicture?: string | null;
 };
 
-export async function fetchMe(accessToken: string): Promise<{ role: UserRole; name: string; blocked: boolean; profilePicture: string | null }> {
+export async function fetchMe(accessToken: string): Promise<{ role: UserRole; name: string; username: string | null; blocked: boolean; profilePicture: string | null }> {
     const data = await apiFetchJson<MeResponse>("/api/me", {
         headers: { Authorization: `Bearer ${accessToken}` },
     });
     return {
         role: data.role ?? null,
         name: data.name ?? '',
+        username: data.username ?? null,
         blocked: data.blocked ?? false,
         profilePicture: data.profilePicture ?? null,
     };
@@ -45,6 +47,25 @@ export async function updateName(name: string, accessToken: string): Promise<voi
         const data = await response.json().catch(() => ({}));
         throw new Error((data as { message?: string }).message ?? `Kunne ikke oppdatere navn (${response.status})`);
     }
+}
+
+export async function updateUsername(username: string, accessToken: string): Promise<string | null> {
+    const response = await fetch('/api/me/username', {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ username }),
+    });
+
+    if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error((data as { message?: string }).message ?? `Kunne ikke oppdatere brukernavn (${response.status})`);
+    }
+
+    const data = await response.json().catch(() => ({}));
+    return (data as { username?: string | null }).username ?? null;
 }
 
 

@@ -52,6 +52,7 @@ export default function PersonalInfoCard({
     const [editedEmail, setEditedEmail] = useState(email);
     const [emailError, setEmailError] = useState('');
     const [nameError, setNameError] = useState('');
+    const [usernameError, setUsernameError] = useState('');
     const [profilePictureError, setProfilePictureError] = useState('');
 
     useEffect(() => {
@@ -107,6 +108,7 @@ export default function PersonalInfoCard({
 
         setEmailError('');
         setNameError('');
+        setUsernameError('');
         setProfilePictureError('');
         setIsSaving(true);
 
@@ -129,7 +131,12 @@ export default function PersonalInfoCard({
             try {
                 await onSave({ name: editedName, username: editedUsername, location: editedLocation });
             } catch (err) {
-                setNameError(err instanceof Error ? err.message : 'Kunne ikke oppdatere navn');
+                const message = err instanceof Error ? err.message : 'Kunne ikke oppdatere profil';
+                if (message.toLowerCase().includes('brukernavn')) {
+                    setUsernameError(message);
+                } else {
+                    setNameError(message);
+                }
                 nameOk = false;
             }
         }
@@ -159,6 +166,7 @@ export default function PersonalInfoCard({
         setEditedEmail(displayEmail);
         setEmailError('');
         setNameError('');
+        setUsernameError('');
         setProfilePictureError('');
         setIsEditing(false);
     };
@@ -229,8 +237,9 @@ export default function PersonalInfoCard({
                     label="Brukernavn"
                     value={username}
                     editedValue={editedUsername}
-                    onChange={setEditedUsername}
+                    onChange={(v) => { setEditedUsername(v); setUsernameError(''); }}
                     isEditing={isEditing}
+                    error={usernameError}
                 />
 
                 <EmailField
