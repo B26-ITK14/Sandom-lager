@@ -8,122 +8,26 @@ import Layout from "../components/Layout";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ProductCard from "../components/storage/productCard";
 import StorageFilterButton from "../components/storage/StorageFilterButton";
-import { fetchInventory } from "../api/storage";
-import { AUTH0_AUDIENCE } from "../config/auth";
 import { Plus, Search } from "lucide-react";
-import { useMemo, useState, useEffect } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
+import { useMemo, useState } from "react";
+import { useInventory } from "../hooks/storage/useInventory";
 import type { InventoryItem } from "../types";
 
 const FILTER_OPTIONS = ["Alle", "Mengde: lite -> mye", "Mengde: mye -> lite"];
 
-function parseQuantityValue(quantity: string) {
-    const parsed = Number.parseFloat(quantity.replace(",", "."));
-    return Number.isNaN(parsed) ? 0 : parsed;
-}
-
 type Product = {
     name: string;
-    quantity: string;
+    quantity: number;
+    unit: InventoryItem["unit"];
 };
 
-function isAuth0Error(error: unknown): error is { error?: string; message?: string } {
-    return typeof error === "object" && error !== null;
-}
-
 export default function StoragePage() {
+    const { inventory, isLoading, errorMessage } = useInventory();
 
-    const {
-        getAccessTokenSilently,
-        getAccessTokenWithPopup,
-        isAuthenticated,
-        isLoading: authLoading,
-    } = useAuth0();
-
-    const [products, setProducts] = useState<Product[]>([]);
     const [selectedFilter, setSelectedFilter] = useState(FILTER_OPTIONS[0]);
     const [searchQuery, setSearchQuery] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (authLoading) {
-            return;
-        }
-
-        if (!isAuthenticated) {
-            setProducts([]);
-            setErrorMessage(null);
-            setIsLoading(false);
-            return;
-        }
-
-        let cancelled = false;
-
-        async function loadInventory() {
-            try {
-                setIsLoading(true);
-                setErrorMessage(null);
-
-                let token: string;
-
-                try {
-                    token = await getAccessTokenSilently({
-                        authorizationParams: { audience: AUTH0_AUDIENCE },
-                    });
-                } catch (error) {
-                    if (
-                        isAuth0Error(error) &&
-                        (error.error === "consent_required" || error.error === "login_required")
-                    ) {
-                        const popupToken = await getAccessTokenWithPopup({
-                            authorizationParams: { audience: AUTH0_AUDIENCE },
-                        });
-
-                        if (!popupToken) {
-                            throw new Error("Kunne ikke hente tilgang til lagerdata.");
-                        }
-
-                        token = popupToken;
-                    } else {
-                        throw error;
-                    }
-                }
-
-                const inventory = await fetchInventory(token);
-
-                if (cancelled) {
-                    return;
-                }
-
-                setProducts(mapInventoryToProducts(inventory));
-
-            } catch (error) {
-                console.error("Feil ved innhenting av lagerdata:", error);
-
-                if (cancelled) {
-                    return;
-                }
-
-                setProducts([]);
-                setErrorMessage(
-                    error instanceof Error
-                        ? error.message
-                        : "Kunne ikke hente lagerdata."
-                );
-            } finally {
-                if (!cancelled) {
-                    setIsLoading(false);
-                }
-            }
-        }
-
-        loadInventory();
-
-        return () => {
-            cancelled = true;
-        };
-    }, [authLoading, getAccessTokenSilently, getAccessTokenWithPopup, isAuthenticated]);
+    const products = useMemo(() => mapInventoryToProducts(inventory), [inventory]);
 
     const filteredProducts = useMemo(() => {
 
@@ -136,13 +40,13 @@ export default function StoragePage() {
 
         if (selectedFilter === "Mengde: lite -> mye") {
             result = [...result].sort(
-                (a, b) => parseQuantityValue(a.quantity) - parseQuantityValue(b.quantity)
+                (a, b) => a.quantity - b.quantity
             );
         }
 
         if (selectedFilter === "Mengde: mye -> lite") {
             result = [...result].sort(
-                (a, b) => parseQuantityValue(b.quantity) - parseQuantityValue(a.quantity)
+                (a, b) => b.quantity - a.quantity
             );
         }
 
@@ -150,7 +54,7 @@ export default function StoragePage() {
 
     }, [products, searchQuery, selectedFilter]);
 
-    if (authLoading || isLoading) {
+    if (isLoading) {
         return <LoadingSpinner />;
     }
 
@@ -210,7 +114,7 @@ export default function StoragePage() {
                         <ProductCard
                             key={`${product.name}-${index}`}
                             name={product.name}
-                            quantity={product.quantity}
+                            quantity={`${product.quantity} ${product.unit}`}
                             highlighted={index % 2 === 0}
                         />
                     ))}
@@ -224,6 +128,7 @@ export default function StoragePage() {
 function mapInventoryToProducts(inventory: InventoryItem[]): Product[] {
     return inventory.map((item) => ({
         name: item.ingredient,
-        quantity: `${item.quantity} ${item.unit}`,
+        quantity: item.quantity,
+        unit: item.unit,
     }));
 }

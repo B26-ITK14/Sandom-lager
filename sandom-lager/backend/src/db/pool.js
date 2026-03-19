@@ -13,13 +13,6 @@ function ensureUserSchema() {
       ALTER TABLE users
       ADD COLUMN IF NOT EXISTS profile_picture TEXT;
 
-      CREATE TABLE IF NOT EXISTS user_sessions (
-        id TEXT PRIMARY KEY,
-        user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        ip_address TEXT,
-        user_agent TEXT,
-        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-        last_seen_at TIMESTAMP NOT NULL DEFAULT NOW()
       ALTER TABLE users
       ADD COLUMN IF NOT EXISTS username TEXT;
 
@@ -31,7 +24,7 @@ function ensureUserSchema() {
         id TEXT PRIMARY KEY,
         user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         revoked_at TIMESTAMP NOT NULL DEFAULT NOW()
-      )
+      );
     `).catch((error) => {
       userSchemaPromise = null;
       throw error;
