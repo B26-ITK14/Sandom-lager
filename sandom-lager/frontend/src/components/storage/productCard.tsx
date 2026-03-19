@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import DelCardQ from "./DelCardQ";
 
 type ProductCardProps = {
     name: string;
@@ -6,7 +7,9 @@ type ProductCardProps = {
     unit: string;
     highlighted?: boolean;
     onSaveQuantity?: (nextQuantity: number) => Promise<void> | void;
+    onDelete?: () => Promise<void> | void;
     editDisabled?: boolean;
+    deleteDisabled?: boolean;
 };
 
 import StorageEditCardBtn from "./StorageEditCardBtn";
@@ -18,10 +21,13 @@ export default function ProductCard({
     unit,
     highlighted = false,
     onSaveQuantity,
+    onDelete,
     editDisabled = false,
+    deleteDisabled = false,
 }: ProductCardProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [quantityInput, setQuantityInput] = useState(String(quantity));
+    const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
     useEffect(() => {
         if (!isEditing) {
@@ -48,51 +54,79 @@ export default function ProductCard({
         setIsEditing(false);
     }
 
+    async function handleConfirmDelete() {
+        await onDelete?.();
+        setIsConfirmingDelete(false);
+    }
+
     return (
         <article
-            className="flex items-center justify-between rounded-none px-6 py-8"
+            className="rounded-none px-6 py-6"
             style={{backgroundColor: highlighted ? "#e2e5ea" : "#eceef2",}}
         >
-            <section>
-                <h2 className="text-lg leading-none font-medium" style={{ color: "#000" }}>
-                    {name}
-                </h2>
+            <div className="flex items-center justify-between">
+                <section>
+                    <h2 className="text-lg leading-none font-medium" style={{ color: "#000" }}>
+                        {name}
+                    </h2>
 
-                {isEditing ? (
-                    <div className="mt-2 flex items-center gap-2">
-                        <input
-                            type="number"
-                            min="0"
-                            step="any"
-                            className="w-24 rounded-md border px-2 py-1 text-md font-semibold outline-none"
-                            style={{ borderColor: "#b8bcc6", color: "#5f6368", backgroundColor: "#ffffff" }}
-                            value={quantityInput}
-                            onChange={(event) => setQuantityInput(event.target.value)}
-                            aria-label={`Ny mengde for ${name}`}
-                            disabled={editDisabled}
-                        />
-                        <span className="text-md font-semibold" style={{ color: "#5f6368" }}>
-                            {unit}
-                        </span>
-                    </div>
-                ) : (
-                    <p className="mt-2 text-md leading-none font-semibold" style={{ color: "#5f6368" }}>
-                        {quantity} {unit}
-                    </p>
-                )}
-            </section>
+                    {isEditing ? (
+                        <div className="mt-2 flex items-center gap-2">
+                            <input
+                                type="number"
+                                min="0"
+                                step="any"
+                                className="w-24 rounded-md border px-2 py-1 text-md font-semibold outline-none"
+                                style={{ borderColor: "#b8bcc6", color: "#5f6368", backgroundColor: "#ffffff" }}
+                                value={quantityInput}
+                                onChange={(event) => setQuantityInput(event.target.value)}
+                                aria-label={`Ny mengde for ${name}`}
+                                disabled={editDisabled}
+                            />
+                            <span className="text-md font-semibold" style={{ color: "#5f6368" }}>
+                                {unit}
+                            </span>
+                        </div>
+                    ) : (
+                        <p className="mt-2 text-md leading-none font-semibold" style={{ color: "#5f6368" }}>
+                            {quantity} {unit}
+                        </p>
+                    )}
+                </section>
 
-            <section className="flex items-center gap-3">
-                <StorageEditCardBtn
-                    name={name}
-                    onClick={() => {
-                        void handleEditButtonClick();
-                    }}
-                    disabled={editDisabled}
-                    isSaving={isEditing}
-                />
-                <StorageDelCardBtn name={name} />
-            </section>
+                <section className="flex items-center gap-3">
+                    <StorageEditCardBtn
+                        name={name}
+                        onClick={() => {
+                            void handleEditButtonClick();
+                        }}
+                        disabled={editDisabled}
+                        isSaving={isEditing}
+                    />
+                    <StorageDelCardBtn
+                        name={name}
+                        onClick={() => {
+                            setIsConfirmingDelete(true);
+                        }}
+                        disabled={deleteDisabled}
+                    />
+                </section>
+            </div>
+
+            {isConfirmingDelete ? (
+                <div className="mt-4">
+                    <DelCardQ
+                        name={name}
+                        onConfirm={() => {
+                            void handleConfirmDelete();
+                        }}
+                        onCancel={() => {
+                            setIsConfirmingDelete(false);
+                        }}
+                        disabled={deleteDisabled}
+                    />
+                </div>
+            ) : null}
         </article>
     );
 }

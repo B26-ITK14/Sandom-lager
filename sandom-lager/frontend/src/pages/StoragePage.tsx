@@ -14,7 +14,7 @@ import { useInventory } from "../hooks/storage/useInventory";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useUser } from "../context/UserContext";
 import { AUTH0_AUDIENCE } from "../config/auth";
-import { updateInventoryQuantity } from "../api/storage";
+import { deleteInventoryItem, updateInventoryQuantity } from "../api/storage";
 import type { InventoryItem } from "../types";
 
 const FILTER_OPTIONS = ["Alle", "Mengde: lite -> mye", "Mengde: mye -> lite"];
@@ -40,6 +40,7 @@ export default function StoragePage() {
     const [selectedFilter, setSelectedFilter] = useState(FILTER_OPTIONS[0]);
     const [searchQuery, setSearchQuery] = useState("");
     const [editingProductId, setEditingProductId] = useState<number | null>(null);
+    const [deletingProductId, setDeletingProductId] = useState<number | null>(null);
 
     const products = useMemo(() => mapInventoryToProducts(inventory), [inventory]);
 
@@ -69,6 +70,32 @@ export default function StoragePage() {
     }, [products, searchQuery, selectedFilter]);
 
     const canEditInventory = role === "admin" || role === "manager";
+    const canDeleteInventory = role === "admin";
+
+    async function getInventoryToken(): Promise<string> {
+        try {
+            return await getAccessTokenSilently({
+                authorizationParams: { audience: AUTH0_AUDIENCE },
+            });
+        } catch (error) {
+            if (
+                isAuth0Error(error) &&
+                (error.error === "consent_required" || error.error === "login_required")
+            ) {
+                const popupToken = await getAccessTokenWithPopup({
+                    authorizationParams: { audience: AUTH0_AUDIENCE },
+                });
+
+                if (!popupToken) {
+                    throw new Error("Kunne ikke hente tilgang til lagerdata.");
+                }
+
+                return popupToken;
+            }
+
+            throw error;
+        }
+    }
 
     async function handleSaveProductQuantity(product: Product, nextQuantity: number) {
         if (!canEditInventory) {
@@ -78,30 +105,7 @@ export default function StoragePage() {
         setEditingProductId(product.id);
 
         try {
-            let token: string;
-
-            try {
-                token = await getAccessTokenSilently({
-                    authorizationParams: { audience: AUTH0_AUDIENCE },
-                });
-            } catch (error) {
-                if (
-                    isAuth0Error(error) &&
-                    (error.error === "consent_required" || error.error === "login_required")
-                ) {
-                    const popupToken = await getAccessTokenWithPopup({
-                        authorizationParams: { audience: AUTH0_AUDIENCE },
-                    });
-
-                    if (!popupToken) {
-                        throw new Error("Kunne ikke hente tilgang til lagerredigering.");
-                    }
-
-                    token = popupToken;
-                } else {
-                    throw error;
-                }
-            }
+            const token = await getInventoryToken();
 
             await updateInventoryQuantity(product.id, nextQuantity, token);
             refresh();
@@ -109,6 +113,24 @@ export default function StoragePage() {
             window.alert(error instanceof Error ? error.message : "Kunne ikke oppdatere lageret.");
         } finally {
             setEditingProductId(null);
+        }
+    }
+
+    async function handleDeleteProduct(product: Product) {
+        if (!canDeleteInventory) {
+            return;
+        }
+
+        setDeletingProductId(product.id);
+
+        try {
+            const token = await getInventoryToken();
+            await deleteInventoryItem(product.id, token);
+            refresh();
+        } catch (error) {
+            window.alert(error instanceof Error ? error.message : "Kunne ikke slette vare fra lageret.");
+        } finally {
+            setDeletingProductId(null);
         }
     }
 
@@ -179,6 +201,10 @@ export default function StoragePage() {
                                 void handleSaveProductQuantity(product, nextQuantity);
                             }}
                             editDisabled={!canEditInventory || editingProductId === product.id}
+                            onDelete={() => {
+                                void handleDeleteProduct(product);
+                            }}
+                            deleteDisabled={!canDeleteInventory || deletingProductId === product.id}
                         />
                     ))}
                 </section>

@@ -48,3 +48,16 @@ export async function updateInventoryQuantity(
         body: JSON.stringify({ quantity }),
     });
 }
+
+export async function deleteInventoryItem(
+    inventoryId: number,
+    accessToken: string
+    ): Promise<void> {
+    await apiFetchJson(`/api/inventory/${inventoryId}`, {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+        },
+    });
+}
