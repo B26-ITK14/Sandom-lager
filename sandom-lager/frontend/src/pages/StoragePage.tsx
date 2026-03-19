@@ -7,25 +7,39 @@
 import Layout from "../components/Layout";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ProductCard from "../components/storage/productCard";
-import StorageFilterButton from "../components/storage/StorageFilterButton";
+import StorageFilterButton from "../components/storage/StorageFilterBtn";
 import { Plus, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useInventory } from "../hooks/storage/useInventory";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useUser } from "../context/UserContext";
+import { AUTH0_AUDIENCE } from "../config/auth";
+import { updateInventoryQuantity } from "../api/storage";
 import type { InventoryItem } from "../types";
 
 const FILTER_OPTIONS = ["Alle", "Mengde: lite -> mye", "Mengde: mye -> lite"];
 
 type Product = {
+    id: number;
     name: string;
     quantity: number;
     unit: InventoryItem["unit"];
 };
 
+type Auth0ErrorShape = { error?: string; message?: string };
+
+function isAuth0Error(error: unknown): error is Auth0ErrorShape {
+    return typeof error === "object" && error !== null;
+}
+
 export default function StoragePage() {
-    const { inventory, isLoading, errorMessage } = useInventory();
+    const { inventory, isLoading, errorMessage, refresh } = useInventory();
+    const { role } = useUser();
+    const { getAccessTokenSilently, getAccessTokenWithPopup } = useAuth0();
 
     const [selectedFilter, setSelectedFilter] = useState(FILTER_OPTIONS[0]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [editingProductId, setEditingProductId] = useState<number | null>(null);
 
     const products = useMemo(() => mapInventoryToProducts(inventory), [inventory]);
 
@@ -53,6 +67,50 @@ export default function StoragePage() {
         return result;
 
     }, [products, searchQuery, selectedFilter]);
+
+    const canEditInventory = role === "admin" || role === "manager";
+
+    async function handleSaveProductQuantity(product: Product, nextQuantity: number) {
+        if (!canEditInventory) {
+            return;
+        }
+
+        setEditingProductId(product.id);
+
+        try {
+            let token: string;
+
+            try {
+                token = await getAccessTokenSilently({
+                    authorizationParams: { audience: AUTH0_AUDIENCE },
+                });
+            } catch (error) {
+                if (
+                    isAuth0Error(error) &&
+                    (error.error === "consent_required" || error.error === "login_required")
+                ) {
+                    const popupToken = await getAccessTokenWithPopup({
+                        authorizationParams: { audience: AUTH0_AUDIENCE },
+                    });
+
+                    if (!popupToken) {
+                        throw new Error("Kunne ikke hente tilgang til lagerredigering.");
+                    }
+
+                    token = popupToken;
+                } else {
+                    throw error;
+                }
+            }
+
+            await updateInventoryQuantity(product.id, nextQuantity, token);
+            refresh();
+        } catch (error) {
+            window.alert(error instanceof Error ? error.message : "Kunne ikke oppdatere lageret.");
+        } finally {
+            setEditingProductId(null);
+        }
+    }
 
     if (isLoading) {
         return <LoadingSpinner />;
@@ -114,8 +172,13 @@ export default function StoragePage() {
                         <ProductCard
                             key={`${product.name}-${index}`}
                             name={product.name}
-                            quantity={`${product.quantity} ${product.unit}`}
+                            quantity={product.quantity}
+                            unit={product.unit}
                             highlighted={index % 2 === 0}
+                            onSaveQuantity={(nextQuantity) => {
+                                void handleSaveProductQuantity(product, nextQuantity);
+                            }}
+                            editDisabled={!canEditInventory || editingProductId === product.id}
                         />
                     ))}
                 </section>
@@ -127,6 +190,7 @@ export default function StoragePage() {
 
 function mapInventoryToProducts(inventory: InventoryItem[]): Product[] {
     return inventory.map((item) => ({
+        id: item.id,
         name: item.ingredient,
         quantity: item.quantity,
         unit: item.unit,

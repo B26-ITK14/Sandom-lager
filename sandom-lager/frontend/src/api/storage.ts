@@ -33,3 +33,18 @@ export async function addToShoppingList(
         body: JSON.stringify({ ingredient_id: itemId, needed_quantity: quantity }),
     });
 }
+
+export async function updateInventoryQuantity(
+    inventoryId: number,
+    quantity: number,
+    accessToken: string
+): Promise<void> {
+    await apiFetchJson(`/api/inventory/${inventoryId}`, {
+        method: "PUT",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ quantity }),
+    });
+}

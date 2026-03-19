@@ -1,12 +1,53 @@
+import { useEffect, useState } from "react";
+
 type ProductCardProps = {
     name: string;
-    quantity: string;
+    quantity: number;
+    unit: string;
     highlighted?: boolean;
+    onSaveQuantity?: (nextQuantity: number) => Promise<void> | void;
+    editDisabled?: boolean;
 };
 
-import { Pencil, Trash2 } from "lucide-react";
+import StorageEditCardBtn from "./StorageEditCardBtn";
+import StorageDelCardBtn from "./StorageDelCardBtn";
 
-export default function ProductCard({ name, quantity, highlighted = false }: ProductCardProps) {
+export default function ProductCard({
+    name,
+    quantity,
+    unit,
+    highlighted = false,
+    onSaveQuantity,
+    editDisabled = false,
+}: ProductCardProps) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [quantityInput, setQuantityInput] = useState(String(quantity));
+
+    useEffect(() => {
+        if (!isEditing) {
+            setQuantityInput(String(quantity));
+        }
+    }, [quantity, isEditing]);
+
+    async function handleEditButtonClick() {
+        if (!isEditing) {
+            setQuantityInput(String(quantity));
+            setIsEditing(true);
+            return;
+        }
+
+        const normalizedInput = quantityInput.replace(",", ".").trim();
+        const nextQuantity = Number(normalizedInput);
+
+        if (!Number.isFinite(nextQuantity) || nextQuantity < 0) {
+            window.alert("Ugyldig mengde. Skriv inn et tall som er 0 eller høyere.");
+            return;
+        }
+
+        await onSaveQuantity?.(nextQuantity);
+        setIsEditing(false);
+    }
+
     return (
         <article
             className="flex items-center justify-between rounded-none px-6 py-8"
@@ -16,28 +57,41 @@ export default function ProductCard({ name, quantity, highlighted = false }: Pro
                 <h2 className="text-lg leading-none font-medium" style={{ color: "#000" }}>
                     {name}
                 </h2>
-                <p className="mt-2 text-md leading-none font-semibold" style={{ color: "#5f6368" }}>
-                    {quantity}
-                </p>
+
+                {isEditing ? (
+                    <div className="mt-2 flex items-center gap-2">
+                        <input
+                            type="number"
+                            min="0"
+                            step="any"
+                            className="w-24 rounded-md border px-2 py-1 text-md font-semibold outline-none"
+                            style={{ borderColor: "#b8bcc6", color: "#5f6368", backgroundColor: "#ffffff" }}
+                            value={quantityInput}
+                            onChange={(event) => setQuantityInput(event.target.value)}
+                            aria-label={`Ny mengde for ${name}`}
+                            disabled={editDisabled}
+                        />
+                        <span className="text-md font-semibold" style={{ color: "#5f6368" }}>
+                            {unit}
+                        </span>
+                    </div>
+                ) : (
+                    <p className="mt-2 text-md leading-none font-semibold" style={{ color: "#5f6368" }}>
+                        {quantity} {unit}
+                    </p>
+                )}
             </section>
 
             <section className="flex items-center gap-3">
-                <button
-                    type="button"
-                    className="grid h-11 w-11 place-items-center rounded-full"
-                    style={{ backgroundColor: "#f2cf8e", color: "#000" }}
-                    aria-label={`Rediger ${name}`}
-                >
-                    <Pencil size={20} />
-                </button>
-                <button
-                    type="button"
-                    className="grid h-11 w-11 place-items-center rounded-full"
-                    style={{ backgroundColor: "#ee9da1", color: "#000" }}
-                    aria-label={`Slett ${name}`}
-                >
-                    <Trash2 size={20} />
-                </button>
+                <StorageEditCardBtn
+                    name={name}
+                    onClick={() => {
+                        void handleEditButtonClick();
+                    }}
+                    disabled={editDisabled}
+                    isSaving={isEditing}
+                />
+                <StorageDelCardBtn name={name} />
             </section>
         </article>
     );
