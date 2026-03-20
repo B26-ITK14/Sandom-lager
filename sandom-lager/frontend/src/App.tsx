@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import { SelectedRecipesProvider } from "./context/SelectedRecipesContext";
+import { UserProvider } from "./context/UserContext";
 import { ProtectedRoute } from "./auth";
 
 import LoginPage from "./pages/LoginPage";
@@ -13,18 +14,52 @@ import MyAccountPage from "./pages/settings/MyAccountPage";
 import MyApplicationsPage from "./pages/settings/MyApplicationsPage";
 import AppSettingsPage from "./pages/settings/AppSettingsPage";
 
+import AdminPage from "./pages/AdminPage";
+import RequestAccessPage from "./pages/onboarding/RequestAccessPage"; // ← beholder din sti
+import PendingApprovalPage from "./pages/onboarding/PendingApprovalPage"; // ← beholder din sti
+import { ROUTES } from "./router/routes"; // ← beholder deres tillegg
+
 export default function App() {
   return (
     <ThemeProvider>
+      <UserProvider>
       <BrowserRouter>
         <SelectedRecipesProvider>
         <Routes>
           {/* Public route */}
           <Route path="/login" element={<LoginPage />} />
-
-          {/* Protected route */}
+          
+          {/* Onboarding – krever innlogging, men ikke godkjent lokasjon */}
           <Route
-            path="/"
+            path={ROUTES.REQUEST_ACCESS.path}
+            element={
+              <ProtectedRoute requireLocation={false}>
+                <RequestAccessPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.PENDING_APPROVAL.path}
+            element={
+              <ProtectedRoute requireLocation={false}>
+                <PendingApprovalPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin */}
+          <Route
+            path={ROUTES.ADMIN.path}
+            element={
+              <ProtectedRoute requireLocation={false}>
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected routes */}
+          <Route
+            path={ROUTES.DASHBOARD.path}
             element={
               <ProtectedRoute>
                 <HomePage />
@@ -32,7 +67,7 @@ export default function App() {
             }
           />
           <Route
-            path="/shopping-list"
+            path={ROUTES.SHOPPING_LIST.path}
             element={
               <ProtectedRoute>
                 <ShoppingListPage />
@@ -40,7 +75,7 @@ export default function App() {
             }
           />
           <Route
-            path="/settings"
+            path={ROUTES.SETTINGS.path}
             element={
               <ProtectedRoute>
                 <SettingsPage />
@@ -48,7 +83,7 @@ export default function App() {
             }
           />
           <Route
-            path="/storage"
+            path={ROUTES.STORAGE.path}
             element={
               <ProtectedRoute>
                 <StoragePage />
@@ -56,16 +91,15 @@ export default function App() {
             }
           />
           <Route
-            path="/recipes"
+            path={ROUTES.RECIPES.path}
             element={
               <ProtectedRoute>
                 <RecipesPage />
               </ProtectedRoute>
             }
-          />  
-
+          />
           <Route
-            path="/settings/account"
+            path={ROUTES.SETTINGS_ACCOUNT.path}
             element={
               <ProtectedRoute>
                 <MyAccountPage />
@@ -73,7 +107,7 @@ export default function App() {
             }
           />
           <Route
-            path="/settings/applications"
+            path={ROUTES.SETTINGS_APPLICATIONS.path}
             element={
               <ProtectedRoute>
                 <MyApplicationsPage />
@@ -81,7 +115,7 @@ export default function App() {
             }
           />
           <Route
-            path="/settings/app-settings"
+            path={ROUTES.SETTINGS_APP_SETTINGS.path}
             element={
               <ProtectedRoute>
                 <AppSettingsPage />
@@ -94,6 +128,7 @@ export default function App() {
         </Routes>
         </SelectedRecipesProvider>
       </BrowserRouter>
+      </UserProvider>
     </ThemeProvider>
   );
 }

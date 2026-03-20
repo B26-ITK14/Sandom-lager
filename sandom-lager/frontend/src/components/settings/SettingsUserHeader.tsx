@@ -7,12 +7,16 @@
 
 import { MapPin } from 'lucide-react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useUsername, useUserRole } from '../../hooks';
+import { useUser } from '../../context/UserContext';
+import { useUserRole } from '../../hooks';
+import { useUppercaseUsername } from '../../hooks/user/useName';
 
 export default function SettingsUserHeader() {
-    const userName = useUsername();
+    const userName = useUppercaseUsername();
     const { user } = useAuth0();
+    const { profilePicture } = useUser();
     const { role, loading: roleLoading } = useUserRole();
+    const imageSrc = profilePicture ?? user?.picture ?? 'src/assets/temp_EmilB04.png';
 
     const email = user?.email ?? 'ukjent@epost.no';
     const memberSince = user?.updated_at
@@ -32,7 +36,7 @@ export default function SettingsUserHeader() {
                     }}
                 >
                     <img
-                        src="src/assets/temp_EmilB04.png"
+                        src={imageSrc}
                         alt="Profile Picture"
                         className="w-24 h-24 rounded-2xl object-cover"
                     />

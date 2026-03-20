@@ -21,9 +21,33 @@ CREATE TABLE IF NOT EXISTS users (
     auth0_id TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
     name TEXT,
+    username TEXT,
+    profile_picture TEXT,
     role TEXT NOT NULL DEFAULT 'user'
     CHECK (role IN ('user', 'admin', 'manager')),
     created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS users_username_unique_idx
+ON users (LOWER(username))
+WHERE username IS NOT NULL;
+
+-- USER SESSIONS --
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id TEXT PRIMARY KEY,                          -- JWT jti claim
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    ip_address TEXT,
+    user_agent TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    last_seen_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- REVOKED SESSIONS --
+-- Sessions listed here are denied on subsequent requests (force logout).
+CREATE TABLE IF NOT EXISTS revoked_sessions (
+    id TEXT PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    revoked_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 -- USER LOCATION ACCESS --
@@ -116,6 +140,23 @@ CREATE TABLE IF NOT EXISTS logs (
     user_id INT REFERENCES users(id) ON DELETE SET NULL,
     action TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- USER SESSIONS --
+-- Tracks authenticated sessions by JWT ID (jti). Upserted on every request.
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id TEXT PRIMARY KEY,            -- JWT jti claim
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    ip_address TEXT,
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    last_seen_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS revoked_sessions (
+    id TEXT PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    revoked_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 

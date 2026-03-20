@@ -25,5 +25,8 @@ export const getAllRoutes = (): Route[] => {
 };
 
 export const getAllMainRoutes = (): Route[] => {
-    return Object.values(ROUTES).filter((route) => !route.path.includes("/settings/"));
+    const excludedNicknames = ["request-access", "pending-approval", "admin"]; 
+    return Object.values(ROUTES).filter(
+        (route) => !route.path.includes("/settings/") && !excludedNicknames.includes(route.nickname) 
+    );
 };

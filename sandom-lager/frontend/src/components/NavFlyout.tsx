@@ -5,12 +5,14 @@
     * Author: Emil Berglund
 */
 
-import { X, Search, Power } from 'lucide-react';
-import { useUsername } from '../hooks';
+import { X, Power } from 'lucide-react';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useUppercaseUsername } from '../hooks/user/useName';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getAllMainRoutes } from '../router/nav';
-import { version } from '../../package.json';
 import { LogoutLoadingOverlay, useAppLogout } from '../auth';
+import { useUser } from '../context/UserContext';
+import { useAppVersion } from '../hooks/version/appVersion';
 
 interface NavFlyoutProps {
     isOpen: boolean;
@@ -18,10 +20,14 @@ interface NavFlyoutProps {
 }
 
 export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
-    const username = useUsername();
+    const username = useUppercaseUsername();
+    const { user } = useAuth0();
+    const { profilePicture } = useUser();
     const { logoutUser, isLoggingOut } = useAppLogout(onClose);
+    const { display: appVersion } = useAppVersion();
     const navigate = useNavigate();
     const location = useLocation();
+    const imageSrc = profilePicture ?? user?.picture ?? 'src/assets/temp_EmilB04.png';
 
     const handleLogout = () => {
         void logoutUser();
@@ -56,11 +62,13 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         className="flex items-center gap-3 py-6 px-8 rounded-br-3xl"
                         style={{ backgroundColor: 'var(--color-surface)' }}
                     >
-                        <img
-                            src="src/assets/temp_EmilB04.png"
-                            alt="Profile Picture"
-                            className="w-14 h-14 rounded-full"
-                        />
+                        <div className="w-14 aspect-square overflow-hidden rounded-full">
+                            <img
+                                src={imageSrc}
+                                alt="Profile Picture"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
                         <div>
                             <p className="font-bold text-lg" style={{ color: 'var(--color-text-primary)' }}>
                                 {username}
@@ -78,27 +86,6 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         <X size={28} />
                     </button>
                 </section>
-
-                {/* Search bar */}
-                <div className={`p-6 ${isOpen ? 'animate-slide-in-left animate-delay-100' : ''}`}>
-                    <div className="relative">
-                        <Search
-                            size={20}
-                            className="absolute left-4 top-1/2 transform -translate-y-1/2"
-                            style={{ color: 'var(--color-text-secondary)' }}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Søk etter noe.."
-                            className="w-full pl-12 pr-4 py-3 rounded-full border"
-                            style={{
-                                backgroundColor: 'var(--color-background)',
-                                borderColor: 'var(--color-border)',
-                                color: 'var(--color-text-primary)',
-                            }}
-                        />
-                    </div>
-                </div>
 
                 {/* Navigation links */}
                 <nav className={`flex-1 py-4 overflow-y-auto ${isOpen ? 'animate-slide-in-left animate-delay-100' : ''}`}>
@@ -140,7 +127,7 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         Logg ut
                     </button>
                     <p className="text-xs text-right" style={{ color: 'var(--color-text-secondary)' }}>
-                        Versjon: {version ? version === '0.0.0' ? 'Under utvikling' : version : 'Ukjent'}
+                        Versjon: {appVersion}
                     </p>
                 </div>
             </section>
