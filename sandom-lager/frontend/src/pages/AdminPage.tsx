@@ -149,6 +149,7 @@ export default function AdminPage() {
                     </div>
                 )}
 
+                {/* Stat Cards */}
                 <div className="mb-6 grid grid-cols-3 gap-3">
                     {statCards.map(({ tab, label, icon: Icon, color }) => (
                         <div key={tab} className="rounded-2xl p-4 text-center"
@@ -165,7 +166,8 @@ export default function AdminPage() {
                         </div>
                     ))}
                 </div>
-
+                
+                {/* Filter Tabs */}
                 <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
                     {(["pending", "approved", "denied", "all"] as FilterTab[]).map((tab) => (
                         <button key={tab} onClick={() => setActiveTab(tab)}

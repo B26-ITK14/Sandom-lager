@@ -22,6 +22,7 @@ type MyApplication = {
     locationId: number;
     locationName: string;
     accessStatus: AccessStatus;
+    requestedAt: string | null;
 };
 
 type LocationOption = {
@@ -39,6 +40,21 @@ function statusStyle(status: AccessStatus): { bg: string; text: string } {
     if (status === "approved") return { bg: "#DCFCE7", text: "#166534" };
     if (status === "denied") return { bg: "#FEE2E2", text: "#991B1B" };
     return { bg: "#FEF9C3", text: "#854D0E" };
+}
+
+function formatRequestedAt(iso: string | null): string {
+    if (!iso) return "Ukjent tidspunkt";
+
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return "Ukjent tidspunkt";
+
+    return new Intl.DateTimeFormat("nb-NO", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(date);
 }
 
 export default function MyApplicationsPage() {
@@ -84,6 +100,7 @@ export default function MyApplicationsPage() {
                     name?: string;
                     location_name?: string;
                     access_status: AccessStatus;
+                    created_at?: string;
                 }>
             ).map((application, index) => {
                 const locationId = Number(application.location_id ?? application.id);
@@ -94,6 +111,7 @@ export default function MyApplicationsPage() {
                     locationId,
                     locationName,
                     accessStatus: application.access_status,
+                    requestedAt: application.created_at ?? null,
                 };
             });
 
@@ -182,7 +200,8 @@ export default function MyApplicationsPage() {
                                                     className="mt-1 text-xs"
                                                     style={{ color: "var(--color-text-secondary)" }}
                                                 >
-                                                    Lokasjon-ID: {application.locationId}
+                                                    {/* TODO: Replace with actual date */}
+                                                    Sendt: {formatRequestedAt(application.requestedAt)}
                                                 </p>
                                             </div>
 
