@@ -7,11 +7,21 @@ const { checkJwt } = require("../middleware/checkJwt");
 const { syncUser } = require("../middleware/syncUser");
 const { requireRole } = require("../middleware/requireRole");
 
+<<<<<<< HEAD
 const userLocationsController = require("../controllers/userLocations.controller");
 
 // Apply authentication and user synchronization middleware to all routes in this router
 router.use(checkJwt())
 router.use(syncUser)
+=======
+const {
+    requestLocationAccess,
+    approveLocationAccess,
+    denyLocationAccess,
+    getMyLocationAccess,
+     getAllLocationAccess 
+} = require("../controllers/userLocations.controller");
+>>>>>>> feature/admin-frontend
 
 // POST - User requests access to location
 router.post(
@@ -39,4 +49,12 @@ router.get(
     asyncHandler(userLocationsController.getMyLocationAccess)
 );
 
+// GET - Admin henter alle søknader
+router.get(
+    "/user-locations",
+    checkJwt(),
+    syncUser,
+    requireRole("admin"),
+    getAllLocationAccess
+);
 module.exports = router;

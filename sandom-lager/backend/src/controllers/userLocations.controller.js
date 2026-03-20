@@ -68,10 +68,30 @@ async function getMyLocationAccess(req, res) {
     res.json(result.rows);
 }
 
+// GET api/user-locations - Admin henter alle tilgangssøknader
+async function getAllLocationAccess(req, res) {
+    try {
+        const result = await pool.query(
+            `SELECT ul.id, ul.access_status, u.created_at,
+                    u.name as user_name, u.email,
+                    l.name as location_name
+             FROM user_locations ul
+             JOIN users u ON ul.user_id = u.id
+             JOIN locations l ON ul.location_id = l.id
+             ORDER BY u.created_at DESC`
+        );
+        res.json(result.rows);
+    } catch (err) {
+        console.error("getAllLocationAccess error:", err);
+        res.status(500).json({ message: "Failed to fetch location access requests" });
+    }
+}
+
 module.exports = {
     requestLocationAccess,
     approveLocationAccess,
     denyLocationAccess,
-    getMyLocationAccess
+    getMyLocationAccess,
+    getAllLocationAccess
 };
 
