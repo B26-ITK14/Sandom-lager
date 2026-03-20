@@ -14,7 +14,10 @@ export type RouteNickname =
     | "settings"
     | "settings-account"
     | "settings-applications"
-    | "settings-app-settings";
+    | "settings-app-settings"
+    | "request-access"
+    | "pending-approval"
+    | "admin";
 
 export const ROUTES: Record<string, Route> = {
     DASHBOARD: {
@@ -56,5 +59,20 @@ export const ROUTES: Record<string, Route> = {
         nickname: "settings-app-settings",
         path: "/settings/app-settings",
         displayName: "App innstillinger",
+    },
+     REQUEST_ACCESS: {
+        nickname: "request-access",
+        path: "/request-access",
+        displayName: "Søk om tilgang",
+    },
+    PENDING_APPROVAL: {
+        nickname: "pending-approval",
+        path: "/pending-approval",
+        displayName: "Venter på godkjenning",
+    },
+    ADMIN: {
+        nickname: "admin",
+        path: "/admin",
+        displayName: "Admin",
     },
 } as const;
