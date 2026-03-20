@@ -8,9 +8,10 @@
 import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useUserRole } from "../hooks/user/useUserRole";
-import { Users, CheckCircle, XCircle, Clock } from "lucide-react";
+import { CheckCircle, XCircle, Clock } from "lucide-react";
 import PendingCard, { type AccessRequest } from "../components/onBoarding/PendingCard";
-import type { UserLocationResponse } from "../types"; // ← NY
+import type { UserLocationResponse } from "../types";
+import SettingsLayout from "../components/settings/SettingsLayout";
 
 type FilterTab = "all" | "pending" | "approved" | "denied";
 
@@ -57,7 +58,7 @@ export default function AdminPage() {
                     status: r.access_status,
                 }));
                 setRequests(mapped);
-            } catch (err) {
+            } catch {
                 setError("Kunne ikke laste søknader.");
             } finally {
                 setPageLoading(false);
@@ -123,32 +124,15 @@ export default function AdminPage() {
     }
 
     return (
-        <main className="min-h-screen px-4 py-8"
-            style={{ backgroundColor: 'var(--color-background)' }}>
+        <SettingsLayout notifications={true} backMenu={false}>
+            {error && (
+                <div className="mb-4 rounded-xl p-3 text-sm"
+                    style={{ backgroundColor: 'var(--color-danger-surface)', color: 'var(--color-danger)' }}>
+                    {error}
+                </div>
+            )}
+
             <div className="mx-auto max-w-2xl">
-
-                <header className="mb-6 flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full"
-                        style={{ backgroundColor: 'var(--color-secondary-surface)', color: 'var(--color-primary)' }}>
-                        <Users size={20} />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-bold" style={{ color: 'var(--color-header-text-primary)' }}>
-                            Tilgangssøknader
-                        </h1>
-                        <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                            Administrer brukertilganger for Sandom og Tomasgården
-                        </p>
-                    </div>
-                </header>
-
-                {error && (
-                    <div className="mb-4 rounded-xl p-3 text-sm"
-                        style={{ backgroundColor: 'var(--color-danger-surface)', color: 'var(--color-danger)' }}>
-                        {error}
-                    </div>
-                )}
-
                 {/* Stat Cards */}
                 <div className="mb-6 grid grid-cols-3 gap-3">
                     {statCards.map(({ tab, label, icon: Icon, color }) => (
@@ -206,6 +190,6 @@ export default function AdminPage() {
                     </div>
                 )}
             </div>
-        </main>
+        </SettingsLayout>
     );
 }
