@@ -72,7 +72,8 @@ CREATE TABLE IF NOT EXISTS recipes (
     location_id INT REFERENCES locations(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     category TEXT NOT NULL,
-    instructions TEXT, 
+    instructions TEXT,
+    servings INT NOT NULL DEFAULT 4,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
