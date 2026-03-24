@@ -4,3 +4,4 @@
 */
 
 export { useRecipes } from "./useRecipes";
+export { useRecipeIngredients } from "./useRecipeIngredients";
