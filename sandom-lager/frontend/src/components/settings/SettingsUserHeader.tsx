@@ -14,7 +14,7 @@ import { useUppercaseUsername } from '../../hooks/user/useName';
 export default function SettingsUserHeader() {
     const userName = useUppercaseUsername();
     const { user } = useAuth0();
-    const { profilePicture } = useUser();
+    const { profilePicture, location } = useUser();
     const { role, loading: roleLoading } = useUserRole();
     const imageSrc = profilePicture || user?.picture || 'src/assets/temp_EmilB04.png';
 
@@ -78,7 +78,7 @@ export default function SettingsUserHeader() {
                 {/* TODO: Location */}
                 <p className="flex items-center gap-1 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                     <MapPin size={14} />
-                    Tomasgården, Kornsjø
+                    {location ?? 'Ukjent lokasjon'}
                 </p>
 
                 {/* Member since */}

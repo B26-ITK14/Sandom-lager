@@ -15,9 +15,10 @@ type MeResponse = {
     username?: string | null;
     blocked?: boolean;
     profilePicture?: string | null;
+    location?: string | null;
 };
 
-export async function fetchMe(accessToken: string): Promise<{ role: UserRole; name: string; username: string | null; blocked: boolean; profilePicture: string | null }> {
+export async function fetchMe(accessToken: string): Promise<{ role: UserRole; name: string; username: string | null; blocked: boolean; profilePicture: string | null; location: string | null }> {
     const data = await apiFetchJson<MeResponse>("/api/me", {
         headers: { Authorization: `Bearer ${accessToken}` },
     });
@@ -27,6 +28,7 @@ export async function fetchMe(accessToken: string): Promise<{ role: UserRole; na
         username: data.username ?? null,
         blocked: data.blocked ?? false,
         profilePicture: data.profilePicture ?? null,
+        location: data.location ?? null,
     };
 }
 

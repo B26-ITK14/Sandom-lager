@@ -70,6 +70,10 @@ export default function PersonalInfoCard({
         setDisplayProfilePicture(profilePicture);
     }, [profilePicture]);
 
+    useEffect(() => {
+        setEditedLocation(location);
+    }, [location]);
+
     // Create preview URL when editedProfilePicture changes
     useEffect(() => {
         if (editedProfilePicture) {
@@ -292,7 +296,7 @@ export default function PersonalInfoCard({
                             Plassering
                         </div>
                     }
-                    value={editedLocation}
+                    value={location}
                     editedValue={editedLocation}
                     onChange={setEditedLocation}
                     isEditing={isEditing}

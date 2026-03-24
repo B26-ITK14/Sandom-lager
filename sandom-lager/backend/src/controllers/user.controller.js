@@ -11,7 +11,25 @@ const uploadsDir = path.join(__dirname, '../../uploads/profile-pictures');
 async function getMe(req, res) {
     try {
         const result = await pool.query(
-            "SELECT id, name, email, username, role, profile_picture FROM users WHERE id = $1",
+            `SELECT
+                u.id,
+                u.name,
+                u.email,
+                u.username,
+                u.role,
+                u.profile_picture,
+                loc.location_name
+            FROM users u
+            LEFT JOIN LATERAL (
+                SELECT l.name AS location_name
+                FROM user_locations ul
+                JOIN locations l ON l.id = ul.location_id
+                WHERE ul.user_id = u.id
+                  AND ul.access_status = 'approved'
+                ORDER BY ul.id DESC
+                LIMIT 1
+            ) loc ON true
+            WHERE u.id = $1`,
             [req.user.id]
         );
 
@@ -32,6 +50,7 @@ async function getMe(req, res) {
             username: user.username || null,
             role: user.role,
             profilePicture: profilePictureUrl,
+            location: user.location_name || null,
         });
     } catch (err) {
         console.error("[getMe] error:", err.message);
