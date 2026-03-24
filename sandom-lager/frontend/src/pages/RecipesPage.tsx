@@ -6,15 +6,28 @@ import { useMemo, useState } from "react";
 import Layout from "../components/Layout";
 import LoadingSpinner from "../components/LoadingSpinner";
 import RecipeCard from "../components/recipes/RecipeCard";
-import { useRecipes } from "../hooks";
+import AddRecipeModal from "../components/recipes/AddRecipeModal";
+import RecipeDetailModal from "../components/recipes/RecipeDetailModal";
+import { useRecipes, useUserRole } from "../hooks";
 import { useSelectedRecipes } from "../context/SelectedRecipesContext";
+import type { Recipe } from "../types";
 
 export default function RecipesPage() {
-    const { recipes, loading, error } = useRecipes();
+    const { recipes, loading, error, refresh } = useRecipes();
     const { selectedIds, toggleSelected } = useSelectedRecipes();
+    const { role } = useUserRole();
     const [search, setSearch] = useState("");
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [filterOpen, setFilterOpen] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [detailRecipe, setDetailRecipe] = useState<Recipe | null>(null);
+
+    const canManageRecipes = role === "admin" || role === "manager";
+
+    function handleRecipeCreated() {
+        setShowAddModal(false);
+        refresh();
+    }
 
     const categories = useMemo(() => {
         const unique = Array.from(new Set(recipes.map((r) => r.category)));
@@ -63,7 +76,7 @@ export default function RecipesPage() {
                     onClick={() => setFilterOpen((prev) => !prev)}
                     aria-expanded={filterOpen}
                     aria-label="Filtrer oppskrifter"
-                    className="flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-colors"
+                    className="flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-colors cursor-pointer"
                     style={{
                         backgroundColor: filterOpen || activeCategory !== null
                             ? "var(--color-primary)"
@@ -78,6 +91,24 @@ export default function RecipesPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M7 12h10M11 18h2" />
                     </svg>
                 </button>
+
+                {canManageRecipes && (
+                    <button
+                        type="button"
+                        onClick={() => setShowAddModal(true)}
+                        aria-label="Legg til oppskrift"
+                        className="flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-colors cursor-pointer"
+                        style={{
+                            backgroundColor: "var(--color-primary)",
+                            color: "var(--color-on-primary)",
+                            border: "none",
+                        }}
+                    >
+                        <svg fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                )}
             </search>
 
             {/* Category filter chips */}
@@ -86,7 +117,7 @@ export default function RecipesPage() {
                     <button
                         type="button"
                         onClick={() => setActiveCategory(null)}
-                        className="px-3 py-1 rounded-full text-sm font-medium transition-colors"
+                        className="px-3 py-1 rounded-full text-sm font-medium transition-colors cursor-pointer"
                         style={{
                             backgroundColor: activeCategory === null ? "var(--color-primary)" : "var(--color-surface)",
                             color: activeCategory === null ? "var(--color-on-primary)" : "var(--color-text-primary)",
@@ -100,7 +131,7 @@ export default function RecipesPage() {
                             key={cat}
                             type="button"
                             onClick={() => setActiveCategory(cat === activeCategory ? null : cat)}
-                            className="px-3 py-1 rounded-full text-sm font-medium transition-colors"
+                            className="px-3 py-1 rounded-full text-sm font-medium transition-colors cursor-pointer"
                             style={{
                                 backgroundColor: activeCategory === cat ? "var(--color-primary)" : "var(--color-surface)",
                                 color: activeCategory === cat ? "var(--color-on-primary)" : "var(--color-text-primary)",
@@ -143,11 +174,27 @@ export default function RecipesPage() {
                                     recipe={recipe}
                                     selected={selectedIds.has(recipe.id)}
                                     onToggle={() => toggleSelected(recipe.id)}
+                                    onOpenDetail={() => setDetailRecipe(recipe)}
                                 />
                             </li>
                         ))}
                     </ol>
                 </section>
+            )}
+            {/* Add recipe modal */}
+            {showAddModal && (
+                <AddRecipeModal
+                    onClose={() => setShowAddModal(false)}
+                    onCreated={handleRecipeCreated}
+                />
+            )}
+
+            {/* Recipe detail modal */}
+            {detailRecipe && (
+                <RecipeDetailModal
+                    recipe={detailRecipe}
+                    onClose={() => setDetailRecipe(null)}
+                />
             )}
         </Layout>
     );
