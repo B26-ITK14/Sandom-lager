@@ -34,7 +34,7 @@ async function getRecipeById(req, res) {
 // POST /recipes
 async function createRecipe(req, res) {
     
-    const { title, category, instructions, location_id } = req.body;
+    const { title, category, instructions, location_id, servings } = req.body;
 
     if (!title) {
         throw new ApiError(400, "Missing required field: title");
@@ -42,10 +42,10 @@ async function createRecipe(req, res) {
 
     const result = await pool.query(
         `INSERT INTO recipes 
-        (title, category, instructions, location_id)
-        VALUES ($1, $2, $3, $4)
+        (title, category, instructions, location_id, servings)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING *`,
-        [title, category, instructions, location_id]
+        [title, category, instructions, location_id, servings ?? 4]
     );
 
     const recipe = result.rows[0];
@@ -62,7 +62,7 @@ async function createRecipe(req, res) {
 async function updateRecipe(req, res) {
 
     const { id } = req.params;
-    const { title, category, instructions } = req.body;
+    const { title, category, instructions, servings } = req.body;
 
     if (!title) {
         throw new ApiError(400, "Missing required field: title");
@@ -70,10 +70,10 @@ async function updateRecipe(req, res) {
 
     const result = await pool.query(
         `UPDATE recipes
-         SET title = $1, category = $2, instructions = $3
-         WHERE id = $4
+         SET title = $1, category = $2, instructions = $3, servings = $4
+         WHERE id = $5
          RETURNING *`,
-        [title, category, instructions, id]
+        [title, category, instructions, servings ?? 4, id]
     );
 
     if (result.rows.length === 0) {

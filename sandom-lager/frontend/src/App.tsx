@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
+import { SelectedRecipesProvider } from "./context/SelectedRecipesContext";
 import { UserProvider } from "./context/UserContext";
 import { AuthErrorProvider } from "./context/AuthErrorContext";
 import { ProtectedRoute } from "./auth";
@@ -25,107 +26,109 @@ export default function App() {
       <BrowserRouter>
         <AuthErrorProvider>
           <UserProvider>
-            <Routes>
-          {/* Public route */}
-          <Route path="/login" element={<LoginPage />} />
-          
-          {/* Onboarding – krever innlogging, men ikke godkjent lokasjon */}
-          <Route
-            path={ROUTES.REQUEST_ACCESS.path}
-            element={
-              <ProtectedRoute requireLocation={false}>
-                <RequestAccessPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTES.PENDING_APPROVAL.path}
-            element={
-              <ProtectedRoute requireLocation={false}>
-                <PendingApprovalPage />
-              </ProtectedRoute>
-            }
-          />
+            <SelectedRecipesProvider>
+              <Routes>
+                {/* Public route */}
+                <Route path="/login" element={<LoginPage />} />
 
-          {/* Admin */}
-          <Route
-            path={ROUTES.ADMIN.path}
-            element={
-              <ProtectedRoute requireLocation={false}>
-                <AdminPage />
-              </ProtectedRoute>
-            }
-          />
+                {/* Onboarding – krever innlogging, men ikke godkjent lokasjon */}
+                <Route
+                  path={ROUTES.REQUEST_ACCESS.path}
+                  element={
+                    <ProtectedRoute requireLocation={false}>
+                      <RequestAccessPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={ROUTES.PENDING_APPROVAL.path}
+                  element={
+                    <ProtectedRoute requireLocation={false}>
+                      <PendingApprovalPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-          {/* Protected routes */}
-          <Route
-            path={ROUTES.DASHBOARD.path}
-            element={
-              <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTES.SHOPPING_LIST.path}
-            element={
-              <ProtectedRoute>
-                <ShoppingListPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTES.SETTINGS.path}
-            element={
-              <ProtectedRoute>
-                <SettingsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTES.STORAGE.path}
-            element={
-              <ProtectedRoute>
-                <StoragePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTES.RECIPES.path}
-            element={
-              <ProtectedRoute>
-                <RecipesPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTES.SETTINGS_ACCOUNT.path}
-            element={
-              <ProtectedRoute>
-                <MyAccountPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTES.SETTINGS_APPLICATIONS.path}
-            element={
-              <ProtectedRoute>
-                <MyApplicationsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTES.SETTINGS_APP_SETTINGS.path}
-            element={
-              <ProtectedRoute>
-                <AppSettingsPage />
-              </ProtectedRoute>
-            }
-          />
+                {/* Admin */}
+                <Route
+                  path={ROUTES.ADMIN.path}
+                  element={
+                    <ProtectedRoute requireLocation={false}>
+                      <AdminPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-          {/* Catch-all */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+                {/* Protected routes */}
+                <Route
+                  path={ROUTES.DASHBOARD.path}
+                  element={
+                    <ProtectedRoute>
+                      <HomePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={ROUTES.SHOPPING_LIST.path}
+                  element={
+                    <ProtectedRoute>
+                      <ShoppingListPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={ROUTES.SETTINGS.path}
+                  element={
+                    <ProtectedRoute>
+                      <SettingsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={ROUTES.STORAGE.path}
+                  element={
+                    <ProtectedRoute>
+                      <StoragePage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={ROUTES.RECIPES.path}
+                  element={
+                    <ProtectedRoute>
+                      <RecipesPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={ROUTES.SETTINGS_ACCOUNT.path}
+                  element={
+                    <ProtectedRoute>
+                      <MyAccountPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={ROUTES.SETTINGS_APPLICATIONS.path}
+                  element={
+                    <ProtectedRoute>
+                      <MyApplicationsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={ROUTES.SETTINGS_APP_SETTINGS.path}
+                  element={
+                    <ProtectedRoute>
+                      <AppSettingsPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Catch-all */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </SelectedRecipesProvider>
           </UserProvider>
         </AuthErrorProvider>
       </BrowserRouter>
