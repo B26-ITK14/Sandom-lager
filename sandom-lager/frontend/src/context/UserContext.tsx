@@ -1,18 +1,10 @@
-/*
-    * UserContext.tsx
-    * Provides authenticated user data (name, role) fetched once from the backend
-    * after login. All components should read from this context instead of making
-    * their own /api/me calls, to keep Auth0 API usage minimal.
-    * Author: Emil Berglund
-*/
-
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { AUTH0_AUDIENCE } from '../config/auth';
 import { fetchMe } from '../api/user';
 import { ApiError } from '../api/client';
-import { useAuthError } from './AuthErrorContext';
+import { useAuthError } from './useAuthError';
 import type { UserRole } from '../api/user';
 
 interface UserContextValue {

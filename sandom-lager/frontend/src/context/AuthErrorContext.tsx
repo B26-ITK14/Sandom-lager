@@ -5,7 +5,8 @@
     * Author: Emil Berglund
 */
 
-import React, { createContext, useContext, useCallback, ReactNode } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useCallback, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppLogout } from '../auth/useAppLogout';
 
@@ -13,7 +14,7 @@ interface AuthErrorContextType {
     handleAuthError: (status: number, errorMessage?: string) => void;
 }
 
-const AuthErrorContext = createContext<AuthErrorContextType | undefined>(undefined);
+export const AuthErrorContext = createContext<AuthErrorContextType | undefined>(undefined);
 
 export function AuthErrorProvider({ children }: { children: ReactNode }) {
     const navigate = useNavigate();
@@ -37,12 +38,4 @@ export function AuthErrorProvider({ children }: { children: ReactNode }) {
             {children}
         </AuthErrorContext.Provider>
     );
-}
-
-export function useAuthError() {
-    const context = useContext(AuthErrorContext);
-    if (!context) {
-        throw new Error('useAuthError must be used within AuthErrorProvider');
-    }
-    return context;
 }

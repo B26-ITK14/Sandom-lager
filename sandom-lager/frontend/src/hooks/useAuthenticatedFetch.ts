@@ -8,7 +8,7 @@
 
 import { useCallback } from 'react';
 import { apiFetchJson, ApiError } from '../api/client';
-import { useAuthError } from '../context/AuthErrorContext';
+import { useAuthError } from '../context/useAuthError';
 
 export function useAuthenticatedFetch() {
     const { handleAuthError } = useAuthError();
