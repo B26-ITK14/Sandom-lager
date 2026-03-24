@@ -54,7 +54,9 @@ export default function PersonalInfoCard({
     const [displayProfilePicture, setDisplayProfilePicture] =
         useState(profilePicture);
     const [editedProfilePicture, setEditedProfilePicture] =
-        useState(profilePicture);
+        useState<File | null>(null);
+    const [editedProfilePicturePreview, setEditedProfilePicturePreview] =
+        useState<string | null>(null);
 
     const [displayEmail, setDisplayEmail] = useState(email);
     const [editedEmail, setEditedEmail] = useState(email);
@@ -66,8 +68,18 @@ export default function PersonalInfoCard({
 
     useEffect(() => {
         setDisplayProfilePicture(profilePicture);
-        setEditedProfilePicture(profilePicture);
     }, [profilePicture]);
+
+    // Create preview URL when editedProfilePicture changes
+    useEffect(() => {
+        if (editedProfilePicture) {
+            const url = URL.createObjectURL(editedProfilePicture);
+            setEditedProfilePicturePreview(url);
+            return () => URL.revokeObjectURL(url);
+        } else {
+            setEditedProfilePicturePreview(null);
+        }
+    }, [editedProfilePicture]);
 
     const handleProfilePictureChange = (event: ChangeEvent<HTMLInputElement>) => {
         handleProfilePictureChangeUtil(event, {
@@ -219,7 +231,7 @@ export default function PersonalInfoCard({
                 )}
 
                 <ProfilePictureSection
-                    imageSrc={editedProfilePicture}
+                    imageSrc={editedProfilePicturePreview || displayProfilePicture}
                     isEditing={isEditing}
                     error={profilePictureError}
                     onFileChange={handleProfilePictureChange}

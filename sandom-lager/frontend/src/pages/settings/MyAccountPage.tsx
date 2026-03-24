@@ -80,7 +80,7 @@ export default function MyAccountPage() {
                     name={displayName}
                     username={displayUsername}
                     email={email}
-                    profilePicture={profilePicture ?? user?.picture ?? null}
+                    profilePicture={profilePicture || null}
                     onProfilePictureSave={setProfilePicture}
                     onSave={handleSavePersonalInfo}
                 />

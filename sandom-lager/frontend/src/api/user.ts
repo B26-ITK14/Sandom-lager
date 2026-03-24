@@ -161,14 +161,16 @@ export async function requestEmailChange(newEmail: string, accessToken: string):
     }
 }
 
-export async function updateProfilePicture(profilePicture: string, accessToken: string): Promise<string | null> {
+export async function updateProfilePicture(file: File, accessToken: string): Promise<string | null> {
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+
     const response = await fetch('/api/me/profile-picture', {
         method: 'PATCH',
         headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ profilePicture }),
+        body: formData,
     });
 
     if (!response.ok) {
