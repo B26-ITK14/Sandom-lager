@@ -1,16 +1,10 @@
-/*
-    * UserContext.tsx
-    * Provides authenticated user data (name, role) fetched once from the backend
-    * after login. All components should read from this context instead of making
-    * their own /api/me calls, to keep Auth0 API usage minimal.
-    * Author: Emil Berglund
-*/
-
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { AUTH0_AUDIENCE } from '../config/auth';
 import { fetchMe } from '../api/user';
+import { ApiError } from '../api/client';
+import { useAuthError } from './useAuthError';
 import type { UserRole } from '../api/user';
 
 interface UserContextValue {
@@ -33,6 +27,7 @@ const UserContext = createContext<UserContextValue | null>(null);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
     const { getAccessTokenSilently, isAuthenticated, isLoading: authLoading } = useAuth0();
+    const { handleAuthError } = useAuthError();
     const [name, setName] = useState('');
     const [username, setUsername] = useState<string | null>(null);
     const [role, setRole] = useState<UserRole>(null);
@@ -72,6 +67,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             })
             .catch((err) => {
                 console.error('[UserContext] fetchMe error:', err);
+                
+                // Handle 401 (Unauthorized) errors
+                if (err instanceof ApiError && err.status === 401) {
+                    handleAuthError(401, err.detail || err.message);
+                    return;
+                }
+                
                 if (!cancelled) {
                     setError(err instanceof Error ? err.message : 'Unknown error');
                     setLoading(false);
