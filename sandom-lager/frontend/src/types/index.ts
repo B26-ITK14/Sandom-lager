@@ -29,6 +29,7 @@ export interface Recipe {
     title: string;
     category: string;
     instructions: string | null;
+    servings: number;
     created_at: string;
 }
 
@@ -49,6 +50,16 @@ export const INGREDIENT_UNITS: readonly IngredientUnit[] = [
     ...COUNT_UNITS,
 ];
 
+export const RECIPE_CATEGORIES = [
+    "Frokost",
+    "Lunsj",
+    "Middag",
+    "Mellommåltid",
+    "Kveldsmat",
+] as const;
+
+export type RecipeCategory = typeof RECIPE_CATEGORIES[number];
+
 export interface Ingredient {
     id: number;
     name: string;
@@ -60,6 +71,8 @@ export interface RecipeIngredient {
     recipe_id: number;
     ingredient_id: number;
     quantity: number;
+    ingredient_name: string;
+    unit: IngredientUnit;
 }
 
 export interface ShoppingListItem {
