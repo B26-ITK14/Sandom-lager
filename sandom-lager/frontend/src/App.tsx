@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import { UserProvider } from "./context/UserContext";
+import { AuthErrorProvider } from "./context/AuthErrorContext";
 import { ProtectedRoute } from "./auth";
 
 import LoginPage from "./pages/LoginPage";
@@ -21,9 +22,10 @@ import { ROUTES } from "./router/routes"; // ← beholder deres tillegg
 export default function App() {
   return (
     <ThemeProvider>
-      <UserProvider>
       <BrowserRouter>
-        <Routes>
+        <AuthErrorProvider>
+          <UserProvider>
+            <Routes>
           {/* Public route */}
           <Route path="/login" element={<LoginPage />} />
           
@@ -123,9 +125,10 @@ export default function App() {
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            </Routes>
+          </UserProvider>
+        </AuthErrorProvider>
       </BrowserRouter>
-      </UserProvider>
     </ThemeProvider>
   );
 }

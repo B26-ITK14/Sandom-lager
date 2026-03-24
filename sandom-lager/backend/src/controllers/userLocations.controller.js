@@ -61,7 +61,16 @@ async function getMyLocationAccess(req, res) {
     const userId = req.user.id;
 
     const result = await pool.query(
-        "SELECT l.id, l.name, ul.access_status FROM user_locations ul JOIN locations l ON ul.location_id = l.id WHERE ul.user_id = $1",
+        `SELECT ul.id,
+                ul.location_id,
+                l.name AS location_name,
+                ul.access_status,
+                u.created_at
+         FROM user_locations ul
+         JOIN locations l ON ul.location_id = l.id
+         JOIN users u ON ul.user_id = u.id
+         WHERE ul.user_id = $1
+         ORDER BY u.created_at DESC`,
         [userId]
     );
 
