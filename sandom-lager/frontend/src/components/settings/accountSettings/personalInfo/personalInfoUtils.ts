@@ -22,16 +22,16 @@ type SaveHandlerDeps = {
     username: string;
     editedLocation: string;
     location: string;
-    editedProfilePicture: string | null;
+    editedProfilePicture: File | null;
     displayProfilePicture: string | null;
     getAccessTokenSilently: () => Promise<string>;
     onSave: (data: SaveData) => Promise<void>;
     onProfilePictureSave: (profilePicture: string | null) => void;
     requestEmailChangeFn: (email: string, accessToken: string) => Promise<void>;
-    updateProfilePictureFn: (profilePicture: string, accessToken: string) => Promise<string | null>;
+    updateProfilePictureFn: (file: File, accessToken: string) => Promise<string | null>;
     setDisplayEmail: (value: string) => void;
     setDisplayProfilePicture: (value: string | null) => void;
-    setEditedProfilePicture: (value: string | null) => void;
+    setEditedProfilePicture: (value: File | null) => void;
     setEmailError: (value: string) => void;
     setNameError: (value: string) => void;
     setUsernameError: (value: string) => void;
@@ -49,12 +49,11 @@ type CancelHandlerDeps = {
     name: string;
     username: string;
     location: string;
-    displayProfilePicture: string | null;
     displayEmail: string;
     setEditedName: (value: string) => void;
     setEditedUsername: (value: string) => void;
     setEditedLocation: (value: string) => void;
-    setEditedProfilePicture: (value: string | null) => void;
+    setEditedProfilePicture: (value: File | null) => void;
     setEditedEmail: (value: string) => void;
     setEmailError: (value: string) => void;
     setNameError: (value: string) => void;
@@ -64,7 +63,7 @@ type CancelHandlerDeps = {
 };
 
 type ProfilePictureChangeDeps = {
-    setEditedProfilePicture: (value: string | null) => void;
+    setEditedProfilePicture: (value: File | null) => void;
     setProfilePictureError: (value: string) => void;
 };
 
@@ -172,14 +171,9 @@ export function handleProfilePictureChange(
         return;
     }
 
-    void readFileAsDataUrl(file)
-        .then((result) => {
-            deps.setEditedProfilePicture(result);
-            deps.setProfilePictureError('');
-        })
-        .catch(() => {
-            deps.setProfilePictureError('Kunne ikke lese profilbildet');
-        });
+    // Store the File object directly - preview will use URL.createObjectURL
+    deps.setEditedProfilePicture(file);
+    deps.setProfilePictureError('');
 }
 
 export async function handleSave(deps: SaveHandlerDeps): Promise<SaveResult> {
@@ -187,7 +181,7 @@ export async function handleSave(deps: SaveHandlerDeps): Promise<SaveResult> {
     const nameChanged = deps.editedName.trim() !== deps.name.trim();
     const usernameChanged = deps.editedUsername.trim() !== deps.username.trim();
     const locationChanged = deps.editedLocation.trim() !== deps.location.trim();
-    const profilePictureChanged = deps.editedProfilePicture !== deps.displayProfilePicture;
+    const profilePictureChanged = deps.editedProfilePicture !== null;
     const profileChanged = nameChanged || usernameChanged || locationChanged;
 
     if (!emailChanged && !profileChanged && !profilePictureChanged) {
@@ -243,12 +237,12 @@ export async function handleSave(deps: SaveHandlerDeps): Promise<SaveResult> {
         }
     }
 
-    if (profilePictureChanged) {
+    if (profilePictureChanged && deps.editedProfilePicture) {
         try {
             const token = await deps.getAccessTokenSilently();
-            const savedProfilePicture = await deps.updateProfilePictureFn(deps.editedProfilePicture ?? '', token);
+            const savedProfilePicture = await deps.updateProfilePictureFn(deps.editedProfilePicture, token);
             deps.setDisplayProfilePicture(savedProfilePicture);
-            deps.setEditedProfilePicture(savedProfilePicture);
+            deps.setEditedProfilePicture(null);
             deps.onProfilePictureSave(savedProfilePicture);
             successParts.push('Profilbilde oppdatert');
         } catch (err) {
@@ -285,7 +279,7 @@ export function handleCancel(deps: CancelHandlerDeps): void {
     deps.setEditedName(deps.name);
     deps.setEditedUsername(deps.username);
     deps.setEditedLocation(deps.location);
-    deps.setEditedProfilePicture(deps.displayProfilePicture);
+    deps.setEditedProfilePicture(null);
     deps.setEditedEmail(deps.displayEmail);
     deps.setEmailError('');
     deps.setNameError('');

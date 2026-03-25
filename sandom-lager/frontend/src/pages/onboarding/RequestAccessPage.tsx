@@ -12,14 +12,25 @@ import LocationSelector, { type Location } from "../../components/onBoarding/Loc
 import OnBoardingTitle from "../../components/onBoarding/OnBoardingTitle";
 import { ROUTES } from "../../router/routes";
 import { fetchLocations, requestLocationAccess } from "../../api/userLocations";
+import { LogoutLoadingOverlay, useAppLogout } from "../../auth";
+import { useUser } from "../../context/UserContext";
 
 export default function RequestAccessPage() {
     const navigate = useNavigate();
     const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0();
+    const { logoutUser, isLoggingOut } = useAppLogout();
+    const { location, loading: userLoading } = useUser();
     const [locations, setLocations] = useState<Location[]>([]);
     const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (isLoading || userLoading) return;
+        if (isAuthenticated && location) {
+            navigate(ROUTES.DASHBOARD.path, { replace: true });
+        }
+    }, [isLoading, userLoading, isAuthenticated, location, navigate]);
 
     useEffect(() => {
         if (!isAuthenticated || isLoading) return; 
@@ -31,7 +42,7 @@ export default function RequestAccessPage() {
                     id: String(l.id),
                     name: l.name,
                 })));
-            } catch (err) {
+            } catch {
                 setError("Kunne ikke laste lokasjoner.");
             }
         }
@@ -127,7 +138,7 @@ export default function RequestAccessPage() {
                     <button
                         onClick={() => navigate(ROUTES.DASHBOARD.path)}
                         disabled={isSubmitting}
-                        className="w-full rounded-xl border py-3 text-sm font-medium transition-colors duration-150 disabled:opacity-50"
+                        className="w-full rounded-xl border py-3 text-sm font-medium transition-colors duration-150 disabled:opacity-50 cursor-pointer"
                         style={{
                             borderColor: 'var(--color-border)',
                             color: 'var(--color-text-secondary)',
@@ -138,8 +149,28 @@ export default function RequestAccessPage() {
                     >
                         Avbryt
                     </button>
+                    {/*Log out button */}
+                    <button
+                        onClick={() => {
+                            void logoutUser();
+                        }}
+                        disabled={isSubmitting || isLoggingOut}
+                        className="w-full rounded-xl border py-3 text-sm font-medium transition-colors duration-150 disabled:opacity-50 cursor-pointer"
+                        style={{
+                            borderColor: 'var(--color-border)',
+                            color: 'var(--color-text-secondary)',
+                            backgroundColor: 'transparent',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-secondary-surface)')}
+                        onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                    >
+                        Logg ut
+                    </button>
+                    
                 </section>
             </div>
+
+            <LogoutLoadingOverlay isVisible={isLoggingOut} />
         </main>
     );
 }

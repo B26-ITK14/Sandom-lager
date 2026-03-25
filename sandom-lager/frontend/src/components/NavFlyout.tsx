@@ -22,11 +22,11 @@ interface NavFlyoutProps {
 export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
     const username = useUppercaseUsername();
     const { user } = useAuth0();
-    const { profilePicture } = useUser();
+    const { profilePicture, location: userLocation } = useUser();
     const { logoutUser, isLoggingOut } = useAppLogout(onClose);
     const { display: appVersion } = useAppVersion();
     const navigate = useNavigate();
-    const location = useLocation();
+    const routeLocation = useLocation();
     const imageSrc = profilePicture ?? user?.picture ?? 'src/assets/temp_EmilB04.png';
 
     const handleLogout = () => {
@@ -74,7 +74,7 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                                 {username}
                             </p>
                             <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                                Tomasgården, Kornsjø
+                                {userLocation ?? 'Ukjent lokasjon'}
                             </p>
                         </div>
                     </div>
@@ -94,13 +94,13 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                             <li key={route.nickname}>
                                 <button
                                     onClick={() => handleNavigation(route.path)}
-                                    className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${location.pathname === route.path ? 'font-bold' : ''
+                                    className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${routeLocation.pathname === route.path ? 'font-bold' : ''
                                         }`}
                                     style={{
                                         color: 'var(--color-text-primary)',
                                     }}
                                 >
-                                    {location.pathname === route.path && (
+                                    {routeLocation.pathname === route.path && (
                                         <span
                                             className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
                                             style={{ backgroundColor: 'var(--color-primary)' }}
