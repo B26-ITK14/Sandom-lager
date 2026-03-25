@@ -49,7 +49,6 @@ type CancelHandlerDeps = {
     name: string;
     username: string;
     location: string;
-    displayProfilePicture: string | null;
     displayEmail: string;
     setEditedName: (value: string) => void;
     setEditedUsername: (value: string) => void;
@@ -280,7 +279,7 @@ export function handleCancel(deps: CancelHandlerDeps): void {
     deps.setEditedName(deps.name);
     deps.setEditedUsername(deps.username);
     deps.setEditedLocation(deps.location);
-    deps.setEditedProfilePicture(deps.displayProfilePicture);
+    deps.setEditedProfilePicture(null);
     deps.setEditedEmail(deps.displayEmail);
     deps.setEmailError('');
     deps.setNameError('');

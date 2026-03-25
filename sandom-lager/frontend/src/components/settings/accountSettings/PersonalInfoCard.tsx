@@ -135,7 +135,6 @@ export default function PersonalInfoCard({
             name,
             username,
             location,
-            displayProfilePicture,
             displayEmail,
             setEditedName,
             setEditedUsername,
