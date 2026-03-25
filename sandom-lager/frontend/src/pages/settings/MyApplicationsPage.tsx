@@ -4,10 +4,12 @@
     * Author: Emil Berglund
     TODO: Fetch access status from DB
     TODO: Move functions to API file
+    TODO: Make global file for status labels
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { ChevronDown } from "lucide-react";
 import SettingsLayout from "../../components/settings/SettingsLayout";
 import {
     fetchLocations,
@@ -241,29 +243,39 @@ export default function MyApplicationsPage() {
                         >
                             Velg sted
                         </label>
-                        <select
-                            id="new-location-application"
-                            value={selectedLocation}
-                            onChange={(event) => setSelectedLocation(event.target.value)}
-                            disabled={isSubmitting || pageLoading}
-                            className="w-full rounded-xl border px-3 py-2.5 text-sm"
-                            style={{
-                                borderColor: "var(--color-border)",
-                                color: "var(--color-text-primary)",
-                                backgroundColor: "var(--color-background)",
-                            }}
-                        >
-                            <option value="">Velg lokasjon...</option>
-                            {locations.map((location) => {
-                                const unavailable = unavailableLocationIds.has(location.id);
-                                return (
-                                    <option key={location.id} value={location.id} disabled={unavailable}>
-                                        {location.name}
-                                        {unavailable ? " (allerede søkt/godkjent)" : ""}
-                                    </option>
-                                );
-                            })}
-                        </select>
+                        <div className="relative">
+                            <select
+                                id="new-location-application"
+                                value={selectedLocation}
+                                onChange={(event) => setSelectedLocation(event.target.value)}
+                                disabled={isSubmitting || pageLoading}
+                                className="w-full appearance-none rounded-xl border px-3 py-2.5 pr-10 text-sm"
+                                style={{
+                                    borderColor: "var(--color-border)",
+                                    color: "var(--color-text-primary)",
+                                    backgroundColor: "var(--color-background)",
+                                }}
+                            >
+                                <option value="">Velg lokasjon...</option>
+                                {locations.map((location) => {
+                                    const unavailable = unavailableLocationIds.has(location.id);
+                                    return (
+                                        <option key={location.id} value={location.id} disabled={unavailable}>
+                                            {location.name}
+                                            {unavailable ? " (allerede søkt/godkjent)" : ""}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+
+                            <span
+                                className="pointer-events-none absolute inset-y-0 right-3 flex items-center"
+                                style={{ color: "var(--color-text-secondary)" }}
+                                aria-hidden="true"
+                            >
+                                <ChevronDown size={16} />
+                            </span>
+                        </div>
                     </div>
 
                     {error && (
@@ -287,7 +299,7 @@ export default function MyApplicationsPage() {
                     <button
                         onClick={handleCreateApplication}
                         disabled={isSubmitting || !selectedLocation}
-                        className="mt-4 w-full rounded-xl py-2.5 text-sm font-semibold transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                        className="mt-4 w-full rounded-xl py-2.5 text-sm font-semibold transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                         style={{
                             backgroundColor: "var(--color-primary)",
                             color: "var(--color-on-primary)",

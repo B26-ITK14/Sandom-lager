@@ -124,7 +124,7 @@ export default function AdminPage() {
     }
 
     return (
-        <SettingsLayout notifications={true} backMenu={false}>
+        <SettingsLayout notifications={true} backMenu={true}>
             {error && (
                 <div className="mb-4 rounded-xl p-3 text-sm"
                     style={{ backgroundColor: 'var(--color-danger-surface)', color: 'var(--color-danger)' }}>
