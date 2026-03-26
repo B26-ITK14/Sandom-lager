@@ -1,3 +1,9 @@
+/**
+ * DelCardQ.tsx
+ * A confirmation card component for deleting an inventory item.
+ * Displays the item name and asks the user to confirm or cancel the deletion.
+ */
+
 type DelCardQProps = {
     name: string;
     onConfirm: () => void;

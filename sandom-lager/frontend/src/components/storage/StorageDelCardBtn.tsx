@@ -1,5 +1,9 @@
+/*
+ * StorageDelCardBtn.tsx
+* A delete button component for inventory items in the storage page.
+ */
+
 import { Trash2 } from "lucide-react";
-import { useUser } from "../../context/UserContext";
 
 type StorageDelCardBtnProps = {
     name: string;
@@ -7,23 +11,11 @@ type StorageDelCardBtnProps = {
     disabled?: boolean;
 };
 
-const DELETE_ALLOWED_ROLES = ["admin"];
-
 export default function StorageDelCardBtn({
     name,
     onClick,
     disabled = false,
 }: StorageDelCardBtnProps) {
-    const { role, loading } = useUser();
-
-    if (loading) {
-        return null;
-    }
-
-    if (!role || !DELETE_ALLOWED_ROLES.includes(role)) {
-        return null;
-    }
-
     return(
         <button
             type="button"

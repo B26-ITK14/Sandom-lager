@@ -1,5 +1,9 @@
+/**
+* StorageEditCardBtn.tsx
+* A button component for editing or saving changes to an inventory item.
+*/
+
 import { Check, Pencil } from "lucide-react";
-import { useUser } from "../../context/UserContext";
 
 type StorageEditCardBtnProps = {
     name: string;
@@ -8,24 +12,12 @@ type StorageEditCardBtnProps = {
     isSaving?: boolean;
 };
 
-const EDIT_ALLOWED_ROLES = ["admin", "manager"];
-
 export default function StorageEditCardBtn({
     name,
     onClick,
     disabled = false,
     isSaving = false,
 }: StorageEditCardBtnProps) {
-    const { role, loading } = useUser();
-
-    if (loading) {
-        return null;
-    }
-
-    if (!role || !EDIT_ALLOWED_ROLES.includes(role)) {
-        return null;
-    }
-
     return(
         <button
             type="button"

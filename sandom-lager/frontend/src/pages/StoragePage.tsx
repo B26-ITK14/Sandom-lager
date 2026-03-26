@@ -8,7 +8,7 @@ import Layout from "../components/Layout";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ProductCard from "../components/storage/productCard";
 import StorageFilterButton from "../components/storage/StorageFilterBtn";
-import { Plus, Search } from "lucide-react";
+import { CircleAlert, Plus, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useInventory } from "../hooks/storage/useInventory";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -41,6 +41,7 @@ export default function StoragePage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [editingProductId, setEditingProductId] = useState<number | null>(null);
     const [deletingProductId, setDeletingProductId] = useState<number | null>(null);
+    const [notice, setNotice] = useState<string | null>(null);
 
     const products = useMemo(() => mapInventoryToProducts(inventory), [inventory]);
 
@@ -72,6 +73,10 @@ export default function StoragePage() {
     const canEditInventory = role === "admin" || role === "manager";
     const canDeleteInventory = role === "admin";
 
+    function showNotice(message: string) {
+        setNotice(message);
+    }
+
     async function getInventoryToken(): Promise<string> {
         try {
             return await getAccessTokenSilently({
@@ -99,6 +104,7 @@ export default function StoragePage() {
 
     async function handleSaveProductQuantity(product: Product, nextQuantity: number) {
         if (!canEditInventory) {
+            showNotice("Du har ikke tilgang til å redigere lageret.");
             return;
         }
 
@@ -110,7 +116,7 @@ export default function StoragePage() {
             await updateInventoryQuantity(product.id, nextQuantity, token);
             refresh();
         } catch (error) {
-            window.alert(error instanceof Error ? error.message : "Kunne ikke oppdatere lageret.");
+            showNotice(error instanceof Error ? error.message : "Kunne ikke oppdatere lageret.");
         } finally {
             setEditingProductId(null);
         }
@@ -118,6 +124,7 @@ export default function StoragePage() {
 
     async function handleDeleteProduct(product: Product) {
         if (!canDeleteInventory) {
+            showNotice("Du har ikke tilgang til å slette varer fra lageret.");
             return;
         }
 
@@ -128,7 +135,7 @@ export default function StoragePage() {
             await deleteInventoryItem(product.id, token);
             refresh();
         } catch (error) {
-            window.alert(error instanceof Error ? error.message : "Kunne ikke slette vare fra lageret.");
+            showNotice(error instanceof Error ? error.message : "Kunne ikke slette vare fra lageret.");
         } finally {
             setDeletingProductId(null);
         }
@@ -178,6 +185,28 @@ export default function StoragePage() {
                 </header>
 
                 <section>
+                    {notice ? (
+                        <article className="mb-4 rounded-xl border px-4 py-3" style={{ borderColor: "#d4d6db", backgroundColor: "#f8fafc" }} role="status" aria-live="polite">
+                            <div className="flex items-start gap-3">
+                                <CircleAlert size={18} className="mt-0.5 shrink-0" style={{ color: "#5f6470" }} />
+
+                                <p className="text-sm font-semibold" style={{ color: "#253042" }}>
+                                    {notice}
+                                </p>
+
+                                <button
+                                    type="button"
+                                    aria-label="Lukk melding"
+                                    className="ml-auto shrink-0 rounded-md p-1 transition-opacity hover:opacity-75"
+                                    style={{ color: "#5f6470" }}
+                                    onClick={() => setNotice(null)}
+                                >
+                                    <X size={16} />
+                                </button>
+                            </div>
+                        </article>
+                    ) : null}
+
                     {errorMessage ? (
                         <p className="rounded-2xl border px-4 py-5 text-sm" style={{ borderColor: "#ee9da1", color: "#7d2126", backgroundColor: "#fff3f3" }}>
                             {errorMessage}
@@ -200,11 +229,14 @@ export default function StoragePage() {
                             onSaveQuantity={(nextQuantity) => {
                                 void handleSaveProductQuantity(product, nextQuantity);
                             }}
-                            editDisabled={!canEditInventory || editingProductId === product.id}
+                            editDisabled={editingProductId === product.id}
                             onDelete={() => {
                                 void handleDeleteProduct(product);
                             }}
-                            deleteDisabled={!canDeleteInventory || deletingProductId === product.id}
+                            deleteDisabled={deletingProductId === product.id}
+                            canEdit={canEditInventory}
+                            canDelete={canDeleteInventory}
+                            onNotice={showNotice}
                         />
                     ))}
                 </section>

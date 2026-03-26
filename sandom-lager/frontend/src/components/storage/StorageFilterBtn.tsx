@@ -1,3 +1,8 @@
+/**
+ * StorageFilterBtn.tsx
+ * A filter button component for the storage page that allows users to select a filter the inventory.
+ */
+
 import { SlidersHorizontal } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 

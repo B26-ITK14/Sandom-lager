@@ -1,5 +1,14 @@
+/*
+* ProductCard.tsx
+* Displays an inventory item with its name, quantity, and unit.
+* Allows editing the quantity and deleting the item with confirmation.
+* Shows appropriate buttons based on user permissions and action states.
+*/
+
 import { useEffect, useState } from "react";
 import DelCardQ from "./DelCardQ";
+import StorageEditCardBtn from "./StorageEditCardBtn";
+import StorageDelCardBtn from "./StorageDelCardBtn";
 
 type ProductCardProps = {
     name: string;
@@ -10,10 +19,10 @@ type ProductCardProps = {
     onDelete?: () => Promise<void> | void;
     editDisabled?: boolean;
     deleteDisabled?: boolean;
+    canEdit?: boolean;
+    canDelete?: boolean;
+    onNotice?: (message: string) => void;
 };
-
-import StorageEditCardBtn from "./StorageEditCardBtn";
-import StorageDelCardBtn from "./StorageDelCardBtn";
 
 export default function ProductCard({
     name,
@@ -24,6 +33,9 @@ export default function ProductCard({
     onDelete,
     editDisabled = false,
     deleteDisabled = false,
+    canEdit = true,
+    canDelete = true,
+    onNotice,
 }: ProductCardProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [quantityInput, setQuantityInput] = useState(String(quantity));
@@ -36,6 +48,11 @@ export default function ProductCard({
     }, [quantity, isEditing]);
 
     async function handleEditButtonClick() {
+        if (!canEdit) {
+            onNotice?.("Du har ikke tilgang til å redigere lageret.");
+            return;
+        }
+
         if (!isEditing) {
             setQuantityInput(String(quantity));
             setIsEditing(true);
@@ -46,7 +63,7 @@ export default function ProductCard({
         const nextQuantity = Number(normalizedInput);
 
         if (!Number.isFinite(nextQuantity) || nextQuantity < 0) {
-            window.alert("Ugyldig mengde. Skriv inn et tall som er 0 eller høyere.");
+            onNotice?.("Ugyldig mengde. Skriv inn et tall som er 0 eller høyere.");
             return;
         }
 
@@ -106,6 +123,11 @@ export default function ProductCard({
                     <StorageDelCardBtn
                         name={name}
                         onClick={() => {
+                            if (!canDelete) {
+                                onNotice?.("Du har ikke tilgang til å slette varer fra lageret.");
+                                return;
+                            }
+
                             setIsConfirmingDelete(true);
                         }}
                         disabled={deleteDisabled}
