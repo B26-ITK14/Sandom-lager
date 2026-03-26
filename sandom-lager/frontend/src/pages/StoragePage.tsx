@@ -17,7 +17,7 @@ import { AUTH0_AUDIENCE } from "../config/auth";
 import { deleteInventoryItem, updateInventoryQuantity } from "../api/storage";
 import type { InventoryItem } from "../types";
 
-const FILTER_OPTIONS = ["Alle", "Mengde: lite -> mye", "Mengde: mye -> lite"];
+const FILTER_OPTIONS = ["Alle", "Mengde: lite -> mye", "Mengde: mye -> lite", "Favoritter"];
 
 type Product = {
     id: number;
@@ -64,6 +64,17 @@ export default function StoragePage() {
             result = [...result].sort(
                 (a, b) => b.quantity - a.quantity
             );
+        }
+
+        if (selectedFilter === "Favoritter") {
+            try {
+                const favorites = JSON.parse(localStorage.getItem("favoriteProducts") || "[]") as string[];
+                const favoriteProducts = result.filter((product) => favorites.includes(product.name));
+                const nonFavoriteProducts = result.filter((product) => !favorites.includes(product.name));
+                result = [...favoriteProducts, ...nonFavoriteProducts];
+            } catch (err) {
+                console.error("Feil ved lesing av favoritter:", err);
+            }
         }
 
         return result;

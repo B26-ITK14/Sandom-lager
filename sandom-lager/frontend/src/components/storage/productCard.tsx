@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import DelCardQ from "./DelCardQ";
 import StorageEditCardBtn from "./StorageEditCardBtn";
 import StorageDelCardBtn from "./StorageDelCardBtn";
+import FavProductBtn from "./FavProductBtn";
 
 type ProductCardProps = {
     name: string;
@@ -40,6 +41,14 @@ export default function ProductCard({
     const [isEditing, setIsEditing] = useState(false);
     const [quantityInput, setQuantityInput] = useState(String(quantity));
     const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(() => {
+        try {
+            const favorites = JSON.parse(localStorage.getItem("favoriteProducts") || "[]");
+            return favorites.includes(name);
+        } catch {
+            return false;
+        }
+    });
 
     useEffect(() => {
         if (!isEditing) {
@@ -74,6 +83,29 @@ export default function ProductCard({
     async function handleConfirmDelete() {
         await onDelete?.();
         setIsConfirmingDelete(false);
+    }
+
+    function handleFavButtonClick() {
+        const newFavoriteState = !isFavorite;
+        setIsFavorite(newFavoriteState);
+
+        try {
+            const favorites = JSON.parse(localStorage.getItem("favoriteProducts") || "[]");
+            if (newFavoriteState) {
+                if (!favorites.includes(name)) {
+                    favorites.push(name);
+                }
+            } else {
+                const index = favorites.indexOf(name);
+                if (index > -1) {
+                    favorites.splice(index, 1);
+                }
+            }
+            localStorage.setItem("favoriteProducts", JSON.stringify(favorites));
+        } catch (error) {
+            console.error("Feil ved lagring av favoritter:", error);
+            setIsFavorite(!newFavoriteState);
+        }
     }
 
     return (
@@ -112,6 +144,11 @@ export default function ProductCard({
                 </section>
 
                 <section className="flex items-center gap-3">
+                    <FavProductBtn 
+                        name={name}
+                        onClick={handleFavButtonClick}
+                        isSaved={isFavorite}
+                    />
                     <StorageEditCardBtn
                         name={name}
                         onClick={() => {
