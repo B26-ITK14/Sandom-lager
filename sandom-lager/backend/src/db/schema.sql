@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS user_locations (
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
     location_id INT REFERENCES locations(id) ON DELETE CASCADE,
     access_status TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'approved', 'denied'
+    created_at TIMESTAMP DEFAULT NOW(),
     UNIQUE(user_id, location_id)
 );
 

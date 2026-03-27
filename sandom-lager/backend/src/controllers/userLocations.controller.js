@@ -65,12 +65,11 @@ async function getMyLocationAccess(req, res) {
                 ul.location_id,
                 l.name AS location_name,
                 ul.access_status,
-                u.created_at
+                ul.created_at
          FROM user_locations ul
          JOIN locations l ON ul.location_id = l.id
-         JOIN users u ON ul.user_id = u.id
          WHERE ul.user_id = $1
-         ORDER BY u.created_at DESC`,
+         ORDER BY ul.created_at DESC`,
         [userId]
     );
 
@@ -81,13 +80,13 @@ async function getMyLocationAccess(req, res) {
 async function getAllLocationAccess(req, res) {
     try {
         const result = await pool.query(
-            `SELECT ul.id, ul.access_status, u.created_at,
+            `SELECT ul.id, ul.access_status, ul.created_at,
                     u.name as user_name, u.email,
                     l.name as location_name
              FROM user_locations ul
              JOIN users u ON ul.user_id = u.id
              JOIN locations l ON ul.location_id = l.id
-             ORDER BY u.created_at DESC`
+             ORDER BY ul.created_at DESC`
         );
         res.json(result.rows);
     } catch (err) {
