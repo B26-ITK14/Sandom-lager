@@ -7,7 +7,11 @@ export default function AddShoppingItemModal({ isOpen, onClose }: Props) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50"
+        <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-item-title"
+            className="fixed inset-0 flex items-center justify-center z-50"
             style={{ backgroundColor: "rgba(0, 0, 0, 0.35)" }}>
 
             <div className="w-full max-w-md rounded-xl p-6"
@@ -17,6 +21,7 @@ export default function AddShoppingItemModal({ isOpen, onClose }: Props) {
                 }}>
 
                 <h2
+                    id="add-item-title"
                     className="text-xl font-medium"
                     style={{ color: "var(--color-text-primary)" }}>
                     Legg til vare
@@ -27,7 +32,7 @@ export default function AddShoppingItemModal({ isOpen, onClose }: Props) {
                     Legg til en ny vare i handlelisten din. (Denne funksjonen er under utvikling.)
                 </p>
 
-                <div className="mt-6 flex justify-end gap-3">
+                <footer className="mt-6 flex justify-end gap-3">
                     <button
                         onClick={onClose}
                         className="py-2 px-4 rounded-md"
@@ -46,7 +51,7 @@ export default function AddShoppingItemModal({ isOpen, onClose }: Props) {
                         }}>
                         Lagre
                     </button>
-                </div>
+                </footer>
             </div>
         </div>
     )

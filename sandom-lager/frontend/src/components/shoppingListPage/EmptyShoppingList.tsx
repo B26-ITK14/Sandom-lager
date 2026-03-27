@@ -1,9 +1,12 @@
 export function EmptyShoppingList() {
     return (
-        <div className="rounded-xl p-6"
+        <section
+            aria-label="Tom handleliste"
+            className="rounded-xl p-6"
             style={{
                 background: "var(--color-surface)",
-                border: "1px solid var(--color-border)",}}>
+                border: "1px solid var(--color-border)",
+            }}>
 
         <p style={{ color: "var(--color-text-primary)" }}>
             Handlelisten er tom.
@@ -12,6 +15,6 @@ export function EmptyShoppingList() {
             style={{ color: "var(--color-text-secondary)" }}>
             Velg oppskrifter eller legg til varer manuelt for å fylle handlelisten.
         </p>
-        </div>
+        </section>
     );
 }

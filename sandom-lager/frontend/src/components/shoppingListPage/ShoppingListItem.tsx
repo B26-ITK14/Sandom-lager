@@ -16,19 +16,18 @@ export default function ShoppingListItem({ item, onIncrease, onDecrease }: Props
              border: "1px solid var(--color-border)",
              }}>
 
-            <div className="flex flex-col gap-4">
-                <strong style={{
+            <dl className="flex flex-col gap-4 m-0">
+                <dt className="font-semibold" style={{
                     color: "var(--color-text-primary)"}}>
                     {item.ingredient}
-                </strong>
-
-                <span className="text-sm"
+                </dt>
+                <dd className="m-0 text-sm"
                     style={{ color: "var(--color-text-secondary)" }}>
-                        {item.needed_quantity} {item.unit}
-                </span>
-            </div>
+                    {item.needed_quantity} {item.unit}
+                </dd>
+            </dl>
 
-            <div className="flex items-center gap-3">
+            <menu className="flex items-center gap-3 list-none m-0 p-0">
                 <button
                     onClick={() => onDecrease(item.id)}
                     className="h-9 w-9 rounded-full text-lg transition-colors"
@@ -51,7 +50,7 @@ export default function ShoppingListItem({ item, onIncrease, onDecrease }: Props
                     aria-label={`Øk mengde for ${item.ingredient}`}>
                     +
                 </button>
-            </div>
+            </menu>
         </li>
     );
 }
