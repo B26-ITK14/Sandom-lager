@@ -6,11 +6,13 @@
 
 export class ApiError extends Error {
     status: number;
+    detail?: string;
 
-    constructor(status: number, message: string) {
+    constructor(status: number, message: string, detail?: string) {
         super(message);
         this.name = "ApiError";
         this.status = status;
+        this.detail = detail;
     }
 }
 
@@ -21,8 +23,18 @@ export async function apiFetchJson<T>(path: string, init?: RequestInit): Promise
     const response = await fetch(path, init);
 
     if (!response.ok) {
+        let errorDetail: string | undefined;
+        
+        // Try to get detailed error message from response body
+        try {
+            const errorBody = await response.json() as Record<string, unknown>;
+            errorDetail = (errorBody.detail || errorBody.message) as string;
+        } catch {
+            // If response is not JSON, ignore
+        }
+
         console.error(`[API] ${method} ${path} → ${response.status} ${response.statusText}`);
-        throw new ApiError(response.status, `API request failed (${response.status})`);
+        throw new ApiError(response.status, `API request failed (${response.status})`, errorDetail);
     }
 
     console.log(`[API] ${method} ${path} → ${response.status} OK`);

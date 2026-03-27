@@ -1,15 +1,35 @@
 const pool = require("../db/pool");
 const { callManagementApi } = require("../lib/auth0Management");
+const fs = require('fs');
+const path = require('path');
 
 const MAX_PROFILE_PICTURE_BYTES = 5 * 1024 * 1024;
 const PROFILE_PICTURE_PATTERN = /^data:image\/(png|jpeg|jpg|gif|webp);base64,[A-Za-z0-9+/=]+$/;
+const uploadsDir = path.join(__dirname, '../../uploads/profile-pictures');
 
 // GET /me - Returns the current authenticated user's profile
 async function getMe(req, res) {
-    console.log(`[getMe] user id: ${req.user.id}, role: ${req.user.role}`);
     try {
         const result = await pool.query(
-            "SELECT id, name, email, username, role, profile_picture FROM users WHERE id = $1",
+            `SELECT
+                u.id,
+                u.name,
+                u.email,
+                u.username,
+                u.role,
+                u.profile_picture,
+                loc.location_name
+            FROM users u
+            LEFT JOIN LATERAL (
+                SELECT l.name AS location_name
+                FROM user_locations ul
+                JOIN locations l ON l.id = ul.location_id
+                WHERE ul.user_id = u.id
+                  AND ul.access_status = 'approved'
+                ORDER BY ul.id DESC
+                LIMIT 1
+            ) loc ON true
+            WHERE u.id = $1`,
             [req.user.id]
         );
 
@@ -18,13 +38,19 @@ async function getMe(req, res) {
             return res.status(404).json({ message: "Bruker ikke funnet" });
         }
 
+        // Convert filename to full API URL if profile picture exists
+        const profilePictureUrl = user.profile_picture 
+            ? `/api/profile-pictures/${user.profile_picture}`
+            : null;
+
         res.json({
             id: user.id,
             name: user.name,
             email: user.email,
             username: user.username || null,
             role: user.role,
-            profilePicture: user.profile_picture || null,
+            profilePicture: profilePictureUrl,
+            location: user.location_name || null,
         });
     } catch (err) {
         console.error("[getMe] error:", err.message);
@@ -181,38 +207,88 @@ async function updateEmail(req, res) {
     }
 }
 
-// PATCH /me/profile-picture - Stores a base64 image for the current user
+// PATCH /me/profile-picture - Stores the uploaded profile picture for the current user
 async function updateProfilePicture(req, res) {
-    const { profilePicture } = req.body;
     console.log(`[updateProfilePicture] user id: ${req.user.id}`);
 
-    if (!profilePicture || typeof profilePicture !== "string") {
-        console.warn('[updateProfilePicture] Validation failed: profilePicture missing or invalid type');
+    if (!req.file) {
+        console.warn('[updateProfilePicture] Validation failed: no file uploaded');
         return res.status(400).json({ message: "Profilbildet er påkrevd" });
     }
 
-    if (!PROFILE_PICTURE_PATTERN.test(profilePicture)) {
-        console.warn('[updateProfilePicture] Validation failed: unsupported file format');
-        return res.status(400).json({ message: "Kun JPG, PNG, GIF og WEBP er tillatt" });
+    try {
+        // Get the old profile picture filename to delete it
+        const oldResult = await pool.query(
+            "SELECT profile_picture FROM users WHERE id = $1",
+            [req.user.id]
+        );
+
+        const oldFilename = oldResult.rows[0]?.profile_picture;
+
+        // Delete old file if it exists
+        if (oldFilename && oldFilename !== 'default') {
+            const oldFilePath = path.join(uploadsDir, oldFilename);
+            try {
+                if (fs.existsSync(oldFilePath)) {
+                    fs.unlinkSync(oldFilePath);
+                    console.log(`[updateProfilePicture] Deleted old file: ${oldFilename}`);
+                }
+            } catch (err) {
+                console.warn(`[updateProfilePicture] Failed to delete old file: ${err.message}`);
+                // Don't fail the request if cleanup fails
+            }
+        }
+
+        // Save the filename to database
+        const filename = req.file.filename;
+        const result = await pool.query(
+            "UPDATE users SET profile_picture = $1 WHERE id = $2 RETURNING profile_picture",
+            [filename, req.user.id]
+        );
+
+        console.log(`[updateProfilePicture] Profile picture updated for user id: ${req.user.id}, file: ${filename}`);
+        
+        res.json({ 
+            profilePicture: `/api/profile-pictures/${result.rows[0]?.profile_picture}` || null 
+        });
+    } catch (err) {
+        // Clean up uploaded file on error
+        if (req.file?.path && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
+        console.error("[updateProfilePicture] error:", err.message);
+        res.status(500).json({ message: "Kunne ikke oppdatere profilbildet" });
+    }
+}
+
+// GET /profile-pictures/:filename - Serves the profile picture
+async function getProfilePicture(req, res) {
+    const { filename } = req.params;
+
+    // Validate filename to prevent directory traversal
+    if (!filename || /[/\\]/.test(filename)) {
+        return res.status(400).json({ message: "Ugyldig bildenavn" });
     }
 
-    const base64Payload = profilePicture.split(',')[1] || '';
-    const byteSize = Buffer.from(base64Payload, 'base64').length;
-    if (byteSize > MAX_PROFILE_PICTURE_BYTES) {
-        console.warn(`[updateProfilePicture] Validation failed: file too large (${byteSize} bytes)`);
-        return res.status(400).json({ message: "Profilbildet kan maks være 5 MB" });
+    const filePath = path.join(uploadsDir, filename);
+
+    // Ensure the file is within the uploads directory
+    if (!filePath.startsWith(uploadsDir)) {
+        return res.status(403).json({ message: "Tilgang nektet" });
+    }
+
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: "Bildet ikke funnet" });
     }
 
     try {
-        const result = await pool.query(
-            "UPDATE users SET profile_picture = $1 WHERE id = $2 RETURNING profile_picture",
-            [profilePicture, req.user.id]
-        );
-        console.log(`[updateProfilePicture] Profile picture updated for user id: ${req.user.id}`);
-        res.json({ profilePicture: result.rows[0]?.profile_picture || null });
+        // Set cache headers
+        res.set('Cache-Control', 'public, max-age=604800'); // 1 week
+        res.sendFile(filePath);
     } catch (err) {
-        console.error("[updateProfilePicture] error:", err.message);
-        res.status(500).json({ message: "Kunne ikke oppdatere profilbildet" });
+        console.error("[getProfilePicture] error:", err.message);
+        res.status(500).json({ message: "Kunne ikke hente bildet" });
     }
 }
 
@@ -221,5 +297,6 @@ module.exports = {
     updateName,
     updateEmail,
     updateProfilePicture,
+    getProfilePicture,
     updateUsername,
 };

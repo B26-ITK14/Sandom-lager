@@ -72,7 +72,8 @@ CREATE TABLE IF NOT EXISTS recipes (
     location_id INT REFERENCES locations(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     category TEXT NOT NULL,
-    instructions TEXT, 
+    instructions TEXT,
+    servings INT NOT NULL DEFAULT 4,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -140,17 +141,6 @@ CREATE TABLE IF NOT EXISTS logs (
     user_id INT REFERENCES users(id) ON DELETE SET NULL,
     action TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
-);
-
--- USER SESSIONS --
--- Tracks authenticated sessions by JWT ID (jti). Upserted on every request.
-CREATE TABLE IF NOT EXISTS user_sessions (
-    id TEXT PRIMARY KEY,            -- JWT jti claim
-    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    ip_address TEXT,
-    user_agent TEXT,
-    created_at TIMESTAMP DEFAULT NOW(),
-    last_seen_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS revoked_sessions (

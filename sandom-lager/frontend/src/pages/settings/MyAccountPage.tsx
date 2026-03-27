@@ -24,6 +24,7 @@ export default function MyAccountPage() {
         role,
         blocked,
         profilePicture,
+        location,
         setName: setDisplayName,
         setUsername,
         setProfilePicture,
@@ -80,7 +81,8 @@ export default function MyAccountPage() {
                     name={displayName}
                     username={displayUsername}
                     email={email}
-                    profilePicture={profilePicture ?? user?.picture ?? null}
+                    profilePicture={profilePicture || null}
+                    location={location ?? 'N/A'}
                     onProfilePictureSave={setProfilePicture}
                     onSave={handleSavePersonalInfo}
                 />

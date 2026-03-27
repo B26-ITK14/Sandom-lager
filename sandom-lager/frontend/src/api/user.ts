@@ -15,9 +15,10 @@ type MeResponse = {
     username?: string | null;
     blocked?: boolean;
     profilePicture?: string | null;
+    location?: string | null;
 };
 
-export async function fetchMe(accessToken: string): Promise<{ role: UserRole; name: string; username: string | null; blocked: boolean; profilePicture: string | null }> {
+export async function fetchMe(accessToken: string): Promise<{ role: UserRole; name: string; username: string | null; blocked: boolean; profilePicture: string | null; location: string | null }> {
     const data = await apiFetchJson<MeResponse>("/api/me", {
         headers: { Authorization: `Bearer ${accessToken}` },
     });
@@ -27,6 +28,7 @@ export async function fetchMe(accessToken: string): Promise<{ role: UserRole; na
         username: data.username ?? null,
         blocked: data.blocked ?? false,
         profilePicture: data.profilePicture ?? null,
+        location: data.location ?? null,
     };
 }
 
@@ -161,14 +163,16 @@ export async function requestEmailChange(newEmail: string, accessToken: string):
     }
 }
 
-export async function updateProfilePicture(profilePicture: string, accessToken: string): Promise<string | null> {
+export async function updateProfilePicture(file: File, accessToken: string): Promise<string | null> {
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+
     const response = await fetch('/api/me/profile-picture', {
         method: 'PATCH',
         headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ profilePicture }),
+        body: formData,
     });
 
     if (!response.ok) {

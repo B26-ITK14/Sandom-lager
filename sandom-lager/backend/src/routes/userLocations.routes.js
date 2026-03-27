@@ -39,4 +39,10 @@ router.get(
     asyncHandler(userLocationsController.getMyLocationAccess)
 );
 
+// GET - Admin henter alle søknader
+router.get(
+    "/user-locations",
+    requireRole("admin"),
+    asyncHandler(userLocationsController.getAllLocationAccess)
+);
 module.exports = router;
