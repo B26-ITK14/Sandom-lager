@@ -10,9 +10,9 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { useUppercaseUsername } from '../hooks/user/useName';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getAllMainRoutes } from '../router/nav';
-import { version } from '../../package.json';
 import { LogoutLoadingOverlay, useAppLogout } from '../auth';
 import { useUser } from '../context/UserContext';
+import { useAppVersion } from '../hooks/version/appVersion';
 
 interface NavFlyoutProps {
     isOpen: boolean;
@@ -22,10 +22,11 @@ interface NavFlyoutProps {
 export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
     const username = useUppercaseUsername();
     const { user } = useAuth0();
-    const { profilePicture } = useUser();
+    const { profilePicture, location: userLocation } = useUser();
     const { logoutUser, isLoggingOut } = useAppLogout(onClose);
+    const { display: appVersion } = useAppVersion();
     const navigate = useNavigate();
-    const location = useLocation();
+    const routeLocation = useLocation();
     const imageSrc = profilePicture ?? user?.picture ?? 'src/assets/temp_EmilB04.png';
 
     const handleLogout = () => {
@@ -73,7 +74,7 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                                 {username}
                             </p>
                             <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                                Tomasgården, Kornsjø
+                                {userLocation ?? 'Ukjent lokasjon'}
                             </p>
                         </div>
                     </div>
@@ -93,13 +94,13 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                             <li key={route.nickname}>
                                 <button
                                     onClick={() => handleNavigation(route.path)}
-                                    className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${location.pathname === route.path ? 'font-bold' : ''
+                                    className={`w-full text-left p-3 px-6 rounded-md transition-colors hover:opacity-80 cursor-pointer relative ${routeLocation.pathname === route.path ? 'font-bold' : ''
                                         }`}
                                     style={{
                                         color: 'var(--color-text-primary)',
                                     }}
                                 >
-                                    {location.pathname === route.path && (
+                                    {routeLocation.pathname === route.path && (
                                         <span
                                             className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
                                             style={{ backgroundColor: 'var(--color-primary)' }}
@@ -126,7 +127,7 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         Logg ut
                     </button>
                     <p className="text-xs text-right" style={{ color: 'var(--color-text-secondary)' }}>
-                        Versjon: {version ? version === '0.0.0' ? 'Under utvikling' : version : 'Ukjent'}
+                        Versjon: {appVersion}
                     </p>
                 </div>
             </section>

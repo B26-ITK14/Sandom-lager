@@ -7,6 +7,7 @@
 
 import { useMemo } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
+import { useUser } from '../../context/UserContext';
 
 /*
  * Hook to get the formatted username from Auth0 user data
@@ -14,16 +15,19 @@ import { useAuth0 } from '@auth0/auth0-react';
  */
 export function useUppercaseUsername(): string {
     const { user } = useAuth0();
+    const { username: contextUsername } = useUser();
     
     const username = useMemo(() => {
-        const rawUsername = 
+        const rawUsername =
+            contextUsername
+            ||
             (user as Record<string, unknown>)?.[`https://sandom-lager.app/username`] as string | undefined 
             || user?.username 
             || user?.nickname 
             || 'Bruker';
         
         return rawUsername.charAt(0).toUpperCase() + rawUsername.slice(1).toLowerCase();
-    }, [user]);
+    }, [contextUsername, user]);
     return username;
 }
 
@@ -34,16 +38,19 @@ export function useUppercaseUsername(): string {
  */
 export function useUsername(): string {
     const { user } = useAuth0();
+    const { username: contextUsername } = useUser();
     
     const username = useMemo(() => {
-        const rawUsername = 
+        const rawUsername =
+            contextUsername
+            ||
             (user as Record<string, unknown>)?.[`https://sandom-lager.app/username`] as string | undefined 
             || user?.username 
             || user?.nickname 
             || 'Bruker';
         
         return rawUsername;
-    }, [user]);
+    }, [contextUsername, user]);
     return username;
 }
 

@@ -12,19 +12,23 @@ export type { UserRole };
 type MeResponse = {
     role?: UserRole;
     name?: string;
+    username?: string | null;
     blocked?: boolean;
     profilePicture?: string | null;
+    location?: string | null;
 };
 
-export async function fetchMe(accessToken: string): Promise<{ role: UserRole; name: string; blocked: boolean; profilePicture: string | null }> {
+export async function fetchMe(accessToken: string): Promise<{ role: UserRole; name: string; username: string | null; blocked: boolean; profilePicture: string | null; location: string | null }> {
     const data = await apiFetchJson<MeResponse>("/api/me", {
         headers: { Authorization: `Bearer ${accessToken}` },
     });
     return {
         role: data.role ?? null,
         name: data.name ?? '',
+        username: data.username ?? null,
         blocked: data.blocked ?? false,
         profilePicture: data.profilePicture ?? null,
+        location: data.location ?? null,
     };
 }
 
@@ -45,6 +49,25 @@ export async function updateName(name: string, accessToken: string): Promise<voi
         const data = await response.json().catch(() => ({}));
         throw new Error((data as { message?: string }).message ?? `Kunne ikke oppdatere navn (${response.status})`);
     }
+}
+
+export async function updateUsername(username: string, accessToken: string): Promise<string | null> {
+    const response = await fetch('/api/me/username', {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ username }),
+    });
+
+    if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error((data as { message?: string }).message ?? `Kunne ikke oppdatere brukernavn (${response.status})`);
+    }
+
+    const data = await response.json().catch(() => ({}));
+    return (data as { username?: string | null }).username ?? null;
 }
 
 
@@ -88,6 +111,7 @@ export interface Auth0Session {
     created_at: string;
     updated_at: string;
     last_interaction_at?: string;
+    is_current?: boolean;
     device?: SessionDevice;
     clients?: { client_id: string; name?: string }[];
 }
@@ -109,6 +133,20 @@ export async function revokeSession(sessionId: string, accessToken: string): Pro
     }
 }
 
+export async function revokeOtherSessions(accessToken: string): Promise<number> {
+    const response = await fetch('/api/me/sessions/others', {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Kunne ikke avslutte andre sesjoner (${response.status})`);
+    }
+
+    const data = await response.json().catch(() => ({}));
+    return (data as { revoked?: number }).revoked ?? 0;
+}
+
 
 export async function requestEmailChange(newEmail: string, accessToken: string): Promise<void> {
     const response = await fetch('/api/me/email', {
@@ -125,18 +163,23 @@ export async function requestEmailChange(newEmail: string, accessToken: string):
     }
 }
 
-export async function updateProfilePicture(profilePicture: string, accessToken: string): Promise<void> {
+export async function updateProfilePicture(file: File, accessToken: string): Promise<string | null> {
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+
     const response = await fetch('/api/me/profile-picture', {
         method: 'PATCH',
         headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ profilePicture }),
+        body: formData,
     });
 
     if (!response.ok) {
         const data = await response.json().catch(() => ({}));
         throw new Error((data as { message?: string }).message ?? `Kunne ikke oppdatere profilbildet (${response.status})`);
     }
+
+    const data = await response.json().catch(() => ({}));
+    return (data as { profilePicture?: string | null }).profilePicture ?? null;
 }

@@ -51,6 +51,7 @@ async function syncUser(req, res, next) {
             const profile = await userInfoResponse.json();
             const email = profile.email;
             const name = profile.name || profile.nickname || null;
+            const profilePicture = profile.picture || null;
 
             console.log(`[syncUser] Auth0 profile fetched → email: ${email}, name: ${name}`);
 
@@ -60,8 +61,8 @@ async function syncUser(req, res, next) {
             }
 
             const insertResult = await pool.query(
-                "INSERT INTO users (auth0_id, email, name, role) VALUES ($1, $2, $3, 'user') RETURNING *",
-                [auth0Id, email, name]
+                "INSERT INTO users (auth0_id, email, name, profile_picture, role) VALUES ($1, $2, $3, $4, 'user') RETURNING *",
+                [auth0Id, email, name, profilePicture]
             );
             user = insertResult.rows[0];
             console.log(`[syncUser] New user created → id: ${user.id}, role: ${user.role}`);
@@ -76,6 +77,18 @@ async function syncUser(req, res, next) {
         // Auth0 access tokens do not always include a jti claim, so fall back to a
         // deterministic id built from sub + iat — unique per issued token (per login).
         const jti = req.auth?.jti ?? `${req.auth.sub}:${req.auth.iat}`;
+
+        if (jti) {
+            const revokedCheck = await pool.query(
+                "SELECT 1 FROM revoked_sessions WHERE id = $1 AND user_id = $2 LIMIT 1",
+                [jti, user.id]
+            );
+            if (revokedCheck.rows.length > 0) {
+                console.warn(`[syncUser] Revoked session attempted access jti: ${jti}, user id: ${user.id}`);
+                return res.status(401).json({ message: "Sesjonen er avsluttet. Logg inn på nytt." });
+            }
+        }
+
         if (jti) {
             const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || null;
             const ua = req.headers['user-agent'] || null;

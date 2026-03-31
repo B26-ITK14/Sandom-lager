@@ -8,7 +8,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { X, Loader, AlertCircle, RefreshCw } from 'lucide-react';
 import { AUTH0_AUDIENCE } from '../../../../config/auth';
-import { fetchSessions, revokeSession, type Auth0Session } from '../../../../api/user';
+import { fetchSessions, revokeOtherSessions, revokeSession, type Auth0Session } from '../../../../api/user';
 import { parseUserAgent, getDeviceIcon, formatRelative } from './sessionUtils';
 
 export default function ActiveSessionsPanel() {
@@ -16,11 +16,14 @@ export default function ActiveSessionsPanel() {
     const [sessions, setSessions] = useState<Auth0Session[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [message, setMessage] = useState<string | null>(null);
     const [revoking, setRevoking] = useState<Set<string>>(new Set());
+    const [revokingOthers, setRevokingOthers] = useState(false);
 
     const load = useCallback(async () => {
         setLoading(true);
         setError(null);
+        setMessage(null);
         try {
             const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
             const data = await fetchSessions(token);
@@ -39,15 +42,34 @@ export default function ActiveSessionsPanel() {
     useEffect(() => { load(); }, [load]);
 
     const handleRevoke = async (sessionId: string) => {
+        setError(null);
+        setMessage(null);
         setRevoking((prev) => new Set(prev).add(sessionId));
         try {
             const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
             await revokeSession(sessionId, token);
             setSessions((prev) => prev.filter((s) => s.id !== sessionId));
+            setMessage('Sesjonen ble avsluttet');
         } catch {
-            // Silently leave the session in the list; user can retry
+            setError('Kunne ikke avslutte sesjonen');
         } finally {
             setRevoking((prev) => { const next = new Set(prev); next.delete(sessionId); return next; });
+        }
+    };
+
+    const handleRevokeOthers = async () => {
+        setError(null);
+        setMessage(null);
+        setRevokingOthers(true);
+        try {
+            const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
+            const revoked = await revokeOtherSessions(token);
+            setSessions((prev) => prev.filter((s) => s.is_current));
+            setMessage(revoked > 0 ? `Avsluttet ${revoked} andre sesjon(er)` : 'Ingen andre sesjoner å avslutte');
+        } catch {
+            setError('Kunne ikke avslutte andre sesjoner');
+        } finally {
+            setRevokingOthers(false);
         }
     };
 
@@ -84,13 +106,36 @@ export default function ActiveSessionsPanel() {
 
     return (
         <div className="space-y-2 mt-1">
+            <div className="flex justify-end">
+                <button
+                    onClick={() => { void handleRevokeOthers(); }}
+                    disabled={revokingOthers}
+                    className="text-xs px-2.5 py-1.5 rounded-md cursor-pointer disabled:opacity-60"
+                    style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-primary)' }}
+                >
+                    {revokingOthers ? 'Avslutter ...' : 'Logg ut alle andre enheter'}
+                </button>
+            </div>
+
+            {message && (
+                <div className="text-xs p-2 rounded-md" style={{ backgroundColor: '#dcfce7', color: '#166534' }}>
+                    {message}
+                </div>
+            )}
+
+            {error && (
+                <div className="text-xs p-2 rounded-md" style={{ backgroundColor: '#fee2e2', color: '#991b1b' }}>
+                    {error}
+                </div>
+            )}
+
             {sessions.map((session, index) => {
                 const ua = session.device?.last_user_agent;
                 const { browser, os } = parseUserAgent(ua);
                 const DeviceIcon = getDeviceIcon(ua);
                 const isRevoking = revoking.has(session.id);
                 const isNewest = index === 0;
-                const isCurrentDevice = !!ua && ua === navigator.userAgent;
+                const isCurrentDevice = !!session.is_current;
 
                 return (
                     <div
@@ -131,9 +176,9 @@ export default function ActiveSessionsPanel() {
                         </div>
                         <button
                             onClick={() => handleRevoke(session.id)}
-                            disabled={isRevoking}
+                            disabled={isRevoking || isCurrentDevice}
                             className="shrink-0 p-1 rounded cursor-pointer disabled:opacity-50"
-                            title="Avslutt sesjon"
+                            title={isCurrentDevice ? 'Kan ikke avslutte nåværende sesjon herfra' : 'Avslutt sesjon'}
                             style={{ color: 'var(--color-text-secondary)' }}
                         >
                             {isRevoking

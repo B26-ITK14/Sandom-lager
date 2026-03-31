@@ -1,12 +1,11 @@
 /*
     * SecurityPrivacyCard.tsx
-    * Card component for managing security and privacy settings like password changes, 2FA, and active sessions.
+    * Card component for managing security and privacy settings like password changes and active sessions.
     * Author: Emil Berglund
 */
 
 import { Key } from 'lucide-react';
 import PasswordChangeButton from './securityPrivacy/PasswordChangeButton';
-import TwoFactorAuthButton from './securityPrivacy/TwoFactorAuthButton';
 import ActiveSessionsToggle from './securityPrivacy/ActiveSessionsToggle';
 
 export default function SecurityPrivacyCard() {
@@ -27,7 +26,6 @@ export default function SecurityPrivacyCard() {
 
             <div className="space-y-4">
                 <PasswordChangeButton />
-                <TwoFactorAuthButton />
                 <ActiveSessionsToggle />
             </div>
         </section>
