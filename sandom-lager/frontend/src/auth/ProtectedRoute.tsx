@@ -30,19 +30,27 @@ export default function ProtectedRoute({ children, requireLocation = true }: Pro
     }
 
     async function checkLocation() {
-      try {
+    try {
         const token = await getAccessTokenSilently();
         const data = await fetchMyLocationAccess(token);
         if (data.length === 0) {
-          setLocationStatus("none");
+            setLocationStatus("none");
         } else {
-          setLocationStatus(data[0].access_status as LocationStatus);
-        }
-      } catch {
-        setLocationStatus("none");
-      }
-    }
+            const hasApproved = data.some((d) => d.access_status === "approved");
+            const hasPending = data.some((d) => d.access_status === "pending");
 
+            if (hasApproved) {
+                setLocationStatus("approved");
+            } else if (hasPending) {
+                setLocationStatus("pending");
+            } else {
+                setLocationStatus("denied");
+            }
+        }
+    } catch {
+        setLocationStatus("none");
+    }
+}
     checkLocation();
   }, [isAuthenticated, requireLocation, getAccessTokenSilently]);
 
