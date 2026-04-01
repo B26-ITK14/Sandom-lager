@@ -4,9 +4,24 @@ const ApiError = require("../utils/ApiError");
 
 // GET /recipes
 async function getAllRecipes(req, res) {
-    
+    const userId = req.user.id;
+
+    const locationResult = await pool.query(
+        `SELECT location_id FROM user_locations 
+         WHERE user_id = $1 AND access_status = 'approved' 
+         LIMIT 1`,
+        [userId]
+    );
+
+    if (locationResult.rows.length === 0) {
+        throw new ApiError(403, "No approved location found for user");
+    }
+
+    const locationId = locationResult.rows[0].location_id;
+
     const result = await pool.query(
-        "SELECT * FROM recipes ORDER BY id DESC"
+        "SELECT * FROM recipes WHERE location_id = $1 ORDER BY id DESC",
+        [locationId]
     );
 
     res.json(result.rows);
