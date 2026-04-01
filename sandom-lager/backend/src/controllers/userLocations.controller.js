@@ -95,11 +95,56 @@ async function getAllLocationAccess(req, res) {
     }
 }
 
+// PATCH api/user-locations/:id/revoke - Admin revokes location access
+async function revokeLocationAccess(req, res) {
+    const { id } = req.params;
+
+    const result = await pool.query(
+        "UPDATE user_locations SET access_status = 'denied' WHERE id = $1 RETURNING *",
+        [id]
+    );
+
+    if (result.rows.length === 0) {
+        throw new ApiError(404, "Location access request not found");
+    }
+
+    res.json(result.rows[0]);
+}
+
+// PATCH api/user-locations/:id/block - Admin blocks user in Auth0
+async function blockUser(req, res) {
+    const { id } = req.params;
+    const { callManagementApi } = require("../lib/auth0Management");
+
+    // Hent auth0_id fra databasen via user_locations
+    const result = await pool.query(
+        `SELECT u.auth0_id FROM user_locations ul
+         JOIN users u ON ul.user_id = u.id
+         WHERE ul.id = $1`,
+        [id]
+    );
+
+    if (result.rows.length === 0) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const auth0Id = result.rows[0].auth0_id;
+
+    await callManagementApi(`/users/${encodeURIComponent(auth0Id)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ blocked: true }),
+    });
+
+    res.json({ message: "User blocked successfully" });
+}
+
 module.exports = {
     requestLocationAccess,
     approveLocationAccess,
     denyLocationAccess,
     getMyLocationAccess,
-    getAllLocationAccess
+    getAllLocationAccess,
+    revokeLocationAccess,
+    blockUser
 };
 

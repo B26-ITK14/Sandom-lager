@@ -22,6 +22,8 @@ interface PendingCardProps {
     request: AccessRequest;
     onApprove: (id: string) => void;
     onDeny: (id: string) => void;
+    onRevoke?: (id: string) => void;
+    onBlock?: (id: string) => void;
     isLoading?: boolean;
 }
 
@@ -57,6 +59,8 @@ export default function PendingCard({
     request,
     onApprove,
     onDeny,
+    onRevoke,
+    onBlock,
     isLoading = false,
 }: PendingCardProps) {
     const status = statusConfig[request.status];
@@ -140,6 +144,27 @@ export default function PendingCard({
                         }}
                     >
                         Avslå
+                    </button>
+                </div>
+            )}
+            {/* Knapper – approved */}
+            {request.status === "approved" && (
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => onRevoke?.(request.id)}
+                        disabled={isLoading}
+                        className="flex-1 rounded-xl border px-4 py-2 text-xs font-semibold transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        style={{ borderColor: 'var(--color-danger)', color: 'var(--color-danger)', backgroundColor: 'transparent' }}
+                    >
+                        Fjern tilgang
+                    </button>
+                    <button
+                        onClick={() => onBlock?.(request.id)}
+                        disabled={isLoading}
+                        className="flex-1 rounded-xl px-4 py-2 text-xs font-semibold transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        style={{ backgroundColor: '#7F1D1D', color: '#FEE2E2' }}
+                    >
+                        Blokker bruker
                     </button>
                 </div>
             )}
