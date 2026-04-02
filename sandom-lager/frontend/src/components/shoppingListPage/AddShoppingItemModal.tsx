@@ -23,9 +23,9 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
             const inventory = await fetchInventory(token);
             // Extract unique ingredients from inventory
             const uniqueIngredients = Array.from(
-                new Map(inventory.map(item => [item.ingredient_id, item])).values()
+                new Map(inventory.map(item => [item.id, item])).values()
             ).map(item => ({
-                id: item.ingredient_id,
+                id: item.id,
                 name: item.ingredient,
                 unit: item.unit,
             }));

@@ -85,11 +85,9 @@ export interface ShoppingListItem {
 
 export interface InventoryItem {
     id: number;
-    location_id: number;
-    ingredient_id: number;
+    ingredient: string;
     quantity: number;
     updated_at: string;
-    ingredient: string;
     unit: IngredientUnit;
     location: string;
 }
