@@ -2,7 +2,7 @@ import Layout from "../components/Layout";
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
-import { fetchShoppingList } from "../api";
+import { fetchShoppingList, updateShoppingListItem, removeFromShoppingList } from "../api";
 import type { ShoppingListItem } from "../types";
 
 import ShoppingListToolbar from "../components/shoppingListPage/ShoppingListToolbar";
@@ -18,37 +18,67 @@ export default function ShoppingListPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-    useEffect(() => {
-        async function loadShoppingList() {
-            try {
-                const token = await getAccessTokenSilently();
-                const data = await fetchShoppingList(token);
-                setItems(data);
-            } catch (error) {
-                console.error("Kunne ikke hente handlelisten", error);
-            } finally {
-                setIsLoading(false);
-            }
+    const loadShoppingList = async () => {
+        try {
+            const token = await getAccessTokenSilently();
+            const data = await fetchShoppingList(token);
+            setItems(data);
+        } catch (error) {
+            console.error("Kunne ikke hente handlelisten", error);
         }
-        void loadShoppingList();
+    };
+
+    useEffect(() => {
+        async function initialLoad() {
+            await loadShoppingList();
+            setIsLoading(false);
+        }
+        void initialLoad();
     }, [getAccessTokenSilently]);
 
-    const handleIncrease = (id: number) => {
-        setItems(prev =>
-            prev.map(item =>
-                item.id === id ? { ...item, needed_quantity: item.needed_quantity + 1 } : item
-            )
-        );
+    const handleIncrease = async (id: number) => {
+        const item = items.find(i => i.id === id);
+        if (!item) return;
+
+        try {
+            const token = await getAccessTokenSilently();
+            await updateShoppingListItem(id, item.needed_quantity + 1, token);
+            setItems(prev =>
+                prev.map(i =>
+                    i.id === id ? { ...i, needed_quantity: i.needed_quantity + 1 } : i
+                )
+            );
+        } catch (error) {
+            console.error("Kunne ikke øke mengde", error);
+        }
     };
 
-    const handleDecrease = (id: number) => {
-        setItems(prev =>
-            prev.map(item =>
-                item.id === id ? { ...item, needed_quantity: Math.max(0, item.needed_quantity - 1) } : item
-            )
-        );
+    const handleDecrease = async (id: number) => {
+        const item = items.find(i => i.id === id);
+        if (!item || item.needed_quantity <= 1) return;
+
+        try {
+            const token = await getAccessTokenSilently();
+            await updateShoppingListItem(id, item.needed_quantity - 1, token);
+            setItems(prev =>
+                prev.map(i =>
+                    i.id === id ? { ...i, needed_quantity: i.needed_quantity - 1 } : i
+                )
+            );
+        } catch (error) {
+            console.error("Kunne ikke redusere mengde", error);
+        }
     };
 
+    const handleDelete = async (id: number) => {
+        try {
+            const token = await getAccessTokenSilently();
+            await removeFromShoppingList(id, token);
+            setItems(prev => prev.filter(i => i.id !== id));
+        } catch (error) {
+            console.error("Kunne ikke slette vare", error);
+        }
+    };
 
     return (
         <Layout>
@@ -70,6 +100,7 @@ export default function ShoppingListPage() {
                                 item={item}
                                 onIncrease={handleIncrease}
                                 onDecrease={handleDecrease}
+                                onDelete={handleDelete}
                             />
                         ))}
                     </ul>
@@ -79,6 +110,7 @@ export default function ShoppingListPage() {
             <AddShoppingItemModal
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
+                onItemAdded={loadShoppingList}
             />
             
         </Layout>

@@ -132,7 +132,8 @@ CREATE TABLE IF NOT EXISTS shopping_list (
     location_id INT REFERENCES locations(id) ON DELETE CASCADE,
     ingredient_id INT REFERENCES ingredients(id) ON DELETE CASCADE,
     needed_quantity NUMERIC NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
 
 -- LOGS --

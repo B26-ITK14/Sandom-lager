@@ -20,8 +20,8 @@ export async function fetchShoppingList(accessToken: string): Promise<ShoppingLi
 }
 
 export async function addToShoppingList(
-    itemId: number,
-    quantity: number,
+    ingredient_id: number,
+    needed_quantity: number,
     accessToken: string
 ): Promise<ShoppingListItem> {
     return apiFetchJson<ShoppingListItem>("/api/shopping-list", {
@@ -30,6 +30,31 @@ export async function addToShoppingList(
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ingredient_id: itemId, needed_quantity: quantity }),
+        body: JSON.stringify({ ingredient_id, needed_quantity }),
+    });
+}
+
+export async function updateShoppingListItem(
+    id: number,
+    needed_quantity: number,
+    accessToken: string
+): Promise<ShoppingListItem> {
+    return apiFetchJson<ShoppingListItem>(`/api/shopping-list/${id}`, {
+        method: "PUT",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ needed_quantity }),
+    });
+}
+
+export async function removeFromShoppingList(
+    id: number,
+    accessToken: string
+): Promise<{ message: string; deleted: ShoppingListItem }> {
+    return apiFetchJson<{ message: string; deleted: ShoppingListItem }>(`/api/shopping-list/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
     });
 }

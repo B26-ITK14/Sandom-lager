@@ -89,6 +89,9 @@ export interface InventoryItem {
     ingredient_id: number;
     quantity: number;
     updated_at: string;
+    ingredient: string;
+    unit: IngredientUnit;
+    location: string;
 }
 
 export interface UserLocationResponse {
