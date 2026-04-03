@@ -5,23 +5,45 @@
 */
 
 import { apiFetchJson } from "./client";
-import type { InventoryItem, ShoppingListItem } from "../types";
+import type { IngredientUnit, InventoryItem, ShoppingListItem } from "../types";
 
 export async function fetchInventory(accessToken: string): Promise<InventoryItem[]> {
-    return apiFetchJson<InventoryItem[]>("/api/inventory", {
+    const data = await apiFetchJson<InventoryItem[]>("/api/inventory", {
         headers: { Authorization: `Bearer ${accessToken}` },
     });
+
+    return data.map((item) => ({
+        ...item,
+        id: Number(item.id),
+        location_id: Number(item.location_id),
+        ingredient_id: Number(item.ingredient_id),
+        quantity: Number(item.quantity),
+    }));
 }
 
 export async function fetchShoppingList(accessToken: string): Promise<ShoppingListItem[]> {
-    return apiFetchJson<ShoppingListItem[]>("/api/shopping-list", {
+    const data = await apiFetchJson<ShoppingListItem[]>("/api/shopping-list", {
         headers: { Authorization: `Bearer ${accessToken}` },
     });
+
+    return data.map((item) => ({
+        ...item,
+        id: Number(item.id),
+        ingredient_id: Number(item.ingredient_id),
+        needed_quantity: Number(item.needed_quantity),
+        stock_quantity: Number(item.stock_quantity),
+    }));
+}
+
+interface AddShoppingListPayload {
+    ingredient_id?: number;
+    ingredient_name?: string;
+    needed_quantity: number;
+    unit?: IngredientUnit;
 }
 
 export async function addToShoppingList(
-    ingredient_id: number,
-    needed_quantity: number,
+    payload: AddShoppingListPayload,
     accessToken: string
 ): Promise<ShoppingListItem> {
     return apiFetchJson<ShoppingListItem>("/api/shopping-list", {
@@ -30,13 +52,18 @@ export async function addToShoppingList(
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ingredient_id, needed_quantity }),
+        body: JSON.stringify(payload),
     });
+}
+
+interface UpdateShoppingListPayload {
+    needed_quantity?: number;
+    unit?: IngredientUnit;
 }
 
 export async function updateShoppingListItem(
     id: number,
-    needed_quantity: number,
+    payload: UpdateShoppingListPayload,
     accessToken: string
 ): Promise<ShoppingListItem> {
     return apiFetchJson<ShoppingListItem>(`/api/shopping-list/${id}`, {
@@ -45,7 +72,7 @@ export async function updateShoppingListItem(
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ needed_quantity }),
+        body: JSON.stringify(payload),
     });
 }
 

@@ -132,9 +132,16 @@ CREATE TABLE IF NOT EXISTS shopping_list (
     location_id INT REFERENCES locations(id) ON DELETE CASCADE,
     ingredient_id INT REFERENCES ingredients(id) ON DELETE CASCADE,
     needed_quantity NUMERIC NOT NULL,
+    unit_override TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
+
+ALTER TABLE shopping_list
+ADD COLUMN IF NOT EXISTS unit_override TEXT;
+
+ALTER TABLE shopping_list
+ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
 
 -- LOGS --
 CREATE TABLE IF NOT EXISTS logs (

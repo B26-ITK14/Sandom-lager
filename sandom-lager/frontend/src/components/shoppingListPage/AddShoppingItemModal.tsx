@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { addToShoppingList, fetchInventory } from "../../api";
+import { INGREDIENT_UNITS, type IngredientUnit } from "../../types";
 
 interface Props {
     isOpen: boolean;
@@ -10,22 +11,28 @@ interface Props {
 
 export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: Props) {
     const { getAccessTokenSilently } = useAuth0();
-    const [ingredients, setIngredients] = useState<Array<{ id: number; name: string; unit: string }>>([]);
+    const [ingredients, setIngredients] = useState<Array<{ id: number; name: string; unit: IngredientUnit }>>([]);
+    const [entryMode, setEntryMode] = useState<"existing" | "new">("existing");
     const [selectedIngredient, setSelectedIngredient] = useState<number | null>(null);
+    const [newIngredientName, setNewIngredientName] = useState("");
+    const [selectedUnit, setSelectedUnit] = useState<IngredientUnit>("stk");
     const [quantity, setQuantity] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
+    const [isHydratingIngredients, setIsHydratingIngredients] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const handleOpenModal = async () => {
-        if (isLoading) return;
+        if (isHydratingIngredients) return;
+        setIsHydratingIngredients(true);
+
         try {
             const token = await getAccessTokenSilently();
             const inventory = await fetchInventory(token);
             // Extract unique ingredients from inventory
             const uniqueIngredients = Array.from(
-                new Map(inventory.map(item => [item.id, item])).values()
+                new Map(inventory.map(item => [item.ingredient_id, item])).values()
             ).map(item => ({
-                id: item.id,
+                id: item.ingredient_id,
                 name: item.ingredient,
                 unit: item.unit,
             }));
@@ -33,12 +40,37 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
         } catch (err) {
             console.error("Failed to load ingredients:", err);
             setError("Kunne ikke laste ingredienser");
+        } finally {
+            setIsHydratingIngredients(false);
         }
     };
 
+    useEffect(() => {
+        if (!isOpen) return;
+        void handleOpenModal();
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (entryMode !== "existing") return;
+        const selected = ingredients.find((ing) => ing.id === selectedIngredient);
+        if (selected) {
+            setSelectedUnit(selected.unit);
+        }
+    }, [entryMode, selectedIngredient, ingredients]);
+
     const handleAddItem = async () => {
-        if (!selectedIngredient || quantity <= 0) {
-            setError("Velg en ingrediens og skriv inn mengde");
+        if (quantity <= 0) {
+            setError("Skriv inn gyldig mengde");
+            return;
+        }
+
+        if (entryMode === "existing" && !selectedIngredient) {
+            setError("Velg en ingrediens");
+            return;
+        }
+
+        if (entryMode === "new" && !newIngredientName.trim()) {
+            setError("Skriv inn navn på ny ingrediens");
             return;
         }
 
@@ -47,10 +79,31 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
 
         try {
             const token = await getAccessTokenSilently();
-            await addToShoppingList(selectedIngredient, quantity, token);
+
+            if (entryMode === "existing") {
+                await addToShoppingList(
+                    {
+                        ingredient_id: selectedIngredient!,
+                        needed_quantity: quantity,
+                        unit: selectedUnit,
+                    },
+                    token
+                );
+            } else {
+                await addToShoppingList(
+                    {
+                        ingredient_name: newIngredientName.trim(),
+                        needed_quantity: quantity,
+                        unit: selectedUnit,
+                    },
+                    token
+                );
+            }
             
             // Reset form
             setSelectedIngredient(null);
+            setNewIngredientName("");
+            setSelectedUnit("stk");
             setQuantity(1);
             onItemAdded?.();
             onClose();
@@ -63,11 +116,6 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
     };
 
     if (!isOpen) return null;
-
-    // Load ingredients when modal opens
-    if (ingredients.length === 0) {
-        handleOpenModal();
-    }
 
     return (
         <div
@@ -97,24 +145,87 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                 )}
 
                 <div className="mt-4 flex flex-col gap-4">
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setEntryMode("existing")}
+                            className="py-2 px-3 rounded-md"
+                            style={{
+                                background: entryMode === "existing" ? "var(--color-primary)" : "var(--color-secondary-surface)",
+                                color: entryMode === "existing" ? "var(--color-on-primary)" : "var(--color-text-primary)",
+                                border: "1px solid var(--color-border)",
+                            }}>
+                            Velg eksisterende
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setEntryMode("new")}
+                            className="py-2 px-3 rounded-md"
+                            style={{
+                                background: entryMode === "new" ? "var(--color-primary)" : "var(--color-secondary-surface)",
+                                color: entryMode === "new" ? "var(--color-on-primary)" : "var(--color-text-primary)",
+                                border: "1px solid var(--color-border)",
+                            }}>
+                            Skriv ny vare
+                        </button>
+                    </div>
+
                     <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                             Ingrediens
                         </label>
+                        {entryMode === "existing" ? (
+                            <select
+                                value={selectedIngredient || ""}
+                                onChange={(e) => setSelectedIngredient(Number(e.target.value))}
+                                disabled={isLoading || isHydratingIngredients || ingredients.length === 0}
+                                className="rounded-md px-3 py-2"
+                                style={{
+                                    background: "var(--color-surface)",
+                                    border: "1px solid var(--color-border)",
+                                    color: "var(--color-text-primary)",
+                                }}>
+                                <option value="">Velg ingrediens...</option>
+                                {ingredients.map(ing => (
+                                    <option key={ing.id} value={ing.id}>
+                                        {ing.name}
+                                    </option>
+                                ))}
+                            </select>
+                        ) : (
+                            <input
+                                type="text"
+                                value={newIngredientName}
+                                onChange={(e) => setNewIngredientName(e.target.value)}
+                                disabled={isLoading}
+                                placeholder="F.eks. Havregryn"
+                                className="rounded-md px-3 py-2"
+                                style={{
+                                    background: "var(--color-surface)",
+                                    border: "1px solid var(--color-border)",
+                                    color: "var(--color-text-primary)",
+                                }}
+                            />
+                        )}
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <label className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                            Enhet
+                        </label>
                         <select
-                            value={selectedIngredient || ""}
-                            onChange={(e) => setSelectedIngredient(Number(e.target.value))}
-                            disabled={isLoading || ingredients.length === 0}
+                            value={selectedUnit}
+                            onChange={(e) => setSelectedUnit(e.target.value as IngredientUnit)}
+                            disabled={isLoading}
                             className="rounded-md px-3 py-2"
                             style={{
                                 background: "var(--color-surface)",
                                 border: "1px solid var(--color-border)",
                                 color: "var(--color-text-primary)",
                             }}>
-                            <option value="">Velg ingrediens...</option>
-                            {ingredients.map(ing => (
-                                <option key={ing.id} value={ing.id}>
-                                    {ing.name}
+                            {INGREDIENT_UNITS.map((unit) => (
+                                <option key={unit} value={unit}>
+                                    {unit}
                                 </option>
                             ))}
                         </select>
@@ -155,12 +266,12 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                     </button>
                     <button
                         onClick={handleAddItem}
-                        disabled={isLoading || !selectedIngredient}
+                        disabled={isLoading}
                         className="py-2 px-4 rounded-md transition-opacity"
                         style={{
                             background: "var(--color-primary)",
                             color: "var(--color-on-primary)",
-                            opacity: (isLoading || !selectedIngredient) ? 0.5 : 1,
+                            opacity: isLoading ? 0.5 : 1,
                         }}>
                         {isLoading ? "Legger til..." : "Lagre"}
                     </button>

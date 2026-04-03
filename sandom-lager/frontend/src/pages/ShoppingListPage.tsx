@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
 import { fetchShoppingList, updateShoppingListItem, removeFromShoppingList } from "../api";
-import type { ShoppingListItem } from "../types";
+import type { IngredientUnit, ShoppingListItem } from "../types";
 
 import ShoppingListToolbar from "../components/shoppingListPage/ShoppingListToolbar";
 import ShoppingListItemRow from "../components/shoppingListPage/ShoppingListItem";
@@ -40,12 +40,14 @@ export default function ShoppingListPage() {
         const item = items.find(i => i.id === id);
         if (!item) return;
 
+        const nextQuantity = Number(item.needed_quantity) + 1;
+
         try {
             const token = await getAccessTokenSilently();
-            await updateShoppingListItem(id, item.needed_quantity + 1, token);
+            await updateShoppingListItem(id, { needed_quantity: nextQuantity }, token);
             setItems(prev =>
                 prev.map(i =>
-                    i.id === id ? { ...i, needed_quantity: i.needed_quantity + 1 } : i
+                    i.id === id ? { ...i, needed_quantity: nextQuantity } : i
                 )
             );
         } catch (error) {
@@ -55,18 +57,33 @@ export default function ShoppingListPage() {
 
     const handleDecrease = async (id: number) => {
         const item = items.find(i => i.id === id);
-        if (!item || item.needed_quantity <= 1) return;
+        if (!item) return;
+
+        const currentQuantity = Number(item.needed_quantity);
+        if (currentQuantity <= 1) return;
+
+        const nextQuantity = currentQuantity - 1;
 
         try {
             const token = await getAccessTokenSilently();
-            await updateShoppingListItem(id, item.needed_quantity - 1, token);
+            await updateShoppingListItem(id, { needed_quantity: nextQuantity }, token);
             setItems(prev =>
                 prev.map(i =>
-                    i.id === id ? { ...i, needed_quantity: i.needed_quantity - 1 } : i
+                    i.id === id ? { ...i, needed_quantity: nextQuantity } : i
                 )
             );
         } catch (error) {
             console.error("Kunne ikke redusere mengde", error);
+        }
+    };
+
+    const handleUnitUpdate = async (id: number, unit: IngredientUnit) => {
+        try {
+            const token = await getAccessTokenSilently();
+            await updateShoppingListItem(id, { unit }, token);
+            setItems((prev) => prev.map((item) => (item.id === id ? { ...item, unit } : item)));
+        } catch (error) {
+            console.error("Kunne ikke oppdatere enhet", error);
         }
     };
 
@@ -101,6 +118,7 @@ export default function ShoppingListPage() {
                                 onIncrease={handleIncrease}
                                 onDecrease={handleDecrease}
                                 onDelete={handleDelete}
+                                onUpdateUnit={handleUnitUpdate}
                             />
                         ))}
                     </ul>

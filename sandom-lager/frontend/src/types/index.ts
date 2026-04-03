@@ -77,14 +77,18 @@ export interface RecipeIngredient {
 
 export interface ShoppingListItem {
     id: number;
+    ingredient_id: number;
     ingredient: string;
     needed_quantity: number;
     location: string;
     unit: IngredientUnit;
+    stock_quantity: number;
 }
 
 export interface InventoryItem {
     id: number;
+    location_id: number;
+    ingredient_id: number;
     ingredient: string;
     quantity: number;
     updated_at: string;

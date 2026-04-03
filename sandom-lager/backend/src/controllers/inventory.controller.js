@@ -8,7 +8,10 @@ async function getInventory(req, res) {
     const result = await pool.query(
         `SELECT 
         inv.id,
+        inv.location_id,
+        inv.ingredient_id,
         inv.quantity,
+        inv.updated_at,
         i.name AS ingredient,
         i.unit,
         l.name AS location

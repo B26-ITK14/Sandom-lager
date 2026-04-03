@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { INGREDIENT_UNITS, type IngredientUnit } from "../../types";
 import type { ShoppingListItem } from "../../types";
 
 interface Props {
@@ -6,10 +7,16 @@ interface Props {
     onIncrease: (id: number) => Promise<void>;
     onDecrease: (id: number) => Promise<void>;
     onDelete: (id: number) => Promise<void>;
+    onUpdateUnit: (id: number, unit: IngredientUnit) => Promise<void>;
 }
 
-export default function ShoppingListItem({ item, onIncrease, onDecrease, onDelete }: Props) {
+export default function ShoppingListItem({ item, onIncrease, onDecrease, onDelete, onUpdateUnit }: Props) {
     const [isLoading, setIsLoading] = useState(false);
+    const [isUnitEditing, setIsUnitEditing] = useState(false);
+
+    const formatQuantity = (value: number) => {
+        return new Intl.NumberFormat("nb-NO", { maximumFractionDigits: 2 }).format(value);
+    };
 
     const handleIncrease = async () => {
         setIsLoading(true);
@@ -38,6 +45,16 @@ export default function ShoppingListItem({ item, onIncrease, onDecrease, onDelet
         }
     };
 
+    const handleUnitChange = async (nextUnit: IngredientUnit) => {
+        setIsLoading(true);
+        try {
+            await onUpdateUnit(item.id, nextUnit);
+            setIsUnitEditing(false);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <li
         className="flex items-center justify-between rounded-xl p-4"
@@ -54,7 +71,37 @@ export default function ShoppingListItem({ item, onIncrease, onDecrease, onDelet
                 </dt>
                 <dd className="m-0 text-sm"
                     style={{ color: "var(--color-text-secondary)" }}>
-                    {item.needed_quantity} {item.unit}
+                    {formatQuantity(item.needed_quantity)}{" "}
+                    {isUnitEditing ? (
+                        <select
+                            value={item.unit}
+                            disabled={isLoading}
+                            onChange={(e) => void handleUnitChange(e.target.value as IngredientUnit)}
+                            className="rounded-md px-2 py-1"
+                            style={{
+                                background: "var(--color-surface)",
+                                border: "1px solid var(--color-border)",
+                                color: "var(--color-text-primary)",
+                            }}>
+                            {INGREDIENT_UNITS.map((unit) => (
+                                <option key={unit} value={unit}>
+                                    {unit}
+                                </option>
+                            ))}
+                        </select>
+                    ) : (
+                        <button
+                            type="button"
+                            disabled={isLoading}
+                            className="underline-offset-2 hover:underline"
+                            style={{ color: "var(--color-text-primary)" }}
+                            onClick={() => setIsUnitEditing(true)}>
+                            {item.unit}
+                        </button>
+                    )}
+                </dd>
+                <dd className="m-0 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                    På lager: {formatQuantity(item.stock_quantity)} {item.unit}
                 </dd>
             </dl>
 
