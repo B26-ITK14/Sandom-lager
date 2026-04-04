@@ -41,4 +41,11 @@ router.delete(
     asyncHandler(shoppingListController.deleteShoppingListItem)
 );
 
+// DELETE ALL - Manager/admin can delete entire shopping list for their location
+router.delete(
+    "/shopping-list",
+    requireRole("manager", "admin"),
+    asyncHandler(shoppingListController.clearShoppingList)
+);
+
 module.exports = router;

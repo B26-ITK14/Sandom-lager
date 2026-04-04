@@ -86,6 +86,15 @@ export async function removeFromShoppingList(
     });
 }
 
+export async function clearShoppingList(
+    accessToken: string
+): Promise<{ message: string; deletedCount: number }> {
+    return apiFetchJson<{ message: string; deletedCount: number }>("/api/shopping-list", {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+}
+
 export async function updateInventoryQuantity(
     inventoryId: number,
     quantity: number,

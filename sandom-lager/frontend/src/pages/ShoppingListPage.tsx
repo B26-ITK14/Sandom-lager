@@ -8,6 +8,7 @@ import type { IngredientUnit, ShoppingListItem } from "../types";
 import ShoppingListToolbar from "../components/shoppingListPage/ShoppingListToolbar";
 import ShoppingListItemRow from "../components/shoppingListPage/ShoppingListItem";
 import ShoppingListPrintExport from "../components/shoppingListPage/ShoppingListPrintExport";
+import DeleteShoppingListButton from "../components/shoppingListPage/DeleteShoppingListButton";
 import { EmptyShoppingList }  from "../components/shoppingListPage/EmptyShoppingList";
 import AddShoppingItemModal from "../components/shoppingListPage/AddShoppingItemModal";
 
@@ -102,7 +103,10 @@ export default function ShoppingListPage() {
             <section className="flex flex-col gap-6">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                     <ShoppingListToolbar onAddItem={() => setIsAddModalOpen(true)} />
-                    <ShoppingListPrintExport items={items} />
+                    <div className="flex gap-3 flex-wrap">
+                        <ShoppingListPrintExport items={items} />
+                        <DeleteShoppingListButton onDeleted={loadShoppingList} />
+                    </div>
                 </div>
 
                 {isLoading ? (

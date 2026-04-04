@@ -218,9 +218,28 @@ async function deleteShoppingListItem(req, res) {
     res.json({ message: "Shopping list item deleted successfully", deleted: result.rows[0] });
 }
 
+// DELETE /api/shopping-list - Delete all shopping list items for user's location
+async function clearShoppingList(req, res) {
+    const userId = req.user.id;
+    const locationId = await getApprovedLocationId(userId);
+
+    const result = await pool.query(
+        `DELETE FROM shopping_list
+         WHERE location_id = $1
+         RETURNING id`,
+        [locationId]
+    );
+
+    res.json({
+        message: "Shopping list cleared successfully",
+        deletedCount: result.rowCount || 0,
+    });
+}
+
 module.exports = {
     getShoppingList,
     createShoppingListItem,
     updateShoppingListItem,
-    deleteShoppingListItem
+    deleteShoppingListItem,
+    clearShoppingList
 };
