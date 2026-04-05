@@ -46,14 +46,14 @@ export default function StorageFilterButton({ options, selectedFilter, onSelectF
         <div ref={containerRef} className="relative">
             <button
                 type="button"
-                className="grid h-12 w-12 place-items-center rounded-2xl"
+                className="flex items-center justify-center h-11 w-11 shrink-0 rounded-full"
                 style={{ backgroundColor: "#5d6cb5", color: "#ffffff" }}
                 aria-label="Filtrer produkter"
                 aria-expanded={isOpen}
                 aria-haspopup="menu"
                 onClick={() => setIsOpen((prev) => !prev)}
             >
-                <SlidersHorizontal size={22} />
+                <SlidersHorizontal size={18} />
             </button>
 
             {isOpen ? (
