@@ -4,7 +4,21 @@ const { logAction } = require("../utils/logger");
 
 // GET api/inventory - Get all inventory items
 async function getInventory(req, res) {
-    
+    const userId = req.user.id;
+
+    const locationResult = await pool.query(
+        `SELECT location_id FROM user_locations 
+         WHERE user_id = $1 AND access_status = 'approved' 
+         LIMIT 1`,
+        [userId]
+    );
+
+    if (locationResult.rows.length === 0) {
+        throw new ApiError(403, "No approved location found for user");
+    }
+
+    const locationId = locationResult.rows[0].location_id;
+
     const result = await pool.query(
         `SELECT 
         inv.id,
@@ -15,10 +29,12 @@ async function getInventory(req, res) {
         FROM inventory inv
         JOIN ingredients i ON inv.ingredient_id = i.id
         JOIN locations l ON inv.location_id = l.id
-        ORDER BY inv.id DESC`
-        );
+        WHERE inv.location_id = $1
+        ORDER BY inv.id DESC`,
+        [locationId]
+    );
 
-        res.json(result.rows);
+    res.json(result.rows);
 }
 
 // POST api/inventory

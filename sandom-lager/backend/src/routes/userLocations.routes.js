@@ -39,10 +39,24 @@ router.get(
     asyncHandler(userLocationsController.getMyLocationAccess)
 );
 
-// GET - Admin henter alle søknader
+// GET - Admin gets all applications
 router.get(
     "/user-locations",
     requireRole("admin"),
     asyncHandler(userLocationsController.getAllLocationAccess)
+);
+
+// PATCH - Admin revokes location access
+router.patch(
+    "/user-locations/:id/revoke",
+    requireRole("admin"),
+    asyncHandler(userLocationsController.revokeLocationAccess)
+);
+
+// PATCH - Admin blocks user in Auth0
+router.patch(
+    "/user-locations/:id/block",
+    requireRole("admin"),
+    asyncHandler(userLocationsController.blockUser)
 );
 module.exports = router;

@@ -3,6 +3,20 @@ const ApiError = require('../utils/ApiError');
 
 // GET /api/shopping-list - Get all shopping list items
 async function getShoppingList(req, res) {
+    const userId = req.user.id;
+
+    const locationResult = await pool.query(
+        `SELECT location_id FROM user_locations 
+         WHERE user_id = $1 AND access_status = 'approved' 
+         LIMIT 1`,
+        [userId]
+    );
+
+    if (locationResult.rows.length === 0) {
+        throw new ApiError(403, "No approved location found for user");
+    }
+
+    const locationId = locationResult.rows[0].location_id;
 
     const result = await pool.query(
         `SELECT 
@@ -14,7 +28,9 @@ async function getShoppingList(req, res) {
         FROM shopping_list sl
         JOIN ingredients i ON sl.ingredient_id = i.id
         JOIN locations l ON sl.location_id = l.id
-        ORDER BY sl.id DESC`
+        WHERE sl.location_id = $1
+        ORDER BY sl.id DESC`,
+        [locationId]
     );
 
     res.json(result.rows);
