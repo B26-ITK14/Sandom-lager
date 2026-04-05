@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import Layout from "../components/Layout";
 import LoadingSpinner from "../components/LoadingSpinner";
 import RecipeCard from "../components/recipes/RecipeCard";
+import RecipeFilterBar from "../components/recipes/RecipeFilterBar";
 import AddRecipeModal from "../components/recipes/AddRecipeModal";
 import RecipeDetailModal from "../components/recipes/RecipeDetailModal";
 import { useRecipes, useUserRole } from "../hooks";
@@ -43,106 +44,17 @@ export default function RecipesPage() {
     return (
         <Layout>
 
-            {/* Search bar + filter button */}
-            <search className="flex gap-2 mb-3">
-                <label htmlFor="recipe-search" className="flex-1 relative">
-                    <svg
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-                    </svg>
-                    <input
-                        id="recipe-search"
-                        type="search"
-                        placeholder="Søk etter oppskrifter"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 rounded-full text-sm outline-none"
-                        style={{
-                            backgroundColor: "var(--color-surface)",
-                            color: "var(--color-text-primary)",
-                            border: "1px solid var(--color-border)",
-                        }}
-                    />
-                </label>
-
-                <button
-                    type="button"
-                    onClick={() => setFilterOpen((prev) => !prev)}
-                    aria-expanded={filterOpen}
-                    aria-label="Filtrer oppskrifter"
-                    className="flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-colors cursor-pointer"
-                    style={{
-                        backgroundColor: filterOpen || activeCategory !== null
-                            ? "var(--color-primary)"
-                            : "var(--color-surface)",
-                        color: filterOpen || activeCategory !== null
-                            ? "var(--color-on-primary)"
-                            : "var(--color-text-primary)",
-                        border: "1px solid var(--color-border)",
-                    }}
-                >
-                    <svg fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M7 12h10M11 18h2" />
-                    </svg>
-                </button>
-
-                {canManageRecipes && (
-                    <button
-                        type="button"
-                        onClick={() => setShowAddModal(true)}
-                        aria-label="Legg til oppskrift"
-                        className="flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-colors cursor-pointer"
-                        style={{
-                            backgroundColor: "var(--color-primary)",
-                            color: "var(--color-on-primary)",
-                            border: "none",
-                        }}
-                    >
-                        <svg fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                        </svg>
-                    </button>
-                )}
-            </search>
-
-            {/* Category filter chips */}
-            {filterOpen && categories.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4" role="group" aria-label="Kategorier">
-                    <button
-                        type="button"
-                        onClick={() => setActiveCategory(null)}
-                        className="px-3 py-1 rounded-full text-sm font-medium transition-colors cursor-pointer"
-                        style={{
-                            backgroundColor: activeCategory === null ? "var(--color-primary)" : "var(--color-surface)",
-                            color: activeCategory === null ? "var(--color-on-primary)" : "var(--color-text-primary)",
-                            border: "1px solid var(--color-border)",
-                        }}
-                    >
-                        Alle
-                    </button>
-                    {categories.map((cat) => (
-                        <button
-                            key={cat}
-                            type="button"
-                            onClick={() => setActiveCategory(cat === activeCategory ? null : cat)}
-                            className="px-3 py-1 rounded-full text-sm font-medium transition-colors cursor-pointer"
-                            style={{
-                                backgroundColor: activeCategory === cat ? "var(--color-primary)" : "var(--color-surface)",
-                                color: activeCategory === cat ? "var(--color-on-primary)" : "var(--color-text-primary)",
-                                border: "1px solid var(--color-border)",
-                            }}
-                        >
-                            {cat}
-                        </button>
-                    ))}
-                </div>
-            )}
+            <RecipeFilterBar
+                search={search}
+                onSearchChange={setSearch}
+                activeCategory={activeCategory}
+                onCategoryChange={setActiveCategory}
+                categories={categories}
+                filterOpen={filterOpen}
+                onFilterToggle={() => setFilterOpen((prev) => !prev)}
+                canManageRecipes={canManageRecipes}
+                onAddRecipe={() => setShowAddModal(true)}
+            />
 
             {/* State handling */}
             {loading && (

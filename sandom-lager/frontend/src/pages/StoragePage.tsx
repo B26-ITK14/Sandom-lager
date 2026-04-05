@@ -8,7 +8,8 @@ import Layout from "../components/Layout";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ProductCard from "../components/storage/productCard";
 import StorageFilterButton from "../components/storage/StorageFilterBtn";
-import { CircleAlert, Plus, Search, X } from "lucide-react";
+import { CircleAlert, Plus, X } from "lucide-react";
+import SearchInput from "../components/SearchInput";
 import { useMemo, useState } from "react";
 import { useInventory } from "../hooks/storage/useInventory";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -158,25 +159,14 @@ export default function StoragePage() {
 
     return (
         <Layout>
-            <section className="mx-auto mt-4 max-w-lg">
+            <header className="mb-6 flex items-center gap-3">
 
-                <header className="mb-6 flex items-center gap-3">
-
-                    <div
-                        className="flex h-12 flex-1 items-center gap-2 rounded-2xl border px-4"
-                        style={{ borderColor: "#c7c8cb", backgroundColor: "#f7f7f8" }}
-                    >
-                        <Search size={20} color="#b8b9bd" />
-
-                        <input
-                            type="search"
-                            placeholder="Søk på lageret"
-                            className="w-full border-none bg-transparent text-base outline-none"
-                            style={{ color: "#6f7278" }}
-                            value={searchQuery}
-                            onChange={(event) => setSearchQuery(event.target.value)}
-                        />
-                    </div>
+                    <SearchInput
+                        id="storage-search"
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        placeholder="Søk på lageret"
+                    />
 
                     <StorageFilterButton
                         options={FILTER_OPTIONS}
@@ -186,16 +176,16 @@ export default function StoragePage() {
 
                     <button
                         type="button"
-                        className="grid h-12 w-12 place-items-center rounded-full"
+                        className="flex items-center justify-center h-11 w-11 shrink-0 rounded-full"
                         style={{ backgroundColor: "#0a9a82", color: "#ffffff" }}
                         aria-label="Legg til produkt"
                     >
-                        <Plus size={24} />
+                        <Plus size={18} />
                     </button>
 
-                </header>
+            </header>
 
-                <section>
+            <section>
                     {notice ? (
                         <article className="mb-4 rounded-xl border px-4 py-3" style={{ borderColor: "#d4d6db", backgroundColor: "#f8fafc" }} role="status" aria-live="polite">
                             <div className="flex items-start gap-3">
@@ -250,8 +240,6 @@ export default function StoragePage() {
                             onNotice={showNotice}
                         />
                     ))}
-                </section>
-
             </section>
         </Layout>
     );
