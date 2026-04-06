@@ -25,7 +25,6 @@ export interface User {
 
 export interface Recipe {
     id: number;
-    location_id: number;
     title: string;
     category: string;
     instructions: string | null;
