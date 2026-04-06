@@ -5,7 +5,7 @@
 */
 
 import { apiFetchJson } from "./client";
-import type { Ingredient, Recipe, RecipeIngredient } from "../types";
+import type { Allergen, Ingredient, Recipe, RecipeIngredient } from "../types";
 
 export type RecipesListResponse = Recipe[];
 
@@ -97,5 +97,25 @@ export async function createIngredient(
         method: "POST",
         headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
         body: JSON.stringify(data),
+    });
+}
+
+// Allergens
+
+export async function fetchAllergens(accessToken: string): Promise<Allergen[]> {
+    return apiFetchJson<Allergen[]>("/api/recipes/allergens", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+}
+
+export async function setRecipeAllergens(
+    recipeId: number,
+    allergenIds: number[],
+    accessToken: string
+): Promise<Recipe> {
+    return apiFetchJson<Recipe>(`/api/recipes/${recipeId}/allergens`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ allergen_ids: allergenIds }),
     });
 }
