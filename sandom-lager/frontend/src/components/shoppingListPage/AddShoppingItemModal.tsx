@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { addToShoppingList, fetchInventory } from "../../api";
-import { INGREDIENT_UNITS, type IngredientUnit } from "../../types";
+import { COUNT_UNITS, INGREDIENT_UNITS, type IngredientUnit } from "../../types";
 
 interface Props {
     isOpen: boolean;
@@ -20,6 +20,8 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
     const [isLoading, setIsLoading] = useState(false);
     const [isHydratingIngredients, setIsHydratingIngredients] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const isCountUnit = COUNT_UNITS.includes(selectedUnit as (typeof COUNT_UNITS)[number]);
 
     const handleOpenModal = async () => {
         if (isHydratingIngredients) return;
@@ -59,6 +61,8 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
     }, [entryMode, selectedIngredient, ingredients]);
 
     const handleAddItem = async () => {
+        const normalizedQuantity = isCountUnit ? Math.round(quantity) : quantity;
+
         if (quantity <= 0) {
             setError("Skriv inn gyldig mengde");
             return;
@@ -84,7 +88,7 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                 await addToShoppingList(
                     {
                         ingredient_id: selectedIngredient!,
-                        needed_quantity: quantity,
+                        needed_quantity: normalizedQuantity,
                         unit: selectedUnit,
                     },
                     token
@@ -93,7 +97,7 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                 await addToShoppingList(
                     {
                         ingredient_name: newIngredientName.trim(),
-                        needed_quantity: quantity,
+                        needed_quantity: normalizedQuantity,
                         unit: selectedUnit,
                     },
                     token
@@ -216,7 +220,7 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                         <select
                             value={selectedUnit}
                             onChange={(e) => setSelectedUnit(e.target.value as IngredientUnit)}
-                            disabled={isLoading}
+                            disabled={isLoading || entryMode === "existing"}
                             className="rounded-md px-3 py-2"
                             style={{
                                 background: "var(--color-surface)",
@@ -229,6 +233,11 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                                 </option>
                             ))}
                         </select>
+                        {entryMode === "existing" && (
+                            <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                                Enhet er låst for eksisterende ingredienser.
+                            </p>
+                        )}
                     </div>
 
                     <div className="flex flex-col gap-2">
@@ -237,9 +246,19 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                         </label>
                         <input
                             type="number"
-                            min="1"
+                            min={isCountUnit ? "1" : "0.1"}
+                            step={isCountUnit ? "1" : "0.1"}
                             value={quantity}
-                            onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+                            onChange={(e) => {
+                                const parsed = Number(e.target.value);
+                                if (!Number.isFinite(parsed)) {
+                                    setQuantity(1);
+                                    return;
+                                }
+
+                                const next = Math.max(isCountUnit ? 1 : 0.1, parsed);
+                                setQuantity(isCountUnit ? Math.round(next) : next);
+                            }}
                             disabled={isLoading}
                             className="rounded-md px-3 py-2"
                             style={{

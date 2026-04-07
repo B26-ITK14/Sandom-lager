@@ -20,6 +20,12 @@ router.get(
     asyncHandler(shoppingListController.getShoppingList)
 );
 
+router.get(
+    "/shopping-list/history",
+    requireRole("user", "manager", "admin"),
+    asyncHandler(shoppingListController.getShoppingListHistory)
+);
+
 // POST - Users can create shopping list items (location handled by backend)
 router.post(
     "/shopping-list",

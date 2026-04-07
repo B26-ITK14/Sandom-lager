@@ -143,6 +143,24 @@ ADD COLUMN IF NOT EXISTS unit_override TEXT;
 ALTER TABLE shopping_list
 ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
 
+-- SHOPPING LIST HISTORY --
+CREATE TABLE IF NOT EXISTS shopping_list_history_batches (
+    id SERIAL PRIMARY KEY,
+    location_id INT REFERENCES locations(id) ON DELETE CASCADE,
+    deleted_by_user_id INT REFERENCES users(id) ON DELETE SET NULL,
+    deleted_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS shopping_list_history_items (
+    id SERIAL PRIMARY KEY,
+    batch_id INT REFERENCES shopping_list_history_batches(id) ON DELETE CASCADE,
+    ingredient_id INT REFERENCES ingredients(id) ON DELETE SET NULL,
+    ingredient_name_snapshot TEXT NOT NULL,
+    unit_snapshot TEXT NOT NULL,
+    needed_quantity_snapshot NUMERIC NOT NULL,
+    stock_quantity_snapshot NUMERIC NOT NULL DEFAULT 0
+);
+
 -- LOGS --
 CREATE TABLE IF NOT EXISTS logs (
     id SERIAL PRIMARY KEY,

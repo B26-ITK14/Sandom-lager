@@ -5,7 +5,7 @@
 */
 
 import { apiFetchJson } from "./client";
-import type { IngredientUnit, InventoryItem, ShoppingListItem } from "../types";
+import type { IngredientUnit, InventoryItem, ShoppingListHistoryRow, ShoppingListItem } from "../types";
 
 export async function fetchInventory(accessToken: string): Promise<InventoryItem[]> {
     const data = await apiFetchJson<InventoryItem[]>("/api/inventory", {
@@ -93,6 +93,21 @@ export async function clearShoppingList(
         method: "DELETE",
         headers: { Authorization: `Bearer ${accessToken}` },
     });
+}
+
+export async function fetchShoppingListHistory(accessToken: string): Promise<ShoppingListHistoryRow[]> {
+    const data = await apiFetchJson<ShoppingListHistoryRow[]>("/api/shopping-list/history", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    return data.map((row) => ({
+        ...row,
+        batch_id: Number(row.batch_id),
+        deleted_by_user_id: row.deleted_by_user_id === null ? null : Number(row.deleted_by_user_id),
+        ingredient_id: row.ingredient_id === null ? null : Number(row.ingredient_id),
+        needed_quantity: Number(row.needed_quantity),
+        stock_quantity: Number(row.stock_quantity),
+    }));
 }
 
 export async function updateInventoryQuantity(

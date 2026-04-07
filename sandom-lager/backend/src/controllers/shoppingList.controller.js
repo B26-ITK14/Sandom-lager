@@ -97,6 +97,33 @@ async function getShoppingList(req, res) {
     res.json(result.rows);
 }
 
+// GET /api/shopping-list/history - Get deleted shopping list history for user's location
+async function getShoppingListHistory(req, res) {
+    const userId = req.user.id;
+    const locationId = await getApprovedLocationId(userId);
+
+    const result = await pool.query(
+        `SELECT
+            b.id AS batch_id,
+            b.deleted_at,
+            b.deleted_by_user_id,
+            u.name AS deleted_by_name,
+            i.ingredient_id,
+            i.ingredient_name_snapshot AS ingredient,
+            i.unit_snapshot AS unit,
+            i.needed_quantity_snapshot AS needed_quantity,
+            i.stock_quantity_snapshot AS stock_quantity
+        FROM shopping_list_history_batches b
+        JOIN shopping_list_history_items i ON i.batch_id = b.id
+        LEFT JOIN users u ON u.id = b.deleted_by_user_id
+        WHERE b.location_id = $1
+        ORDER BY b.deleted_at DESC, i.id ASC`,
+        [locationId]
+    );
+
+    res.json(result.rows);
+}
+
 // POST /api/shopping-list - Add a new item to the shopping list
 async function createShoppingListItem(req, res) {
     const userId = req.user.id;
@@ -223,21 +250,87 @@ async function clearShoppingList(req, res) {
     const userId = req.user.id;
     const locationId = await getApprovedLocationId(userId);
 
-    const result = await pool.query(
-        `DELETE FROM shopping_list
-         WHERE location_id = $1
-         RETURNING id`,
-        [locationId]
-    );
+    const client = await pool.connect();
 
-    res.json({
-        message: "Shopping list cleared successfully",
-        deletedCount: result.rowCount || 0,
-    });
+    try {
+        await client.query("BEGIN");
+
+        const itemsResult = await client.query(
+            `SELECT
+                sl.ingredient_id,
+                i.name AS ingredient,
+                COALESCE(sl.unit_override, i.unit) AS unit,
+                sl.needed_quantity,
+                COALESCE(inv.quantity, 0) AS stock_quantity
+             FROM shopping_list sl
+             JOIN ingredients i ON i.id = sl.ingredient_id
+             LEFT JOIN inventory inv ON inv.location_id = sl.location_id AND inv.ingredient_id = sl.ingredient_id
+             WHERE sl.location_id = $1`,
+            [locationId]
+        );
+
+        if (itemsResult.rows.length === 0) {
+            await client.query("COMMIT");
+            return res.json({
+                message: "Shopping list cleared successfully",
+                deletedCount: 0,
+            });
+        }
+
+        const batchResult = await client.query(
+            `INSERT INTO shopping_list_history_batches (location_id, deleted_by_user_id)
+             VALUES ($1, $2)
+             RETURNING id`,
+            [locationId, userId]
+        );
+
+        const batchId = Number(batchResult.rows[0].id);
+
+        for (const row of itemsResult.rows) {
+            await client.query(
+                `INSERT INTO shopping_list_history_items (
+                    batch_id,
+                    ingredient_id,
+                    ingredient_name_snapshot,
+                    unit_snapshot,
+                    needed_quantity_snapshot,
+                    stock_quantity_snapshot
+                ) VALUES ($1, $2, $3, $4, $5, $6)`,
+                [
+                    batchId,
+                    row.ingredient_id,
+                    row.ingredient,
+                    row.unit,
+                    row.needed_quantity,
+                    row.stock_quantity,
+                ]
+            );
+        }
+
+        const result = await client.query(
+            `DELETE FROM shopping_list
+             WHERE location_id = $1
+             RETURNING id`,
+            [locationId]
+        );
+
+        await client.query("COMMIT");
+
+        res.json({
+            message: "Shopping list cleared successfully",
+            deletedCount: result.rowCount || 0,
+        });
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
+    }
 }
 
 module.exports = {
     getShoppingList,
+    getShoppingListHistory,
     createShoppingListItem,
     updateShoppingListItem,
     deleteShoppingListItem,

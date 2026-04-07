@@ -2,13 +2,14 @@ import Layout from "../components/Layout";
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
-import { fetchShoppingList, updateShoppingListItem, removeFromShoppingList } from "../api";
-import type { IngredientUnit, ShoppingListItem } from "../types";
+import { fetchShoppingList, fetchShoppingListHistory, updateShoppingListItem, removeFromShoppingList } from "../api";
+import type { IngredientUnit, ShoppingListHistoryRow, ShoppingListItem } from "../types";
 
 import ShoppingListToolbar from "../components/shoppingListPage/ShoppingListToolbar";
 import ShoppingListItemRow from "../components/shoppingListPage/ShoppingListItem";
 import ShoppingListPrintExport from "../components/shoppingListPage/ShoppingListPrintExport";
 import DeleteShoppingListButton from "../components/shoppingListPage/DeleteShoppingListButton";
+import ShoppingListHistory from "../components/shoppingListPage/ShoppingListHistory";
 import { EmptyShoppingList }  from "../components/shoppingListPage/EmptyShoppingList";
 import AddShoppingItemModal from "../components/shoppingListPage/AddShoppingItemModal";
 
@@ -16,7 +17,9 @@ export default function ShoppingListPage() {
     const { getAccessTokenSilently } = useAuth0();
 
     const [items, setItems] = useState<ShoppingListItem[]>([]);
+    const [historyRows, setHistoryRows] = useState<ShoppingListHistoryRow[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(true);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     const loadShoppingList = async () => {
@@ -29,10 +32,24 @@ export default function ShoppingListPage() {
         }
     };
 
+    const loadShoppingListHistory = async () => {
+        try {
+            const token = await getAccessTokenSilently();
+            const data = await fetchShoppingListHistory(token);
+            setHistoryRows(data);
+        } catch (error) {
+            console.error("Kunne ikke hente historikk", error);
+        }
+    };
+
     useEffect(() => {
         async function initialLoad() {
-            await loadShoppingList();
+            await Promise.all([
+                loadShoppingList(),
+                loadShoppingListHistory(),
+            ]);
             setIsLoading(false);
+            setIsHistoryLoading(false);
         }
         void initialLoad();
     }, [getAccessTokenSilently]);
@@ -105,7 +122,11 @@ export default function ShoppingListPage() {
                     <ShoppingListToolbar onAddItem={() => setIsAddModalOpen(true)} />
                     <div className="flex gap-3 flex-wrap">
                         <ShoppingListPrintExport items={items} />
-                        <DeleteShoppingListButton onDeleted={loadShoppingList} />
+                        <DeleteShoppingListButton
+                            onDeleted={async () => {
+                                await Promise.all([loadShoppingList(), loadShoppingListHistory()]);
+                            }}
+                        />
                     </div>
                 </div>
 
@@ -127,6 +148,8 @@ export default function ShoppingListPage() {
                         ))}
                     </ul>
                 )}
+
+                <ShoppingListHistory rows={historyRows} isLoading={isHistoryLoading} />
             </section>
 
             <AddShoppingItemModal
