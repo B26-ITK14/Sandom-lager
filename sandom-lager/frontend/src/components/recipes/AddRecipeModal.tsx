@@ -8,9 +8,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { AUTH0_AUDIENCE } from "../../config/auth";
-import { createIngredient, createRecipe, addRecipeIngredient, fetchIngredients } from "../../api/recipes";
+import { createIngredient, createRecipe, updateRecipe, addRecipeIngredient, deleteRecipeIngredient, fetchIngredients, fetchAllergens, setRecipeAllergens } from "../../api/recipes";
 import { INGREDIENT_UNITS, RECIPE_CATEGORIES } from "../../types";
-import type { Ingredient, IngredientUnit } from "../../types";
+import type { Allergen, Ingredient, IngredientUnit, Recipe, RecipeIngredient } from "../../types";
 
 interface IngredientRow {
     // If existingId is set, we reuse an existing ingredient; otherwise we create a new one
@@ -23,21 +23,36 @@ interface IngredientRow {
 interface AddRecipeModalProps {
     onClose: () => void;
     onCreated: () => void;
+    initialRecipe?: Recipe;
+    initialIngredients?: RecipeIngredient[];
 }
 
 const DEFAULT_ROW: IngredientRow = { existingId: null, name: "", unit: "g", quantity: "" };
 
-export default function AddRecipeModal({ onClose, onCreated }: AddRecipeModalProps) {
+export default function AddRecipeModal({ onClose, onCreated, initialRecipe, initialIngredients }: AddRecipeModalProps) {
     const { getAccessTokenSilently } = useAuth0();
 
     // Recipe fields
-    const [title, setTitle] = useState("");
-    const [category, setCategory] = useState<string>("");
-    const [instructions, setInstructions] = useState("");
-    const [servings, setServings] = useState("4");
+    const [title, setTitle] = useState(initialRecipe?.title ?? "");
+    const [category, setCategory] = useState<string>(initialRecipe?.category ?? "");
+    const [instructions, setInstructions] = useState(initialRecipe?.instructions ?? "");
+    const [servings, setServings] = useState(String(initialRecipe?.servings ?? 4));
 
     // Ingredient rows
-    const [rows, setRows] = useState<IngredientRow[]>([{ ...DEFAULT_ROW }]);
+    const [rows, setRows] = useState<IngredientRow[]>(
+        initialIngredients && initialIngredients.length > 0
+            ? initialIngredients.map((ri) => ({
+                  existingId: ri.ingredient_id,
+                  name: ri.ingredient_name,
+                  unit: ri.unit,
+                  quantity: String(ri.quantity),
+              }))
+            : [{ ...DEFAULT_ROW }]
+    );
+
+    // Allergens
+    const [allAllergens, setAllAllergens] = useState<Allergen[]>([]);
+    const [selectedAllergenIds, setSelectedAllergenIds] = useState<number[]>([]);
 
     // Available ingredients from the database (for autocomplete)
     const [existingIngredients, setExistingIngredients] = useState<Ingredient[]>([]);
@@ -52,16 +67,28 @@ export default function AddRecipeModal({ onClose, onCreated }: AddRecipeModalPro
         titleRef.current?.focus();
     }, []);
 
-    // Load existing ingredients for the dropdown
+    // Load existing ingredients and all allergens for the form
     useEffect(() => {
         let cancelled = false;
         async function load() {
             try {
                 const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
-                const data = await fetchIngredients(token);
-                if (!cancelled) setExistingIngredients(data);
+                const [ingredientsData, allergensData] = await Promise.all([
+                    fetchIngredients(token),
+                    fetchAllergens(token),
+                ]);
+                if (!cancelled) {
+                    setExistingIngredients(ingredientsData);
+                    setAllAllergens(allergensData);
+                    if (initialRecipe) {
+                        const matched = initialRecipe.allergens
+                            .map((name) => allergensData.find((a) => a.name === name)?.id)
+                            .filter((id): id is number => id !== undefined);
+                        setSelectedAllergenIds(matched);
+                    }
+                }
             } catch {
-                // Non-critical; user can still type new ingredient names
+                // Non-critical
             }
         }
         load();
@@ -110,18 +137,31 @@ export default function AddRecipeModal({ onClose, onCreated }: AddRecipeModalPro
         try {
             const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
 
-            // 1. Create the recipe
-            const recipe = await createRecipe(
-                {
-                    title: title.trim(),
-                    category: category.trim(),
-                    instructions: instructions.trim() || undefined,
-                    servings: parseInt(servings, 10) || 4,
-                },
-                token
-            );
+            const recipeData = {
+                title: title.trim(),
+                category: category.trim(),
+                instructions: instructions.trim() || undefined,
+                servings: parseInt(servings, 10) || 4,
+            };
 
-            // 2. For each ingredient row: find or create ingredient, then add to recipe
+            // 1. Create or update the recipe
+            const recipe = initialRecipe
+                ? await updateRecipe(initialRecipe.id, recipeData, token)
+                : await createRecipe(recipeData, token);
+
+            // 2. Set allergens (always call in edit mode to support removing all allergens)
+            if (selectedAllergenIds.length > 0 || initialRecipe) {
+                await setRecipeAllergens(recipe.id, selectedAllergenIds, token);
+            }
+
+            // 3. For edit mode: remove all existing ingredient links first
+            if (initialRecipe && initialIngredients) {
+                for (const ri of initialIngredients) {
+                    await deleteRecipeIngredient(ri.id, token);
+                }
+            }
+
+            // 4. Add all valid ingredient rows
             for (const row of validRows) {
                 let ingredientId = row.existingId;
 
@@ -163,7 +203,7 @@ export default function AddRecipeModal({ onClose, onCreated }: AddRecipeModalPro
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid var(--color-border)" }}>
                     <h2 id="add-recipe-title" className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
-                        Legg til oppskrift
+                        {initialRecipe ? "Rediger oppskrift" : "Legg til oppskrift"}
                     </h2>
                     <button
                         type="button"
@@ -247,6 +287,37 @@ export default function AddRecipeModal({ onClose, onCreated }: AddRecipeModalPro
                             className="rounded-lg px-3 py-2 text-sm outline-none resize-y"
                             style={inputStyle}
                         />
+                    </div>
+
+                    {/* Allergens */}
+                    <div className="flex flex-col gap-2">
+                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
+                            Allergener
+                        </span>
+                        {allAllergens.length > 0 && (
+                            <div className="grid grid-cols-3 gap-1.5">
+                                {allAllergens.map((allergen) => (
+                                    <label key={allergen.id} className="flex items-center gap-2 cursor-pointer select-none">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedAllergenIds.includes(allergen.id)}
+                                            onChange={(e) => {
+                                                setSelectedAllergenIds(prev =>
+                                                    e.target.checked
+                                                        ? [...prev, allergen.id]
+                                                        : prev.filter(id => id !== allergen.id)
+                                                );
+                                            }}
+                                            className="w-4 h-4 rounded cursor-pointer"
+                                            style={{ accentColor: "var(--color-primary)" }}
+                                        />
+                                        <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+                                            {allergen.name}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Ingredients */}
@@ -371,7 +442,7 @@ export default function AddRecipeModal({ onClose, onCreated }: AddRecipeModalPro
                                 opacity: submitting ? 0.6 : 1,
                             }}
                         >
-                            {submitting ? "Lagrer..." : "Lagre oppskrift"}
+                            {submitting ? "Lagrer..." : initialRecipe ? "Lagre endringer" : "Lagre oppskrift"}
                         </button>
                     </div>
                 </form>
