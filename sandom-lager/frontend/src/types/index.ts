@@ -77,16 +77,33 @@ export interface RecipeIngredient {
 
 export interface ShoppingListItem {
     id: number;
-    location_id: number;
     ingredient_id: number;
+    ingredient: string;
     needed_quantity: number;
-    created_at: string;
+    location: string;
+    unit: IngredientUnit;
+    stock_quantity: number;
+}
+
+export interface ShoppingListHistoryRow {
+    batch_id: number;
+    deleted_at: string;
+    deleted_by_user_id: number | null;
+    deleted_by_name: string | null;
+    ingredient_id: number | null;
+    ingredient: string;
+    unit: IngredientUnit;
+    needed_quantity: number;
+    stock_quantity: number;
 }
 
 export interface InventoryItem {
     id: number;
+    location_id: number;
+    ingredient_id: number;
     ingredient: string;
     quantity: number;
+    updated_at: string;
     unit: IngredientUnit;
     location: string;
 }

@@ -20,25 +20,38 @@ router.get(
     asyncHandler(shoppingListController.getShoppingList)
 );
 
-// POST - Admin and manager can create shopping list items
+router.get(
+    "/shopping-list/history",
+    requireRole("user", "manager", "admin"),
+    asyncHandler(shoppingListController.getShoppingListHistory)
+);
+
+// POST - Users can create shopping list items (location handled by backend)
 router.post(
     "/shopping-list",
-    requireRole("admin", "manager"),
+    requireRole("user", "manager", "admin"),
     asyncHandler(shoppingListController.createShoppingListItem)
 );
 
-// PUT - Admin and manager can update shopping list items
+// PUT - Users can update shopping list items in their location
 router.put(
     "/shopping-list/:id",
-    requireRole("admin", "manager"),
+    requireRole("user", "manager", "admin"),
     asyncHandler(shoppingListController.updateShoppingListItem)
 );
 
-// DELETE - Admin can delete shopping list items
+// DELETE - Users can delete shopping list items from their location
 router.delete(
     "/shopping-list/:id",
-    requireRole("admin"),
+    requireRole("user", "manager", "admin"),
     asyncHandler(shoppingListController.deleteShoppingListItem)
+);
+
+// DELETE ALL - Manager/admin can delete entire shopping list for their location
+router.delete(
+    "/shopping-list",
+    requireRole("manager", "admin"),
+    asyncHandler(shoppingListController.clearShoppingList)
 );
 
 module.exports = router;

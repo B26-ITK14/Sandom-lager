@@ -5,23 +5,45 @@
 */
 
 import { apiFetchJson } from "./client";
-import type { InventoryItem, ShoppingListItem } from "../types";
+import type { IngredientUnit, InventoryItem, ShoppingListHistoryRow, ShoppingListItem } from "../types";
 
 export async function fetchInventory(accessToken: string): Promise<InventoryItem[]> {
-    return apiFetchJson<InventoryItem[]>("/api/inventory", {
+    const data = await apiFetchJson<InventoryItem[]>("/api/inventory", {
         headers: { Authorization: `Bearer ${accessToken}` },
     });
+
+    return data.map((item) => ({
+        ...item,
+        id: Number(item.id),
+        location_id: Number(item.location_id),
+        ingredient_id: Number(item.ingredient_id),
+        quantity: Number(item.quantity),
+    }));
 }
 
 export async function fetchShoppingList(accessToken: string): Promise<ShoppingListItem[]> {
-    return apiFetchJson<ShoppingListItem[]>("/api/shopping-list", {
+    const data = await apiFetchJson<ShoppingListItem[]>("/api/shopping-list", {
         headers: { Authorization: `Bearer ${accessToken}` },
     });
+
+    return data.map((item) => ({
+        ...item,
+        id: Number(item.id),
+        ingredient_id: Number(item.ingredient_id),
+        needed_quantity: Number(item.needed_quantity),
+        stock_quantity: Number(item.stock_quantity),
+    }));
+}
+
+interface AddShoppingListPayload {
+    ingredient_id?: number;
+    ingredient_name?: string;
+    needed_quantity: number;
+    unit?: IngredientUnit;
 }
 
 export async function addToShoppingList(
-    itemId: number,
-    quantity: number,
+    payload: AddShoppingListPayload,
     accessToken: string
 ): Promise<ShoppingListItem> {
     return apiFetchJson<ShoppingListItem>("/api/shopping-list", {
@@ -30,8 +52,62 @@ export async function addToShoppingList(
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ingredient_id: itemId, needed_quantity: quantity }),
+        body: JSON.stringify(payload),
     });
+}
+
+interface UpdateShoppingListPayload {
+    needed_quantity?: number;
+    unit?: IngredientUnit;
+}
+
+export async function updateShoppingListItem(
+    id: number,
+    payload: UpdateShoppingListPayload,
+    accessToken: string
+): Promise<ShoppingListItem> {
+    return apiFetchJson<ShoppingListItem>(`/api/shopping-list/${id}`, {
+        method: "PUT",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
+}
+
+export async function removeFromShoppingList(
+    id: number,
+    accessToken: string
+): Promise<{ message: string; deleted: ShoppingListItem }> {
+    return apiFetchJson<{ message: string; deleted: ShoppingListItem }>(`/api/shopping-list/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+}
+
+export async function clearShoppingList(
+    accessToken: string
+): Promise<{ message: string; deletedCount: number }> {
+    return apiFetchJson<{ message: string; deletedCount: number }>("/api/shopping-list", {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+}
+
+export async function fetchShoppingListHistory(accessToken: string): Promise<ShoppingListHistoryRow[]> {
+    const data = await apiFetchJson<ShoppingListHistoryRow[]>("/api/shopping-list/history", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    return data.map((row) => ({
+        ...row,
+        batch_id: Number(row.batch_id),
+        deleted_by_user_id: row.deleted_by_user_id === null ? null : Number(row.deleted_by_user_id),
+        ingredient_id: row.ingredient_id === null ? null : Number(row.ingredient_id),
+        needed_quantity: Number(row.needed_quantity),
+        stock_quantity: Number(row.stock_quantity),
+    }));
 }
 
 export async function updateInventoryQuantity(
