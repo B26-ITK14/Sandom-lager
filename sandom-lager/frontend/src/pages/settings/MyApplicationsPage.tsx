@@ -3,8 +3,6 @@
     * Page for managing user's applications to access different locations. Users can view the status of their applications and submit new ones. 
     * Author: Emil Berglund
     TODO: Fetch access status from DB
-    TODO: Move functions to API file
-    TODO: Make global file for status labels
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
