@@ -43,6 +43,46 @@ html.reduce-motion .animate-delay-200 {
   transform: none !important;
 }
 
+html.high-contrast {
+  --color-background: #000000 !important;
+  --color-surface: #0b0b0b !important;
+  --color-secondary-surface: #141414 !important;
+  --color-border: #ffffff !important;
+  --color-text-primary: #ffffff !important;
+  --color-text-secondary: #f3f4f6 !important;
+  --color-primary: #ffe600 !important;
+  --color-primary-hover: #fff066 !important;
+  --color-primary-gradient-from: #ffe600 !important;
+  --color-primary-gradient-to: #facc15 !important;
+  --color-on-primary: #000000 !important;
+  --color-danger: #ff4d4f !important;
+  --color-on-danger: #000000 !important;
+  --color-header-text-primary: #ffffff !important;
+}
+
+html.high-contrast body,
+html.high-contrast .high-contrast-surface {
+  background-color: var(--color-background) !important;
+  color: var(--color-text-primary) !important;
+}
+
+html.high-contrast * {
+  border-color: var(--color-border);
+}
+
+html.high-contrast a,
+html.high-contrast button,
+html.high-contrast input,
+html.high-contrast select,
+html.high-contrast textarea {
+  color: inherit;
+}
+
+html.high-contrast img,
+html.high-contrast svg {
+  filter: contrast(1.15) saturate(1.05);
+}
+
 /* Fade-in animation for overlay */
 @keyframes fade-in {
   from {
