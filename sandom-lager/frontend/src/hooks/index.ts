@@ -11,6 +11,7 @@ export { useAuthenticatedFetch } from "./useAuthenticatedFetch";
 // Version hooks
 export * from "./version/appVersion";
 export * from "./version/appStability";
+export * from "./version/appLastUpdated";
 
 // Recipes domain hooks
 export * from "./recipes/index";

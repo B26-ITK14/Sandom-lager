@@ -39,34 +39,20 @@ export default function MyAccountPage() {
         : 'N/A';
 
     const handleSavePersonalInfo = async (data: { name: string; username: string; location: string }) => {
-        console.log('[MyAccountPage] handleSavePersonalInfo called with:', data);
         try {
             const token = await getAccessTokenSilently();
             const trimmedName = data.name.trim();
             const trimmedUsername = data.username.trim();
             const currentPersistedUsername = (persistedUsername ?? '').trim();
 
-            console.log('[MyAccountPage] Username save check →', {
-                editedUsername: trimmedUsername,
-                persistedUsername: currentPersistedUsername,
-                authFallbackUsername: username.trim(),
-            });
-
             if (trimmedName !== displayName.trim()) {
                 await updateName(trimmedName, token);
                 setDisplayName(trimmedName);
-                console.log('[MyAccountPage] Name updated successfully →', trimmedName);
-            } else {
-                console.log('[MyAccountPage] Name unchanged, skipping backend update');
             }
 
             if (trimmedUsername !== currentPersistedUsername) {
-                console.log('[MyAccountPage] Username changed in DB context, calling backend update');
                 const savedUsername = await updateUsername(trimmedUsername, token);
                 setUsername(savedUsername);
-                console.log('[MyAccountPage] Username updated successfully →', savedUsername);
-            } else {
-                console.log('[MyAccountPage] Username unchanged in DB, skipping backend update');
             }
         } catch (err) {
             console.error('[MyAccountPage] Failed to update profile:', err);

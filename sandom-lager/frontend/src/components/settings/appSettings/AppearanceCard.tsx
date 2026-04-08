@@ -39,12 +39,12 @@ export default function AppearanceCard() {
     return (
         <SectionCard title="Utseende" icon={<Sun size={22} />}>
             <SettingRow label="Tema" description="Velg mellom lys, mørk eller systemstandard">
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                     {THEME_OPTIONS.map((opt) => (
                         <button
                             key={opt.value}
                             onClick={() => setPreference(opt.value)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+                            className="flex w-full items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer sm:w-auto"
                             style={{
                                 backgroundColor: preference === opt.value ? 'var(--color-primary)' : 'var(--color-background)',
                                 color: preference === opt.value ? '#fff' : 'var(--color-text-secondary)',

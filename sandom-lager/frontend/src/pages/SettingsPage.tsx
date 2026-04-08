@@ -42,8 +42,7 @@ export default function SettingsPage() {
                 />
             </div>
 
-            <SettingsNavItem title="Hjelp og støtte" url="#" figureType="help" style={{ marginBottom: '0.6rem' }} />
-            <SettingsNavItem title="Om Sandom Lager" url="#" figureType="about" style={{ marginTop: '0.6rem' }} />
+            <SettingsNavItem title="Om Sandom Lager" url={ROUTES.SETTINGS_ABOUT.path} figureType="about" style={{ marginTop: '0.6rem' }} />
 
             {/* Overlay shown during logout */}
             <LogoutLoadingOverlay isVisible={isLoggingOut} />

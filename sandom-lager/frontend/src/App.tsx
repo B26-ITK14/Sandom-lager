@@ -14,6 +14,7 @@ import RecipesPage from "./pages/RecipesPage";
 import MyAccountPage from "./pages/settings/MyAccountPage";
 import MyApplicationsPage from "./pages/settings/MyApplicationsPage";
 import AppSettingsPage from "./pages/settings/AppSettingsPage";
+import AboutSandomLagerPage from "./pages/settings/AboutSandomLagerPage";
 
 import AdminPage from "./pages/AdminPage";
 import RequestAccessPage from "./pages/onboarding/RequestAccessPage"; // ← beholder din sti
@@ -121,6 +122,14 @@ export default function App() {
                   element={
                     <ProtectedRoute>
                       <AppSettingsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={ROUTES.SETTINGS_ABOUT.path}
+                  element={
+                    <ProtectedRoute>
+                      <AboutSandomLagerPage />
                     </ProtectedRoute>
                   }
                 />

@@ -17,7 +17,7 @@ export function useAppVersion(): AppVersionInfo {
 
 		return {
 			raw,
-			display: raw
+			display: raw ?? 'Ukjent'
 		};
 }
 
