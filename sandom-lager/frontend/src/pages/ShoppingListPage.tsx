@@ -105,6 +105,16 @@ export default function ShoppingListPage() {
         }
     };
 
+    const handleSetQuantity = async (id: number, nextQuantity: number) => {
+        try {
+            const token = await getAccessTokenSilently();
+            await updateShoppingListItem(id, { needed_quantity: nextQuantity }, token);
+            setItems((prev) => prev.map((item) => (item.id === id ? { ...item, needed_quantity: nextQuantity } : item)));
+        } catch (error) {
+            console.error("Kunne ikke sette mengde", error);
+        }
+    };
+
     const handleDelete = async (id: number) => {
         try {
             const token = await getAccessTokenSilently();
@@ -144,6 +154,7 @@ export default function ShoppingListPage() {
                                 onDecrease={handleDecrease}
                                 onDelete={handleDelete}
                                 onUpdateUnit={handleUnitUpdate}
+                                onSetQuantity={handleSetQuantity}
                             />
                         ))}
                     </ul>

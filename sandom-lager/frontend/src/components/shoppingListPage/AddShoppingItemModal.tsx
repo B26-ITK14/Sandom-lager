@@ -16,12 +16,14 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
     const [selectedIngredient, setSelectedIngredient] = useState<number | null>(null);
     const [newIngredientName, setNewIngredientName] = useState("");
     const [selectedUnit, setSelectedUnit] = useState<IngredientUnit>("stk");
-    const [quantity, setQuantity] = useState(1);
+    const [quantityInput, setQuantityInput] = useState("1");
     const [isLoading, setIsLoading] = useState(false);
     const [isHydratingIngredients, setIsHydratingIngredients] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const isCountUnit = COUNT_UNITS.includes(selectedUnit as (typeof COUNT_UNITS)[number]);
+
+    const parseQuantity = (value: string): number => Number(value.replace(",", "."));
 
     const handleOpenModal = async () => {
         if (isHydratingIngredients) return;
@@ -61,9 +63,10 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
     }, [entryMode, selectedIngredient, ingredients]);
 
     const handleAddItem = async () => {
-        const normalizedQuantity = isCountUnit ? Math.round(quantity) : quantity;
+        const parsedQuantity = parseQuantity(quantityInput);
+        const normalizedQuantity = isCountUnit ? Math.round(parsedQuantity) : parsedQuantity;
 
-        if (quantity <= 0) {
+        if (!Number.isFinite(parsedQuantity) || parsedQuantity <= 0) {
             setError("Skriv inn gyldig mengde");
             return;
         }
@@ -108,7 +111,7 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
             setSelectedIngredient(null);
             setNewIngredientName("");
             setSelectedUnit("stk");
-            setQuantity(1);
+            setQuantityInput("1");
             onItemAdded?.();
             onClose();
         } catch (err) {
@@ -248,16 +251,42 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                             type="number"
                             min={isCountUnit ? "1" : "0.1"}
                             step={isCountUnit ? "1" : "0.1"}
-                            value={quantity}
+                            value={quantityInput}
                             onChange={(e) => {
-                                const parsed = Number(e.target.value);
-                                if (!Number.isFinite(parsed)) {
-                                    setQuantity(1);
+                                const raw = e.target.value.replace(",", ".");
+
+                                if (raw === "") {
+                                    setQuantityInput("");
                                     return;
                                 }
 
-                                const next = Math.max(isCountUnit ? 1 : 0.1, parsed);
-                                setQuantity(isCountUnit ? Math.round(next) : next);
+                                if (isCountUnit) {
+                                    if (/^\d+$/.test(raw)) {
+                                        setQuantityInput(raw);
+                                    }
+                                    return;
+                                }
+
+                                if (/^\d*\.?\d*$/.test(raw)) {
+                                    setQuantityInput(raw);
+                                }
+                            }}
+                            onBlur={() => {
+                                if (quantityInput.trim() === "") {
+                                    setQuantityInput(isCountUnit ? "1" : "0.1");
+                                    return;
+                                }
+
+                                const parsed = parseQuantity(quantityInput);
+                                if (!Number.isFinite(parsed) || parsed <= 0) {
+                                    setQuantityInput(isCountUnit ? "1" : "0.1");
+                                    return;
+                                }
+
+                                const min = isCountUnit ? 1 : 0.1;
+                                const clamped = Math.max(min, parsed);
+                                const normalized = isCountUnit ? Math.round(clamped).toString() : clamped.toString();
+                                setQuantityInput(normalized);
                             }}
                             disabled={isLoading}
                             className="rounded-md px-3 py-2"

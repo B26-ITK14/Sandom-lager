@@ -8,11 +8,14 @@ interface Props {
     onDecrease: (id: number) => Promise<void>;
     onDelete: (id: number) => Promise<void>;
     onUpdateUnit: (id: number, unit: IngredientUnit) => Promise<void>;
+    onSetQuantity: (id: number, nextQuantity: number) => Promise<void>;
 }
 
-export default function ShoppingListItem({ item, onIncrease, onDecrease, onDelete, onUpdateUnit }: Props) {
+export default function ShoppingListItem({ item, onIncrease, onDecrease, onDelete, onUpdateUnit, onSetQuantity }: Props) {
     const [isLoading, setIsLoading] = useState(false);
     const [isUnitEditing, setIsUnitEditing] = useState(false);
+    const [isQuantityEditing, setIsQuantityEditing] = useState(false);
+    const [quantityInput, setQuantityInput] = useState("");
 
     const formatQuantity = (value: number) => {
         return new Intl.NumberFormat("nb-NO", { maximumFractionDigits: 2 }).format(value);
@@ -55,6 +58,33 @@ export default function ShoppingListItem({ item, onIncrease, onDecrease, onDelet
         }
     };
 
+    const openQuantityEditor = () => {
+        setQuantityInput(String(item.needed_quantity));
+        setIsQuantityEditing(true);
+    };
+
+    const commitQuantity = async () => {
+        const parsed = Number(quantityInput.replace(",", "."));
+
+        if (!Number.isFinite(parsed) || parsed <= 0) {
+            setIsQuantityEditing(false);
+            return;
+        }
+
+        if (parsed === Number(item.needed_quantity)) {
+            setIsQuantityEditing(false);
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            await onSetQuantity(item.id, parsed);
+        } finally {
+            setIsLoading(false);
+            setIsQuantityEditing(false);
+        }
+    };
+
     return (
         <li
         className="flex items-center justify-between rounded-xl p-4"
@@ -71,7 +101,43 @@ export default function ShoppingListItem({ item, onIncrease, onDecrease, onDelet
                 </dt>
                 <dd className="m-0 text-sm"
                     style={{ color: "var(--color-text-secondary)" }}>
-                    {formatQuantity(item.needed_quantity)}{" "}
+                    {isQuantityEditing ? (
+                        <input
+                            type="number"
+                            min="0.1"
+                            step="0.1"
+                            autoFocus
+                            value={quantityInput}
+                            disabled={isLoading}
+                            onChange={(e) => setQuantityInput(e.target.value)}
+                            onBlur={() => void commitQuantity()}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    void commitQuantity();
+                                }
+                                if (e.key === "Escape") {
+                                    e.preventDefault();
+                                    setIsQuantityEditing(false);
+                                }
+                            }}
+                            className="w-20 rounded-md px-2 py-1"
+                            style={{
+                                background: "var(--color-surface)",
+                                border: "1px solid var(--color-border)",
+                                color: "var(--color-text-primary)",
+                            }}
+                        />
+                    ) : (
+                        <button
+                            type="button"
+                            disabled={isLoading}
+                            className="underline-offset-2 hover:underline"
+                            style={{ color: "var(--color-text-primary)" }}
+                            onClick={openQuantityEditor}>
+                            {formatQuantity(item.needed_quantity)}
+                        </button>
+                    )}{" "}
                     {isUnitEditing ? (
                         <select
                             value={item.unit}
