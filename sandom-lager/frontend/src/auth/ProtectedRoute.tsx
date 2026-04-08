@@ -11,8 +11,9 @@ import type { ReactNode } from "react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { fetchMyLocationAccess } from "../api/userLocations";
 import { ROUTES } from "../router/routes";
+import { ACCESS_STATUS, type AccessStatus } from "../constants/accessStatus";
 
-type LocationStatus = "loading" | "none" | "pending" | "approved" | "denied";
+type LocationStatus = "loading" | "none" | AccessStatus;
 
 type Props = {
   children: ReactNode;
@@ -25,7 +26,7 @@ export default function ProtectedRoute({ children, requireLocation = true }: Pro
 
   useEffect(() => {
     if (!isAuthenticated || !requireLocation) {
-      setLocationStatus("approved");
+      setLocationStatus(ACCESS_STATUS.APPROVED);
       return;
     }
 
@@ -36,15 +37,15 @@ export default function ProtectedRoute({ children, requireLocation = true }: Pro
         if (data.length === 0) {
             setLocationStatus("none");
         } else {
-            const hasApproved = data.some((d) => d.access_status === "approved");
-            const hasPending = data.some((d) => d.access_status === "pending");
+            const hasApproved = data.some((d) => d.access_status === ACCESS_STATUS.APPROVED);
+            const hasPending = data.some((d) => d.access_status === ACCESS_STATUS.PENDING);
 
             if (hasApproved) {
-                setLocationStatus("approved");
+              setLocationStatus(ACCESS_STATUS.APPROVED);
             } else if (hasPending) {
-                setLocationStatus("pending");
+              setLocationStatus(ACCESS_STATUS.PENDING);
             } else {
-                setLocationStatus("denied");
+              setLocationStatus(ACCESS_STATUS.DENIED);
             }
         }
     } catch {
@@ -59,7 +60,7 @@ export default function ProtectedRoute({ children, requireLocation = true }: Pro
 
   if (requireLocation) {
     if (locationStatus === "none") return <Navigate to={ROUTES.REQUEST_ACCESS.path} replace />;
-    if (locationStatus === "pending" || locationStatus === "denied") return <Navigate to={ROUTES.PENDING_APPROVAL.path} replace />;
+    if (locationStatus === ACCESS_STATUS.PENDING || locationStatus === ACCESS_STATUS.DENIED) return <Navigate to={ROUTES.PENDING_APPROVAL.path} replace />;
   }
 
   return <>{children}</>;

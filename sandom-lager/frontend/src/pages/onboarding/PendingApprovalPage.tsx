@@ -12,12 +12,18 @@ import { User, MapPin, Clock } from "lucide-react";
 import OnBoardingTitle from "../../components/onBoarding/OnBoardingTitle";
 import { ROUTES } from "../../router/routes";
 import { fetchMyLocationAccess } from "../../api/userLocations";
+import {
+    ACCESS_STATUS,
+    ACCESS_STATUS_LABELS,
+    ACCESS_STATUS_STYLES,
+    type AccessStatus,
+} from "../../constants/accessStatus";
 
 export default function PendingApprovalPage() {
     const navigate = useNavigate();
     const { getAccessTokenSilently, user } = useAuth0();
     const [locationName, setLocationName] = useState<string>("Laster...");
-    const [status, setStatus] = useState<string>("Laster...");
+    const [status, setStatus] = useState<AccessStatus | null>(null);
 
     useEffect(() => {
         async function loadStatus() {
@@ -30,16 +36,20 @@ export default function PendingApprovalPage() {
                 }
             } catch {
                 setLocationName("Ukjent");
-                setStatus("Ukjent");
+                setStatus(null);
             }
         }
         loadStatus();
     }, [getAccessTokenSilently]);
 
+    const badgeStatus = status ?? ACCESS_STATUS.PENDING;
+    const badgeStyle = ACCESS_STATUS_STYLES[badgeStatus];
+    const statusLabel = status ? ACCESS_STATUS_LABELS[status] : "Ukjent";
+
     const infoRows = [
         { icon: User, label: "Navn", value: user?.name ?? "Ukjent" },
         { icon: MapPin, label: "Sted", value: locationName },
-        { icon: Clock, label: "Tilgang", value: status },
+        { icon: Clock, label: "Tilgang", value: statusLabel },
     ];
 
     return (
@@ -66,9 +76,9 @@ export default function PendingApprovalPage() {
                         </h2>
                         <span
                             className="rounded-full px-3 py-1 text-xs font-medium"
-                            style={{ backgroundColor: '#FEF9C3', color: '#A16207' }}
+                            style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
                         >
-                            Under behandling
+                            {status ? ACCESS_STATUS_LABELS[status] : "Under behandling"}
                         </span>
                     </div>
 

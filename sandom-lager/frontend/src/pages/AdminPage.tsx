@@ -166,7 +166,7 @@ async function handleBlock(id: string) {
                 </div>
             )}
 
-            <div className="mx-auto max-w-2xl">
+            <div className="mx-auto">
                 {/* Stat Cards */}
                 <div className="mb-6 grid grid-cols-3 gap-3">
                     {statCards.map(({ tab, label, icon: Icon, color }) => (

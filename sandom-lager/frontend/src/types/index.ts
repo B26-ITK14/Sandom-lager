@@ -5,6 +5,7 @@
 */
 
 import type { RouteNickname } from "../router/routes";
+import type { AccessStatus } from "../constants/accessStatus";
 
 export type UserRole = "admin" | "manager" | "user" | null;
 
@@ -93,7 +94,7 @@ export interface InventoryItem {
 
 export interface UserLocationResponse {
     id: number;
-    access_status: "pending" | "approved" | "denied";
+    access_status: AccessStatus;
     created_at: string;
     user_name: string;
     email: string;
