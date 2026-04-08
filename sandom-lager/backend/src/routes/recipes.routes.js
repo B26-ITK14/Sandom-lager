@@ -21,6 +21,13 @@ router.get(
     asyncHandler(recipesController.getAllRecipes)
 );
 
+// Get all allergens (for recipe forms)
+router.get(
+    "/allergens",
+    requireRole("user", "manager", "admin"),
+    asyncHandler(recipesController.getAllAllergens)
+);
+
 // Get recipe by ID
 router.get(
     "/:id", 
@@ -47,6 +54,13 @@ router.delete(
     "/:id",
     requireRole("admin"),
     asyncHandler(recipesController.deleteRecipe)
+);
+
+// Manager and admin can set allergens for a recipe
+router.put(
+    "/:id/allergens",
+    requireRole("manager", "admin"),
+    asyncHandler(recipesController.setRecipeAllergens)
 );
 
 module.exports = router;

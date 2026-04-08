@@ -26,12 +26,17 @@ export interface User {
 
 export interface Recipe {
     id: number;
-    location_id: number;
     title: string;
     category: string;
     instructions: string | null;
+    allergens: string[];
     servings: number;
     created_at: string;
+}
+
+export interface Allergen {
+    id: number;
+    name: string;
 }
 
 export type WeightUnit = "mg" | "g" | "hg" | "kg";
