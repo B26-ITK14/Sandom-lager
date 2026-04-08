@@ -24,7 +24,7 @@ function ensureUserSchema() {
         id TEXT PRIMARY KEY,
         user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         revoked_at TIMESTAMP NOT NULL DEFAULT NOW()
-      )
+      );
     `).catch((error) => {
       userSchemaPromise = null;
       throw error;

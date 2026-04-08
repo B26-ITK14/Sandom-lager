@@ -10,7 +10,9 @@ async function getRecipeIngredients(req, res) {
 
     const result = await pool.query(
         `SELECT 
-            ri.id, 
+            ri.id,
+            ri.recipe_id,
+            ri.ingredient_id,
             ri.quantity,
             i.name as ingredient_name, 
             i.unit 

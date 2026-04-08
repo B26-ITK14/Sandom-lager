@@ -4,9 +4,24 @@ const ApiError = require("../utils/ApiError");
 
 // GET /recipes
 async function getAllRecipes(req, res) {
-    
+    const userId = req.user.id;
+
+    const locationResult = await pool.query(
+        `SELECT location_id FROM user_locations 
+         WHERE user_id = $1 AND access_status = 'approved' 
+         LIMIT 1`,
+        [userId]
+    );
+
+    if (locationResult.rows.length === 0) {
+        throw new ApiError(403, "No approved location found for user");
+    }
+
+    const locationId = locationResult.rows[0].location_id;
+
     const result = await pool.query(
-        "SELECT * FROM recipes ORDER BY id DESC"
+        "SELECT * FROM recipes WHERE location_id = $1 ORDER BY id DESC",
+        [locationId]
     );
 
     res.json(result.rows);
@@ -34,7 +49,7 @@ async function getRecipeById(req, res) {
 // POST /recipes
 async function createRecipe(req, res) {
     
-    const { title, category, instructions, location_id } = req.body;
+    const { title, category, instructions, location_id, servings } = req.body;
 
     if (!title) {
         throw new ApiError(400, "Missing required field: title");
@@ -42,10 +57,10 @@ async function createRecipe(req, res) {
 
     const result = await pool.query(
         `INSERT INTO recipes 
-        (title, category, instructions, location_id)
-        VALUES ($1, $2, $3, $4)
+        (title, category, instructions, location_id, servings)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING *`,
-        [title, category, instructions, location_id]
+        [title, category, instructions, location_id, servings ?? 4]
     );
 
     const recipe = result.rows[0];
@@ -62,7 +77,7 @@ async function createRecipe(req, res) {
 async function updateRecipe(req, res) {
 
     const { id } = req.params;
-    const { title, category, instructions } = req.body;
+    const { title, category, instructions, servings } = req.body;
 
     if (!title) {
         throw new ApiError(400, "Missing required field: title");
@@ -70,10 +85,10 @@ async function updateRecipe(req, res) {
 
     const result = await pool.query(
         `UPDATE recipes
-         SET title = $1, category = $2, instructions = $3
-         WHERE id = $4
+         SET title = $1, category = $2, instructions = $3, servings = $4
+         WHERE id = $5
          RETURNING *`,
-        [title, category, instructions, id]
+        [title, category, instructions, servings ?? 4, id]
     );
 
     if (result.rows.length === 0) {
