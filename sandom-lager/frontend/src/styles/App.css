@@ -23,6 +23,26 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, fill 0.3s ease, stroke 0.3s ease;
 }
 
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0ms !important;
+  scroll-behavior: auto !important;
+}
+
+html.reduce-motion .animate-fade-in,
+html.reduce-motion .animate-slide-in-left,
+html.reduce-motion .animate-slide-in-right,
+html.reduce-motion .animate-spin,
+html.reduce-motion .animate-delay-100,
+html.reduce-motion .animate-delay-200 {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 /* Fade-in animation for overlay */
 @keyframes fade-in {
   from {

@@ -16,6 +16,7 @@ export default function AccessibilityCard() {
     const handleReducedMotion = (v: boolean) => {
         setReducedMotion(v);
         savePref('app:reducedMotion', v);
+        document.documentElement.classList.toggle('reduce-motion', v);
         document.documentElement.style.setProperty('--transition-duration', v ? '0ms' : '200ms');
     };
 

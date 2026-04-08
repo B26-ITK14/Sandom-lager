@@ -8,6 +8,16 @@ import type { AppState } from "@auth0/auth0-react";
 import { AUTH0_AUDIENCE, AUTH0_SCOPE } from "./config/auth";
 import { env } from "./config/env";
 
+const savedReducedMotion = window.localStorage.getItem('app:reducedMotion');
+if (savedReducedMotion) {
+  try {
+    const isReducedMotion = JSON.parse(savedReducedMotion) === true;
+    document.documentElement.classList.toggle('reduce-motion', isReducedMotion);
+  } catch {
+    document.documentElement.classList.remove('reduce-motion');
+  }
+}
+
 const onRedirectCallback = (appState?: AppState) => {
   const target = appState?.returnTo ?? window.location.pathname;
   window.history.replaceState({}, document.title, target);
