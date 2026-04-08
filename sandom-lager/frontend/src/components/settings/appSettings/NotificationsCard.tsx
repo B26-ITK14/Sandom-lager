@@ -11,9 +11,9 @@ import { SectionCard, SettingRow, Toggle, Divider } from './primitives';
 import { readPref, savePref } from './utils';
 
 export default function NotificationsCard() {
-    const [notifyInventory, setNotifyInventory] = useState<boolean>(() => readPref('app:notifyInventory', true));
-    const [notifyRecipes, setNotifyRecipes] = useState<boolean>(() => readPref('app:notifyRecipes', true));
-    const [notifySystem, setNotifySystem] = useState<boolean>(() => readPref('app:notifySystem', true));
+    const [notifyInventory, setNotifyInventory] = useState<boolean>(() => readPref('app:notifyInventory', false));
+    const [notifyRecipes, setNotifyRecipes] = useState<boolean>(() => readPref('app:notifyRecipes', false));
+    const [notifySystem, setNotifySystem] = useState<boolean>(() => readPref('app:notifySystem', false));
 
     const handle = (setter: (v: boolean) => void, key: string) => (v: boolean) => {
         setter(v);

@@ -47,8 +47,7 @@ export default function AdminPage() {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!res.ok) throw new Error("Feil ved henting av søknader");
-                const data: UserLocationResponse[] = await res.json(); // ← ENDRET: any → UserLocationResponse[]
-
+                const data: UserLocationResponse[] = await res.json();
                 const mapped: AccessRequest[] = data.map((r: UserLocationResponse) => ({ // ← ENDRET: any → UserLocationResponse
                     id: String(r.id),
                     userName: r.user_name,
@@ -124,38 +123,38 @@ export default function AdminPage() {
     }
 
     async function handleRevoke(id: string) {
-    setLoadingId(id);
-    try {
-        const token = await getAccessTokenSilently();
-        const res = await fetch(`/api/user-locations/${id}/revoke`, {
-            method: "PATCH",
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Revoke feilet");
-        setRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "denied" } : r));
-    } catch {
-        setError("Kunne ikke fjerne tilgang.");
-    } finally {
-        setLoadingId(null);
+        setLoadingId(id);
+        try {
+            const token = await getAccessTokenSilently();
+            const res = await fetch(`/api/user-locations/${id}/revoke`, {
+                method: "PATCH",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!res.ok) throw new Error("Revoke feilet");
+            setRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "denied" } : r));
+        } catch {
+            setError("Kunne ikke fjerne tilgang.");
+        } finally {
+            setLoadingId(null);
+        }
     }
-}
 
-async function handleBlock(id: string) {
-    setLoadingId(id);
-    try {
-        const token = await getAccessTokenSilently();
-        const res = await fetch(`/api/user-locations/${id}/block`, {
-            method: "PATCH",
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Blokkering feilet");
-        setRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "denied" } : r));
-    } catch {
-        setError("Kunne ikke blokkere bruker.");
-    } finally {
-        setLoadingId(null);
+    async function handleBlock(id: string) {
+        setLoadingId(id);
+        try {
+            const token = await getAccessTokenSilently();
+            const res = await fetch(`/api/user-locations/${id}/block`, {
+                method: "PATCH",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!res.ok) throw new Error("Blokkering feilet");
+            setRequests((prev) => prev.map((r) => r.id === id ? { ...r, status: "denied" } : r));
+        } catch {
+            setError("Kunne ikke blokkere bruker.");
+        } finally {
+            setLoadingId(null);
+        }
     }
-}
 
     return (
         <SettingsLayout notifications={true} backMenu={true}>
@@ -184,7 +183,7 @@ async function handleBlock(id: string) {
                         </div>
                     ))}
                 </div>
-                
+
                 {/* Filter Tabs */}
                 <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
                     {(["pending", "approved", "denied", "all"] as FilterTab[]).map((tab) => (
@@ -217,10 +216,10 @@ async function handleBlock(id: string) {
                 ) : (
                     <div className="space-y-3">
                         {filtered.map((request) => (
-                            <PendingCard 
-                                key={request.id} 
+                            <PendingCard
+                                key={request.id}
                                 request={request}
-                                onApprove={handleApprove} 
+                                onApprove={handleApprove}
                                 onDeny={handleDeny}
                                 onRevoke={handleRevoke}
                                 onBlock={handleBlock}
