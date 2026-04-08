@@ -3,6 +3,7 @@
 */
 
 import { useMemo, useState } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
 import Layout from "../components/Layout";
 import LoadingSpinner from "../components/LoadingSpinner";
 import RecipeCard from "../components/recipes/RecipeCard";
@@ -11,9 +12,12 @@ import AddRecipeModal from "../components/recipes/AddRecipeModal";
 import RecipeDetailModal from "../components/recipes/RecipeDetailModal";
 import { useRecipes, useUserRole } from "../hooks";
 import { useSelectedRecipes } from "../context/SelectedRecipesContext";
-import type { Recipe } from "../types";
+import { deleteRecipe } from "../api/recipes";
+import { AUTH0_AUDIENCE } from "../config/auth";
+import type { Recipe, RecipeIngredient } from "../types";
 
 export default function RecipesPage() {
+    const { getAccessTokenSilently } = useAuth0();
     const { recipes, loading, error, refresh } = useRecipes();
     const { selectedIds, toggleSelected } = useSelectedRecipes();
     const { role } = useUserRole();
@@ -22,11 +26,33 @@ export default function RecipesPage() {
     const [filterOpen, setFilterOpen] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
     const [detailRecipe, setDetailRecipe] = useState<Recipe | null>(null);
+    const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
+    const [editIngredients, setEditIngredients] = useState<RecipeIngredient[]>([]);
 
     const canManageRecipes = role === "admin" || role === "manager";
 
     function handleRecipeCreated() {
         setShowAddModal(false);
+        refresh();
+    }
+
+    function handleRecipeSaved() {
+        setEditingRecipe(null);
+        setEditIngredients([]);
+        refresh();
+    }
+
+    function handleEditRecipe(ingredients: RecipeIngredient[]) {
+        setEditIngredients(ingredients);
+        setEditingRecipe(detailRecipe);
+        setDetailRecipe(null);
+    }
+
+    async function handleDeleteRecipe() {
+        if (!detailRecipe) return;
+        const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
+        await deleteRecipe(detailRecipe.id, token);
+        setDetailRecipe(null);
         refresh();
     }
 
@@ -101,11 +127,24 @@ export default function RecipesPage() {
                 />
             )}
 
+            {/* Edit recipe modal */}
+            {editingRecipe && (
+                <AddRecipeModal
+                    onClose={() => { setEditingRecipe(null); setEditIngredients([]); }}
+                    onCreated={handleRecipeSaved}
+                    initialRecipe={editingRecipe}
+                    initialIngredients={editIngredients}
+                />
+            )}
+
             {/* Recipe detail modal */}
             {detailRecipe && (
                 <RecipeDetailModal
                     recipe={detailRecipe}
                     onClose={() => setDetailRecipe(null)}
+                    canManage={canManageRecipes}
+                    onEdit={handleEditRecipe}
+                    onDelete={handleDeleteRecipe}
                 />
             )}
         </Layout>

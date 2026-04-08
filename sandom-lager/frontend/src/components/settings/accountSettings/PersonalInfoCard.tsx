@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
 import type { FormEvent } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { User, MapPin, Mail, Save, X, Loader2 } from "lucide-react";
+import { User, Mail, Save, X, Loader2 } from "lucide-react";
 import { requestEmailChange, updateProfilePicture } from "../../../api/user";
 import {
     handleCancel as handleCancelUtil,
@@ -288,20 +288,14 @@ export default function PersonalInfoCard({
                     autoComplete="email"
                 />
 
-                <EditableField
-                    label={
-                        <div className="flex items-center gap-2">
-                            <MapPin size={16} />
-                            Plassering
-                        </div>
-                    }
-                    value={location}
-                    editedValue={editedLocation}
-                    onChange={setEditedLocation}
-                    isEditing={isEditing}
-                    inputName="address-level2"
-                    autoComplete="address-level2"
-                />
+                <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                        Plassering
+                    </label>
+                    <p className="px-4 py-2" style={{ color: 'var(--color-text-secondary)' }}>
+                        {location}
+                    </p>
+                </div>
             </form>
         </section>
     );

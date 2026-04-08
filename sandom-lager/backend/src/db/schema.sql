@@ -70,7 +70,6 @@ CREATE TABLE IF NOT EXISTS ingredients (
 -- RECIPES --
 CREATE TABLE IF NOT EXISTS recipes (
     id SERIAL PRIMARY KEY,
-    location_id INT REFERENCES locations(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     category TEXT NOT NULL,
     instructions TEXT,

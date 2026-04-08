@@ -15,6 +15,7 @@ export type RouteNickname =
     | "settings-account"
     | "settings-applications"
     | "settings-app-settings"
+    | "settings-about"
     | "request-access"
     | "pending-approval"
     | "admin";
@@ -60,7 +61,12 @@ export const ROUTES: Record<string, Route> = {
         path: "/settings/app-settings",
         displayName: "App innstillinger",
     },
-     REQUEST_ACCESS: {
+    SETTINGS_ABOUT: {
+        nickname: "settings-about",
+        path: "/settings/about",
+        displayName: "Om Sandom Lager",
+    },
+    REQUEST_ACCESS: {
         nickname: "request-access",
         path: "/request-access",
         displayName: "Søk om tilgang",

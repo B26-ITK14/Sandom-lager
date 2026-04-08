@@ -61,6 +61,27 @@ export default function RecipeCard({ recipe, selected, onToggle, onOpenDetail }:
                 <h2 className="text-white font-semibold text-sm leading-snug line-clamp-2">
                     {recipe.title}
                 </h2>
+                {recipe.allergens && recipe.allergens.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                        {recipe.allergens.slice(0, 3).map((allergen) => (
+                            <span
+                                key={allergen}
+                                className="text-xs px-1.5 py-0.5 rounded-full"
+                                style={{ backgroundColor: "rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.9)" }}
+                            >
+                                {allergen}
+                            </span>
+                        ))}
+                        {recipe.allergens.length > 3 && (
+                            <span
+                                className="text-xs px-1.5 py-0.5 rounded-full"
+                                style={{ backgroundColor: "rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.9)" }}
+                            >
+                                +{recipe.allergens.length - 3}
+                            </span>
+                        )}
+                    </div>
+                )}
             </footer>
         </article>
     );

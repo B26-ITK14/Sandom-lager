@@ -13,6 +13,10 @@ interface AccountDetailsCardProps {
 }
 
 export default function AccountDetailsCard({ role, memberSince, blocked }: AccountDetailsCardProps) {
+    const formattedMemberSince = memberSince
+        ? memberSince.charAt(0).toUpperCase() + memberSince.slice(1)
+        : memberSince;
+
     return (
         <section
             className="rounded-2xl p-6 lg:col-start-2 lg:row-start-1"
@@ -40,7 +44,7 @@ export default function AccountDetailsCard({ role, memberSince, blocked }: Accou
                 </div>
                 <div className="flex justify-between items-center">
                     <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Medlem siden</span>
-                    <span className="text-sm" style={{ color: 'var(--color-text-primary)' }}>{memberSince}</span>
+                    <span className="text-sm" style={{ color: 'var(--color-text-primary)' }}>{formattedMemberSince}</span>
                 </div>
                 <div className="flex justify-between items-center">
                     <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Status</span>

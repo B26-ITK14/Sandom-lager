@@ -75,7 +75,6 @@ export default function SettingsUserHeader() {
                     )}
                 </div>
 
-                {/* TODO: Location */}
                 <p className="flex items-center gap-1 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                     <MapPin size={14} />
                     {location ?? 'Ukjent lokasjon'}
