@@ -12,20 +12,24 @@ import StorageDelCardBtn from "./StorageDelCardBtn";
 import FavProductBtn from "./FavProductBtn";
 
 type ProductCardProps = {
+    id: number;
     name: string;
     quantity: number;
     unit: string;
     highlighted?: boolean;
-    onSaveQuantity?: (nextQuantity: number) => Promise<void> | void;
-    onDelete?: () => Promise<void> | void;
+    onSaveQuantity?: (nextQuantity: number) => Promise<boolean> | boolean;
+    onDelete?: () => Promise<boolean> | boolean;
     editDisabled?: boolean;
     deleteDisabled?: boolean;
     canEdit?: boolean;
     canDelete?: boolean;
+    isFavorite?: boolean;
+    onToggleFavorite?: (id: number) => void;
     onNotice?: (message: string) => void;
 };
 
 export default function ProductCard({
+    id,
     name,
     quantity,
     unit,
@@ -36,19 +40,13 @@ export default function ProductCard({
     deleteDisabled = false,
     canEdit = true,
     canDelete = true,
+    isFavorite = false,
+    onToggleFavorite,
     onNotice,
 }: ProductCardProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [quantityInput, setQuantityInput] = useState(String(quantity));
     const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
-    const [isFavorite, setIsFavorite] = useState(() => {
-        try {
-            const favorites = JSON.parse(localStorage.getItem("favoriteProducts") || "[]");
-            return favorites.includes(name);
-        } catch {
-            return false;
-        }
-    });
 
     useEffect(() => {
         if (!isEditing) {
@@ -76,35 +74,16 @@ export default function ProductCard({
             return;
         }
 
-        await onSaveQuantity?.(nextQuantity);
-        setIsEditing(false);
+        const didSave = await onSaveQuantity?.(nextQuantity);
+        if (didSave !== false) {
+            setIsEditing(false);
+        }
     }
 
     async function handleConfirmDelete() {
-        await onDelete?.();
-        setIsConfirmingDelete(false);
-    }
-
-    function handleFavButtonClick() {
-        const newFavoriteState = !isFavorite;
-        setIsFavorite(newFavoriteState);
-
-        try {
-            const favorites = JSON.parse(localStorage.getItem("favoriteProducts") || "[]");
-            if (newFavoriteState) {
-                if (!favorites.includes(name)) {
-                    favorites.push(name);
-                }
-            } else {
-                const index = favorites.indexOf(name);
-                if (index > -1) {
-                    favorites.splice(index, 1);
-                }
-            }
-            localStorage.setItem("favoriteProducts", JSON.stringify(favorites));
-        } catch (error) {
-            console.error("Feil ved lagring av favoritter:", error);
-            setIsFavorite(!newFavoriteState);
+        const didDelete = await onDelete?.();
+        if (didDelete !== false) {
+            setIsConfirmingDelete(false);
         }
     }
 
@@ -146,7 +125,7 @@ export default function ProductCard({
                 <section className="flex items-center gap-3">
                     <FavProductBtn 
                         name={name}
-                        onClick={handleFavButtonClick}
+                        onClick={() => onToggleFavorite?.(id)}
                         isSaved={isFavorite}
                     />
                     <StorageEditCardBtn
@@ -155,7 +134,7 @@ export default function ProductCard({
                             void handleEditButtonClick();
                         }}
                         disabled={editDisabled}
-                        isSaving={isEditing}
+                        isSaving={isEditing || editDisabled}
                     />
                     <StorageDelCardBtn
                         name={name}

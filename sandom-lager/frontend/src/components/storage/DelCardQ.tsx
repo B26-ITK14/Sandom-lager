@@ -26,7 +26,7 @@ export default function DelCardQ({
                 Denne handlingen kan ikke angres.
             </p>
 
-            <div className="mt-3 flex gap-2">
+            <section className="mt-3 flex gap-2">
                 <button
                     type="button"
                     onClick={onConfirm}
@@ -45,7 +45,7 @@ export default function DelCardQ({
                 >
                     Nei
                 </button>
-            </div>
+            </section>
         </article>
     )
 }
