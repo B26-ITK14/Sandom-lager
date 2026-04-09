@@ -328,11 +328,102 @@ async function clearShoppingList(req, res) {
     }
 }
 
+// POST /api/shopping-list/generate - Generate shopping list from selected recipe IDs
+async function generateShoppingList(req, res) {
+    const userId = req.user.id;
+    const { recipe_ids } = req.body;
+
+    if (!Array.isArray(recipe_ids) || recipe_ids.length === 0) {
+        throw new ApiError(400, "recipe_ids must be a non-empty array");
+    }
+
+    const parsedRecipeIds = recipe_ids
+        .map((id) => Number(id))
+        .filter((id) => Number.isInteger(id) && id > 0);
+
+    if (parsedRecipeIds.length === 0) {
+        throw new ApiError(400, "recipe_ids contains no valid IDs");
+    }
+
+    const locationId = await getApprovedLocationId(userId);
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN");
+
+        const aggregateResult = await client.query(
+            `SELECT
+                ri.ingredient_id,
+                SUM(ri.quantity) AS needed_quantity
+             FROM recipe_ingredients ri
+             WHERE ri.recipe_id = ANY($1::int[])
+             GROUP BY ri.ingredient_id`,
+            [parsedRecipeIds]
+        );
+
+        for (const row of aggregateResult.rows) {
+            const existingResult = await client.query(
+                `SELECT id, needed_quantity
+                 FROM shopping_list
+                 WHERE location_id = $1 AND ingredient_id = $2
+                 ORDER BY id ASC`,
+                [locationId, row.ingredient_id]
+            );
+
+            if (existingResult.rows.length > 0) {
+                // Merge with existing value (keep the first row if duplicates exist)
+                const keepId = Number(existingResult.rows[0].id);
+                const existingTotal = existingResult.rows.reduce(
+                    (sum, item) => sum + Number(item.needed_quantity),
+                    0
+                );
+                const generatedAmount = Number(row.needed_quantity);
+
+                await client.query(
+                    `UPDATE shopping_list
+                     SET needed_quantity = $1, updated_at = NOW()
+                     WHERE id = $2`,
+                    [existingTotal + generatedAmount, keepId]
+                );
+
+                if (existingResult.rows.length > 1) {
+                    // Clean up accidental duplicates for same ingredient/location.
+                    await client.query(
+                        `DELETE FROM shopping_list
+                         WHERE location_id = $1 AND ingredient_id = $2 AND id <> $3`,
+                        [locationId, row.ingredient_id, keepId]
+                    );
+                }
+            } else {
+                await client.query(
+                    `INSERT INTO shopping_list (location_id, ingredient_id, needed_quantity, unit_override)
+                     VALUES ($1, $2, $3, NULL)`,
+                    [locationId, row.ingredient_id, row.needed_quantity]
+                );
+            }
+        }
+
+        await client.query("COMMIT");
+
+        res.json({
+            message: "Shopping list generated successfully",
+            recipeCount: parsedRecipeIds.length,
+            itemCount: aggregateResult.rows.length,
+        });
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
+    }
+}
+
 module.exports = {
     getShoppingList,
     getShoppingListHistory,
     createShoppingListItem,
     updateShoppingListItem,
     deleteShoppingListItem,
-    clearShoppingList
+    clearShoppingList,
+    generateShoppingList
 };
