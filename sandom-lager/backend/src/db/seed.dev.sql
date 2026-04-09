@@ -156,33 +156,26 @@ VALUES
 -- =====================================
 -- RECIPES
 -- =====================================
-INSERT INTO recipes (location_id, title, category, instructions, created_at)
-SELECT id, 'Pannekaker', 'Frokost', 'Bland mel, melk og egg. Stek i panne med smør.', NOW() - INTERVAL '20 days'
-FROM locations WHERE name = 'Sandom Retreatsenter';
+INSERT INTO recipes (title, category, instructions, created_at)
+VALUES ('Pannekaker', 'Frokost', 'Bland mel, melk og egg. Stek i panne med smør.', NOW() - INTERVAL '20 days');
 
-INSERT INTO recipes (location_id, title, category, instructions, created_at)
-SELECT id, 'Kyllinggryte', 'Middag', 'Stek kylling, løk og hvitløk. Tilsett tomater og paprika.', NOW() - INTERVAL '15 days'
-FROM locations WHERE name = 'Sandom Retreatsenter';
+INSERT INTO recipes (title, category, instructions, created_at)
+VALUES ('Kyllinggryte', 'Middag', 'Stek kylling, løk og hvitløk. Tilsett tomater og paprika.', NOW() - INTERVAL '15 days');
 
-INSERT INTO recipes (location_id, title, category, instructions, created_at)
-SELECT id, 'Ovnsbakt laks', 'Middag', 'Bak laks i ovn. Server med poteter og gulrøtter.', NOW() - INTERVAL '10 days'
-FROM locations WHERE name = 'Tomasgården';
+INSERT INTO recipes (title, category, instructions, created_at)
+VALUES ('Ovnsbakt laks', 'Middag', 'Bak laks i ovn. Server med poteter og gulrøtter.', NOW() - INTERVAL '10 days');
 
-INSERT INTO recipes (location_id, title, category, instructions, created_at)
-SELECT id, 'Pasta med ostesaus', 'Middag', 'Kok pasta. Lag saus med smør, melk og ost.', NOW() - INTERVAL '8 days'
-FROM locations WHERE name = 'Tomasgården';
+INSERT INTO recipes (title, category, instructions, created_at)
+VALUES ('Pasta med ostesaus', 'Middag', 'Kok pasta. Lag saus med smør, melk og ost.', NOW() - INTERVAL '8 days');
 
-INSERT INTO recipes (location_id, title, category, instructions, created_at)
-SELECT id, 'Overnight oats', 'Frokost', 'Bland havregryn, yoghurt og melk. La stå over natten.', NOW() - INTERVAL '5 days'
-FROM locations WHERE name = 'Fjellhytta';
+INSERT INTO recipes (title, category, instructions, created_at)
+VALUES ('Overnight oats', 'Frokost', 'Bland havregryn, yoghurt og melk. La stå over natten.', NOW() - INTERVAL '5 days');
 
-INSERT INTO recipes (location_id, title, category, instructions, created_at)
-SELECT id, 'Kikertcurry', 'Middag', 'Stek løk og hvitløk, tilsett kikerter og kokosmelk.', NOW() - INTERVAL '3 days'
-FROM locations WHERE name = 'Fjellhytta';
+INSERT INTO recipes (title, category, instructions, created_at)
+VALUES ('Kikertcurry', 'Middag', 'Stek løk og hvitløk, tilsett kikerter og kokosmelk.', NOW() - INTERVAL '3 days');
 
-INSERT INTO recipes (location_id, title, category, instructions, created_at)
-SELECT id, 'Asiatisk nudelsalat', 'Lunsj', 'Bland nudler, grønnsaker, soyasaus, peanøtter og sesam.', NOW() - INTERVAL '1 day'
-FROM locations WHERE name = 'Sandom Retreatsenter';
+INSERT INTO recipes (title, category, instructions, created_at)
+VALUES ('Asiatisk nudelsalat', 'Lunsj', 'Bland nudler, grønnsaker, soyasaus, peanøtter og sesam.', NOW() - INTERVAL '1 day');
 
 -- =====================================
 -- RECIPE INGREDIENTS
