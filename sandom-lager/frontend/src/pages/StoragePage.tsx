@@ -157,10 +157,43 @@ export default function StoragePage() {
         return <LoadingSpinner />;
     }
 
+    const hasProducts = !errorMessage && filteredProducts.length > 0;
+
     return (
         <Layout>
-            <header className="mb-6 flex items-center gap-3">
+            <header
+                className="mb-6 rounded-3xl border p-4 sm:p-5"
+                style={{
+                    backgroundColor: "var(--color-surface)",
+                    borderColor: "var(--color-border)",
+                    boxShadow: "0 16px 36px -28px rgba(15, 23, 42, 0.8)",
+                }}
+            >
+                <div className="mb-4 flex items-start justify-between gap-4">
+                    <section>
+                        <h1 className="text-lg font-semibold sm:text-xl" style={{ color: "var(--color-header-text-primary)" }}>
+                            Lageroversikt
+                        </h1>
 
+                        <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                            {filteredProducts.length} {filteredProducts.length === 1 ? "vare" : "varer"} vist
+                        </p>
+                    </section>
+
+                    <button
+                        type="button"
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl cursor-pointer transition-transform hover:-translate-y-0.5"
+                        style={{
+                            background: "linear-gradient(135deg, var(--color-primary-gradient-from), var(--color-primary-gradient-to))",
+                            color: "var(--color-on-primary)",
+                        }}
+                        aria-label="Legg til produkt"
+                    >
+                        <Plus size={18} />
+                    </button>
+                </div>
+
+                <div className="flex items-center gap-3">
                     <SearchInput
                         id="storage-search"
                         value={searchQuery}
@@ -173,73 +206,95 @@ export default function StoragePage() {
                         selectedFilter={selectedFilter}
                         onSelectFilter={setSelectedFilter}
                     />
-
-                    <button
-                        type="button"
-                        className="flex items-center justify-center h-11 w-11 shrink-0 rounded-full"
-                        style={{ backgroundColor: "#0a9a82", color: "#ffffff" }}
-                        aria-label="Legg til produkt"
-                    >
-                        <Plus size={18} />
-                    </button>
-
+                </div>
             </header>
 
             <section>
-                    {notice ? (
-                        <article className="mb-4 rounded-xl border px-4 py-3" style={{ borderColor: "#d4d6db", backgroundColor: "#f8fafc" }} role="status" aria-live="polite">
-                            <div className="flex items-start gap-3">
-                                <CircleAlert size={18} className="mt-0.5 shrink-0" style={{ color: "#5f6470" }} />
+                {notice ? (
+                    <article
+                        className="mb-4 rounded-2xl border px-4 py-3"
+                        style={{ borderColor: "var(--color-border)", backgroundColor: "var(--color-secondary-surface)" }}
+                        role="status"
+                        aria-live="polite"
+                    >
+                        <div className="flex items-start gap-3">
+                            <CircleAlert size={18} className="mt-0.5 shrink-0" style={{ color: "var(--color-text-secondary)" }} />
 
-                                <p className="text-sm font-semibold" style={{ color: "#253042" }}>
-                                    {notice}
-                                </p>
+                            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                                {notice}
+                            </p>
 
-                                <button
-                                    type="button"
-                                    aria-label="Lukk melding"
-                                    className="ml-auto shrink-0 rounded-md p-1 transition-opacity hover:opacity-75"
-                                    style={{ color: "#5f6470" }}
-                                    onClick={() => setNotice(null)}
-                                >
-                                    <X size={16} />
-                                </button>
+                            <button
+                                type="button"
+                                aria-label="Lukk melding"
+                                className="ml-auto shrink-0 rounded-md p-1 cursor-pointer transition-opacity hover:opacity-75"
+                                style={{ color: "var(--color-text-secondary)" }}
+                                onClick={() => setNotice(null)}
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+                    </article>
+                ) : null}
+
+                {errorMessage ? (
+                    <p
+                        className="rounded-2xl border px-4 py-5 text-sm"
+                        style={{
+                            borderColor: "var(--color-danger)",
+                            color: "var(--color-danger)",
+                            backgroundColor: "var(--color-surface)",
+                        }}
+                    >
+                        {errorMessage}
+                    </p>
+                ) : null}
+
+                {!errorMessage && filteredProducts.length === 0 ? (
+                    <p
+                        className="rounded-2xl border px-4 py-5 text-sm"
+                        style={{
+                            borderColor: "var(--color-border)",
+                            color: "var(--color-text-secondary)",
+                            backgroundColor: "var(--color-secondary-surface)",
+                        }}
+                    >
+                        Ingen varer funnet i lageret.
+                    </p>
+                ) : null}
+
+                {hasProducts ? (
+                    <div
+                        className="overflow-hidden rounded-2xl border"
+                        style={{ borderColor: "var(--color-border)", backgroundColor: "var(--color-surface)" }}
+                    >
+                        {filteredProducts.map((product, index) => (
+                            <div
+                                key={`${product.name}-${index}`}
+                                className={index < filteredProducts.length - 1 ? "border-b" : ""}
+                                style={{ borderColor: "var(--color-border)" }}
+                            >
+                                <ProductCard
+                                    name={product.name}
+                                    quantity={product.quantity}
+                                    unit={product.unit}
+                                    highlighted={false}
+                                    onSaveQuantity={(nextQuantity) => {
+                                        void handleSaveProductQuantity(product, nextQuantity);
+                                    }}
+                                    editDisabled={editingProductId === product.id}
+                                    onDelete={() => {
+                                        void handleDeleteProduct(product);
+                                    }}
+                                    deleteDisabled={deletingProductId === product.id}
+                                    canEdit={canEditInventory}
+                                    canDelete={canDeleteInventory}
+                                    onNotice={showNotice}
+                                />
                             </div>
-                        </article>
-                    ) : null}
-
-                    {errorMessage ? (
-                        <p className="rounded-2xl border px-4 py-5 text-sm" style={{ borderColor: "#ee9da1", color: "#7d2126", backgroundColor: "#fff3f3" }}>
-                            {errorMessage}
-                        </p>
-                    ) : null}
-
-                    {!errorMessage && filteredProducts.length === 0 ? (
-                        <p className="rounded-2xl border px-4 py-5 text-sm" style={{ borderColor: "#c7c8cb", color: "#6f7278", backgroundColor: "#f7f7f8" }}>
-                            Ingen varer funnet i lageret.
-                        </p>
-                    ) : null}
-
-                    {filteredProducts.map((product, index) => (
-                        <ProductCard
-                            key={`${product.name}-${index}`}
-                            name={product.name}
-                            quantity={product.quantity}
-                            unit={product.unit}
-                            highlighted={index % 2 === 0}
-                            onSaveQuantity={(nextQuantity) => {
-                                void handleSaveProductQuantity(product, nextQuantity);
-                            }}
-                            editDisabled={editingProductId === product.id}
-                            onDelete={() => {
-                                void handleDeleteProduct(product);
-                            }}
-                            deleteDisabled={deletingProductId === product.id}
-                            canEdit={canEditInventory}
-                            canDelete={canDeleteInventory}
-                            onNotice={showNotice}
-                        />
-                    ))}
+                        ))}
+                    </div>
+                ) : null}
             </section>
         </Layout>
     );

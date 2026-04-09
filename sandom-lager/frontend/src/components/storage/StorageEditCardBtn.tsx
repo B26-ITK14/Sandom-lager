@@ -21,7 +21,7 @@ export default function StorageEditCardBtn({
     return(
         <button
             type="button"
-            className="grid h-11 w-11 place-items-center rounded-full transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+            className="grid h-11 w-11 place-items-center rounded-full cursor-pointer transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
             style={{ backgroundColor: "#f2cf8e", color: "#000" }}
             aria-label={isSaving ? `Lagre endringer for ${name}` : `Rediger ${name}`}
             onClick={onClick}

@@ -46,8 +46,11 @@ export default function StorageFilterButton({ options, selectedFilter, onSelectF
         <div ref={containerRef} className="relative">
             <button
                 type="button"
-                className="flex items-center justify-center h-11 w-11 shrink-0 rounded-full"
-                style={{ backgroundColor: "#5d6cb5", color: "#ffffff" }}
+                className="flex items-center justify-center h-11 w-11 shrink-0 rounded-full cursor-pointer"
+                style={{
+                    background: "linear-gradient(135deg, var(--color-primary-gradient-from), var(--color-primary-gradient-to))",
+                    color: "var(--color-on-primary)",
+                }}
                 aria-label="Filtrer produkter"
                 aria-expanded={isOpen}
                 aria-haspopup="menu"
@@ -61,7 +64,7 @@ export default function StorageFilterButton({ options, selectedFilter, onSelectF
                     role="menu"
                     aria-label="Filtervalg"
                     className="absolute right-0 top-14 z-20 min-w-52 rounded-2xl border p-2 shadow-lg"
-                    style={{ borderColor: "#d4d6db", backgroundColor: "#ffffff" }}
+                    style={{ borderColor: "var(--color-border)", backgroundColor: "var(--color-surface)" }}
                 >
                     {options.map((option) => (
                         <button
@@ -69,10 +72,14 @@ export default function StorageFilterButton({ options, selectedFilter, onSelectF
                             type="button"
                             role="menuitemradio"
                             aria-checked={selectedFilter === option}
-                            className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm"
+                            className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm cursor-pointer"
                             style={{
-                                color: selectedFilter === option ? "#23305f" : "#5f6470",
-                                backgroundColor: selectedFilter === option ? "#eef1ff" : "transparent",
+                                color: selectedFilter === option
+                                    ? "var(--color-header-text-primary)"
+                                    : "var(--color-text-secondary)",
+                                backgroundColor: selectedFilter === option
+                                    ? "var(--color-secondary-surface)"
+                                    : "transparent",
                             }}
                             onClick={() => {
                                 onSelectFilter(option);

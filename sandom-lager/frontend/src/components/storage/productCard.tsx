@@ -111,11 +111,15 @@ export default function ProductCard({
     return (
         <article
             className="rounded-none px-6 py-6"
-            style={{backgroundColor: highlighted ? "#e2e5ea" : "#eceef2",}}
+            style={{
+                backgroundColor: highlighted
+                    ? "var(--color-secondary-surface)"
+                    : "var(--color-surface)",
+            }}
         >
             <div className="flex items-center justify-between">
                 <section>
-                    <h2 className="text-lg leading-none font-medium" style={{ color: "#000" }}>
+                    <h2 className="text-lg leading-none font-medium" style={{ color: "var(--color-text-primary)" }}>
                         {name}
                     </h2>
 
@@ -126,18 +130,22 @@ export default function ProductCard({
                                 min="0"
                                 step="any"
                                 className="w-24 rounded-md border px-2 py-1 text-md font-semibold outline-none"
-                                style={{ borderColor: "#b8bcc6", color: "#5f6368", backgroundColor: "#ffffff" }}
+                                style={{
+                                    borderColor: "var(--color-border)",
+                                    color: "var(--color-text-secondary)",
+                                    backgroundColor: "var(--color-surface)",
+                                }}
                                 value={quantityInput}
                                 onChange={(event) => setQuantityInput(event.target.value)}
                                 aria-label={`Ny mengde for ${name}`}
                                 disabled={editDisabled}
                             />
-                            <span className="text-md font-semibold" style={{ color: "#5f6368" }}>
+                            <span className="text-md font-semibold" style={{ color: "var(--color-text-secondary)" }}>
                                 {unit}
                             </span>
                         </div>
                     ) : (
-                        <p className="mt-2 text-md leading-none font-semibold" style={{ color: "#5f6368" }}>
+                        <p className="mt-2 text-md leading-none font-semibold" style={{ color: "var(--color-text-secondary)" }}>
                             {quantity} {unit}
                         </p>
                     )}

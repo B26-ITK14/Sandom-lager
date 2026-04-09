@@ -31,7 +31,7 @@ export default function DelCardQ({
                     type="button"
                     onClick={onConfirm}
                     disabled={disabled}
-                    className="rounded-md px-3 py-1 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-md px-3 py-1 text-xs font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                     style={{ backgroundColor: "#ee9da1", color: "#111" }}
                 >
                     Ja, slett
@@ -40,7 +40,7 @@ export default function DelCardQ({
                     type="button"
                     onClick={onCancel}
                     disabled={disabled}
-                    className="rounded-md border px-3 py-1 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-md border px-3 py-1 text-xs font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                     style={{ borderColor: "#c7c8cb", color: "#4c5561", backgroundColor: "#f7f7f8" }}
                 >
                     Nei

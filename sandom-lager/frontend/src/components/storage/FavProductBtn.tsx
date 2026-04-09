@@ -21,7 +21,7 @@ export default function FavProductBtn({
     return(
         <button
             type="button"
-            className="grid h-11 w-11 place-items-center rounded-full transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+            className="grid h-11 w-11 place-items-center rounded-full cursor-pointer transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={`Marker ${name} som favoritt`}
             onClick={onClick}
             disabled={disabled}
