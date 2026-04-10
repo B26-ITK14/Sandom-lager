@@ -1,0 +1,32 @@
+import { useEffect } from "react";
+import type { RefObject } from "react";
+
+export function useClickOutside<T extends HTMLElement>(
+    ref: RefObject<T | null>,
+    onOutsideClick: () => void,
+    enabled = true
+): void {
+    useEffect(() => {
+        if (!enabled) {
+            return;
+        }
+
+        function handlePointerDown(event: PointerEvent) {
+            const target = event.target;
+            if (!(target instanceof Node)) {
+                return;
+            }
+
+            if (!ref.current) {
+                return;
+            }
+
+            if (!ref.current.contains(target)) {
+                onOutsideClick();
+            }
+        }
+
+        document.addEventListener("pointerdown", handlePointerDown);
+        return () => document.removeEventListener("pointerdown", handlePointerDown);
+    }, [enabled, onOutsideClick, ref]);
+}

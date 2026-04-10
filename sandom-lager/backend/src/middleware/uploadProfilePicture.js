@@ -1,26 +1,5 @@
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '../../uploads/profile-pictures');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Configure storage
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadsDir);
-    },
-    filename: (req, file, cb) => {
-        // Use user ID and timestamp to create unique filename
-        const userId = req.user?.id || 'unknown';
-        const timestamp = Date.now();
-        const ext = path.extname(file.originalname);
-        cb(null, `profile-${userId}-${timestamp}${ext}`);
-    },
-});
+const storage = multer.memoryStorage();
 
 // File filter
 const fileFilter = (req, file, cb) => {

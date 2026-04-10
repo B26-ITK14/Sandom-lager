@@ -269,6 +269,7 @@ export async function handleSave(deps: SaveHandlerDeps): Promise<SaveResult> {
         };
     }
 
+
     return {
         status: 'error',
         message: firstErrorMessage || 'Kunne ikke lagre endringene',

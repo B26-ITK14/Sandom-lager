@@ -22,7 +22,14 @@ export async function fetchRecipeById(recipeId: number, accessToken: string): Pr
 }
 
 export async function createRecipe(
-    data: { title: string; category: string; instructions?: string; servings: number },
+    data: {
+        title: string;
+        category: string;
+        instructions?: string;
+        servings: number;
+        image_url?: string | null;
+        image_public_id?: string | null;
+    },
     accessToken: string
 ): Promise<Recipe> {
     return apiFetchJson<Recipe>("/api/recipes", {
@@ -34,7 +41,14 @@ export async function createRecipe(
 
 export async function updateRecipe(
     recipeId: number,
-    data: { title: string; category: string; instructions?: string; servings: number },
+    data: {
+        title: string;
+        category: string;
+        instructions?: string;
+        servings: number;
+        image_url?: string | null;
+        image_public_id?: string | null;
+    },
     accessToken: string
 ): Promise<Recipe> {
     return apiFetchJson<Recipe>(`/api/recipes/${recipeId}`, {
@@ -42,6 +56,37 @@ export async function updateRecipe(
         headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
         body: JSON.stringify(data),
     });
+}
+
+export async function uploadRecipeImage(
+    file: File,
+    accessToken: string,
+    recipeId?: number
+): Promise<{ url: string; publicId: string }> {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    if (recipeId) {
+        formData.append("recipeId", String(recipeId));
+    }
+
+    const response = await fetch("/api/upload/recipe-image", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: formData,
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+        throw new Error((data as { error?: string; message?: string }).message || (data as { error?: string }).error || `Kunne ikke laste opp bilde (${response.status})`);
+    }
+
+    return {
+        url: (data as { url: string }).url,
+        publicId: (data as { publicId: string }).publicId,
+    };
 }
 
 export async function deleteRecipe(recipeId: number, accessToken: string): Promise<void> {

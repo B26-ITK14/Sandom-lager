@@ -5,9 +5,9 @@
     * Opened when user clicks the recipe card image area.
 */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import LoadingSpinner from "../LoadingSpinner";
-import { useRecipeIngredients } from "../../hooks";
+import { useClickOutside, useEscapeKey, useRecipeIngredients } from "../../hooks";
 import type { Recipe, RecipeIngredient } from "../../types";
 
 interface RecipeDetailModalProps {
@@ -23,6 +23,11 @@ export default function RecipeDetailModal({ recipe, onClose, canManage, onEdit, 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState<string | null>(null);
+
+    const modalPanelRef = useRef<HTMLDivElement>(null);
+
+    useEscapeKey(onClose);
+    useClickOutside(modalPanelRef, onClose);
 
     async function handleConfirmDelete() {
         if (!onDelete) return;
@@ -43,6 +48,7 @@ export default function RecipeDetailModal({ recipe, onClose, canManage, onEdit, 
             style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
         >
             <div
+                ref={modalPanelRef}
                 className="w-full max-w-lg rounded-2xl shadow-xl overflow-hidden flex flex-col h-[80vh]"
                 style={{ backgroundColor: "var(--color-background)", border: "1px solid var(--color-border)" }}
                 role="dialog"
@@ -79,6 +85,15 @@ export default function RecipeDetailModal({ recipe, onClose, canManage, onEdit, 
 
                 {/* Scrollable content */}
                 <div className="overflow-y-auto flex-1 px-5 py-4 flex flex-col gap-5">
+
+                    {recipe.image_url && (
+                        <img
+                            src={recipe.image_url}
+                            alt={recipe.title}
+                            className="w-full h-48 object-cover rounded-xl"
+                            style={{ border: "1px solid var(--color-border)" }}
+                        />
+                    )}
 
                     {loading && (
                         <div className="flex justify-center py-8">
