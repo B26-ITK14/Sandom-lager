@@ -46,7 +46,6 @@ router.post("/upload/profile-picture", checkJwt(), syncUser, requireRole("user",
             type: "profile-picture",
         });
     } catch (err) {
-        console.error("[uploadRoutes] profile-picture upload failed:", err.message);
         res.status(500).json({ error: "Upload failed" });
     }
 });
@@ -66,7 +65,6 @@ router.post("/upload/recipe-image", checkJwt(), syncUser, requireRole("manager",
             type: "recipe-image",
         });
     } catch (err) {
-        console.error("[uploadRoutes] recipe-image upload failed:", err.message);
         res.status(500).json({ error: "Upload failed" });
     }
 });
