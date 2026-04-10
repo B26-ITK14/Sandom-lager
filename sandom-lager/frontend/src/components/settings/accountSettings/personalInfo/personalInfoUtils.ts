@@ -239,14 +239,24 @@ export async function handleSave(deps: SaveHandlerDeps): Promise<SaveResult> {
 
     if (profilePictureChanged && deps.editedProfilePicture) {
         try {
+            console.log('[PersonalInfo.handleSave] profile picture upload start', {
+                name: deps.editedProfilePicture.name,
+                type: deps.editedProfilePicture.type,
+                size: deps.editedProfilePicture.size,
+            });
             const token = await deps.getAccessTokenSilently();
+            console.log('[PersonalInfo.handleSave] token acquired for profile picture upload');
             const savedProfilePicture = await deps.updateProfilePictureFn(deps.editedProfilePicture, token);
+            console.log('[PersonalInfo.handleSave] profile picture upload success', {
+                hasUrl: Boolean(savedProfilePicture),
+            });
             deps.setDisplayProfilePicture(savedProfilePicture);
             deps.setEditedProfilePicture(null);
             deps.onProfilePictureSave(savedProfilePicture);
             successParts.push('Profilbilde oppdatert');
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Kunne ikke oppdatere profilbildet';
+            console.error('[PersonalInfo.handleSave] profile picture upload failed:', err);
             deps.setProfilePictureError(message);
             if (!firstErrorMessage) firstErrorMessage = message;
             profilePictureOk = false;
@@ -262,12 +272,20 @@ export async function handleSave(deps: SaveHandlerDeps): Promise<SaveResult> {
 
     deps.setIsSaving(false);
     if (emailOk && nameOk && profilePictureOk) {
+        console.log('[PersonalInfo.handleSave] completed with success');
         deps.setIsEditing(false);
         return {
             status: 'success',
             message: successParts.length > 0 ? successParts.join(' • ') : 'Endringer lagret',
         };
     }
+
+    console.warn('[PersonalInfo.handleSave] completed with errors', {
+        emailOk,
+        nameOk,
+        profilePictureOk,
+        firstErrorMessage,
+    });
 
     return {
         status: 'error',

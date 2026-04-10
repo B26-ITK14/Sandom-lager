@@ -164,22 +164,35 @@ export async function requestEmailChange(newEmail: string, accessToken: string):
 }
 
 export async function updateProfilePicture(file: File, accessToken: string): Promise<string | null> {
+    const startedAt = Date.now();
+    console.log(`[updateProfilePictureApi] start name=${file.name} type=${file.type} size=${file.size}`);
+
     const formData = new FormData();
     formData.append('profilePicture', file);
 
-    const response = await fetch('/api/me/profile-picture', {
-        method: 'PATCH',
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-        },
-        body: formData,
-    });
+    let response: Response;
+    try {
+        response = await fetch('/api/me/profile-picture', {
+            method: 'PATCH',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+            body: formData,
+        });
+    } catch (err) {
+        console.error(`[updateProfilePictureApi] network error after ${Date.now() - startedAt}ms:`, err);
+        throw err;
+    }
+
+    console.log(`[updateProfilePictureApi] response status=${response.status} durationMs=${Date.now() - startedAt}`);
 
     if (!response.ok) {
         const data = await response.json().catch(() => ({}));
+        console.error('[updateProfilePictureApi] failed response body:', data);
         throw new Error((data as { message?: string }).message ?? `Kunne ikke oppdatere profilbildet (${response.status})`);
     }
 
     const data = await response.json().catch(() => ({}));
+    console.log(`[updateProfilePictureApi] success durationMs=${Date.now() - startedAt} hasUrl=${Boolean((data as { profilePicture?: string | null }).profilePicture)}`);
     return (data as { profilePicture?: string | null }).profilePicture ?? null;
 }

@@ -5,7 +5,7 @@ const ApiError = require("../utils/ApiError");
 // Helper – henter én oppskrift med allergener
 async function getRecipeWithAllergens(id) {
     const result = await pool.query(
-        `SELECT r.id, r.title, r.category, r.instructions, r.servings, r.created_at,
+                `SELECT r.id, r.title, r.category, r.instructions, r.image_url, r.image_public_id, r.servings, r.created_at,
           COALESCE(array_agg(a.name ORDER BY a.name) FILTER (WHERE a.name IS NOT NULL), '{}') AS allergens
          FROM recipes r
          LEFT JOIN recipe_allergens ra ON ra.recipe_id = r.id
@@ -20,7 +20,7 @@ async function getRecipeWithAllergens(id) {
 // GET /recipes
 async function getAllRecipes(req, res) {
     const result = await pool.query(
-        `SELECT r.id, r.title, r.category, r.instructions, r.servings, r.created_at,
+                `SELECT r.id, r.title, r.category, r.instructions, r.image_url, r.image_public_id, r.servings, r.created_at,
           COALESCE(array_agg(a.name ORDER BY a.name) FILTER (WHERE a.name IS NOT NULL), '{}') AS allergens
          FROM recipes r
          LEFT JOIN recipe_allergens ra ON ra.recipe_id = r.id
@@ -42,7 +42,7 @@ async function getRecipeById(req, res) {
 // POST /recipes
 async function createRecipe(req, res) {
 
-    const { title, category, instructions, servings } = req.body;
+    const { title, category, instructions, servings, image_url, image_public_id } = req.body;
 
     if (!title) {
         throw new ApiError(400, "Missing required field: title");
@@ -50,10 +50,10 @@ async function createRecipe(req, res) {
 
     const result = await pool.query(
         `INSERT INTO recipes 
-        (title, category, instructions, servings)
-        VALUES ($1, $2, $3, $4)
+        (title, category, instructions, image_url, image_public_id, servings)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *`,
-        [title, category, instructions, servings ?? 4]
+        [title, category, instructions, image_url ?? null, image_public_id ?? null, servings ?? 4]
     );
 
     const recipe = result.rows[0];
@@ -70,7 +70,7 @@ async function createRecipe(req, res) {
 async function updateRecipe(req, res) {
 
     const { id } = req.params;
-    const { title, category, instructions, servings } = req.body;
+    const { title, category, instructions, servings, image_url, image_public_id } = req.body;
 
     if (!title) {
         throw new ApiError(400, "Missing required field: title");
@@ -78,10 +78,10 @@ async function updateRecipe(req, res) {
 
     const updateResult = await pool.query(
         `UPDATE recipes
-         SET title = $1, category = $2, instructions = $3, servings = $4
-         WHERE id = $5
+         SET title = $1, category = $2, instructions = $3, image_url = $4, image_public_id = $5, servings = $6
+         WHERE id = $7
          RETURNING *`,
-        [title, category, instructions, servings ?? 4, id]
+        [title, category, instructions, image_url ?? null, image_public_id ?? null, servings ?? 4, id]
     );
 
     if (updateResult.rows.length === 0) {

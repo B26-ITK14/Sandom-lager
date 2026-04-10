@@ -8,7 +8,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { AUTH0_AUDIENCE } from "../../config/auth";
-import { createIngredient, createRecipe, updateRecipe, addRecipeIngredient, deleteRecipeIngredient, fetchIngredients, fetchAllergens, setRecipeAllergens } from "../../api/recipes";
+import { createIngredient, createRecipe, updateRecipe, addRecipeIngredient, deleteRecipeIngredient, fetchIngredients, fetchAllergens, setRecipeAllergens, uploadRecipeImage } from "../../api/recipes";
 import { INGREDIENT_UNITS, RECIPE_CATEGORIES } from "../../types";
 import type { Allergen, Ingredient, IngredientUnit, Recipe, RecipeIngredient } from "../../types";
 
@@ -37,6 +37,11 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
     const [category, setCategory] = useState<string>(initialRecipe?.category ?? "");
     const [instructions, setInstructions] = useState(initialRecipe?.instructions ?? "");
     const [servings, setServings] = useState(String(initialRecipe?.servings ?? 4));
+    const [recipeImageUrl, setRecipeImageUrl] = useState<string | null>(initialRecipe?.image_url ?? null);
+    const [recipeImagePublicId, setRecipeImagePublicId] = useState<string | null>(initialRecipe?.image_public_id ?? null);
+    const [recipeImageFile, setRecipeImageFile] = useState<File | null>(null);
+    const [recipeImagePreview, setRecipeImagePreview] = useState<string | null>(null);
+    const [removeExistingImage, setRemoveExistingImage] = useState(false);
 
     // Ingredient rows
     const [rows, setRows] = useState<IngredientRow[]>(
@@ -61,11 +66,24 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
     const [error, setError] = useState<string | null>(null);
 
     const titleRef = useRef<HTMLInputElement>(null);
+    const imageInputRef = useRef<HTMLInputElement>(null);
 
     // Focus title input on mount
     useEffect(() => {
         titleRef.current?.focus();
     }, []);
+
+    useEffect(() => {
+        if (!recipeImageFile) {
+            setRecipeImagePreview(null);
+            return;
+        }
+
+        const objectUrl = URL.createObjectURL(recipeImageFile);
+        setRecipeImagePreview(objectUrl);
+
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [recipeImageFile]);
 
     // Load existing ingredients and all allergens for the form
     useEffect(() => {
@@ -137,11 +155,21 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
         try {
             const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
 
+            let uploadedImageUrl = removeExistingImage ? null : recipeImageUrl;
+            let uploadedImagePublicId = removeExistingImage ? null : recipeImagePublicId;
+            if (recipeImageFile) {
+                const imageUpload = await uploadRecipeImage(recipeImageFile, token, initialRecipe?.id);
+                uploadedImageUrl = imageUpload.url;
+                uploadedImagePublicId = imageUpload.publicId;
+            }
+
             const recipeData = {
                 title: title.trim(),
                 category: category.trim(),
                 instructions: instructions.trim() || undefined,
                 servings: parseInt(servings, 10) || 4,
+                image_url: uploadedImageUrl,
+                image_public_id: uploadedImagePublicId,
             };
 
             // 1. Create or update the recipe
@@ -153,6 +181,9 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
             if (selectedAllergenIds.length > 0 || initialRecipe) {
                 await setRecipeAllergens(recipe.id, selectedAllergenIds, token);
             }
+
+            setRecipeImageUrl(recipe.image_url ?? uploadedImageUrl ?? null);
+            setRecipeImagePublicId(recipe.image_public_id ?? uploadedImagePublicId ?? null);
 
             // 3. For edit mode: remove all existing ingredient links first
             if (initialRecipe && initialIngredients) {
@@ -286,6 +317,82 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
                             placeholder="Beskriv fremgangsmåten steg for steg..."
                             className="rounded-lg px-3 py-2 text-sm outline-none resize-y"
                             style={inputStyle}
+                        />
+                    </div>
+
+                    {/* Recipe image */}
+                    <div className="flex flex-col gap-2">
+                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
+                            Bilde
+                        </span>
+
+                        {(recipeImagePreview || recipeImageUrl) && (
+                            <img
+                                src={recipeImagePreview || recipeImageUrl || undefined}
+                                alt="Forhåndsvisning av oppskriftsbilde"
+                                className="w-full h-36 object-cover rounded-lg"
+                                style={{ border: "1px solid var(--color-border)" }}
+                            />
+                        )}
+
+                        <div className="flex flex-wrap items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={() => imageInputRef.current?.click()}
+                                className="rounded-lg px-3 py-2 text-sm font-medium cursor-pointer"
+                                style={{
+                                    backgroundColor: "var(--color-secondary-surface)",
+                                    color: "var(--color-text-primary)",
+                                    border: "1px solid var(--color-border)",
+                                }}
+                            >
+                                {recipeImagePreview || recipeImageUrl ? "Bytt bilde" : "Legg til bilde"}
+                            </button>
+
+                            {(recipeImageUrl || recipeImagePreview || recipeImageFile) && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setRecipeImageFile(null);
+                                        setRecipeImagePreview(null);
+                                        setRecipeImageUrl(null);
+                                        setRecipeImagePublicId(null);
+                                        setRemoveExistingImage(true);
+                                        if (imageInputRef.current) {
+                                            imageInputRef.current.value = "";
+                                        }
+                                    }}
+                                    className="rounded-lg px-3 py-2 text-sm font-medium cursor-pointer"
+                                    style={{
+                                        backgroundColor: "rgba(239,68,68,0.1)",
+                                        color: "#ef4444",
+                                        border: "1px solid rgba(239,68,68,0.25)",
+                                    }}
+                                >
+                                    Fjern bilde
+                                </button>
+                            )}
+
+                            {recipeImageFile && (
+                                <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                                    {recipeImageFile.name}
+                                </span>
+                            )}
+                        </div>
+
+                        <input
+                            id="recipe-image"
+                            ref={imageInputRef}
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp,image/gif"
+                            onChange={(e) => {
+                                const nextFile = e.target.files?.[0] ?? null;
+                                setRecipeImageFile(nextFile);
+                                if (nextFile) {
+                                    setRemoveExistingImage(false);
+                                }
+                            }}
+                            className="hidden"
                         />
                     </div>
 

@@ -34,8 +34,17 @@ export default function RecipeCard({ recipe, selected, onToggle, onOpenDetail }:
                 tabIndex={0}
             />
 
-            {/* Placeholder background */}
-            <div className="absolute inset-0 opacity-40" style={{ backgroundColor: "var(--color-secondary-surface)" }} aria-hidden="true" />
+            {/* Image/placeholder background */}
+            {recipe.image_url ? (
+                <img
+                    src={recipe.image_url}
+                    alt={recipe.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    aria-hidden="true"
+                />
+            ) : (
+                <div className="absolute inset-0 opacity-40" style={{ backgroundColor: "var(--color-secondary-surface)" }} aria-hidden="true" />
+            )}
 
             {/* Selection toggle – sits above the background button */}
             <button

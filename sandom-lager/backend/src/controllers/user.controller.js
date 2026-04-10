@@ -1,11 +1,38 @@
 const pool = require("../db/pool");
 const { callManagementApi } = require("../lib/auth0Management");
+const {
+    uploadProfilePictureBuffer,
+    destroyImageByPublicId,
+    toCloudinaryUrl,
+} = require("../lib/cloudinaryUploads");
 const fs = require('fs');
 const path = require('path');
 
 const MAX_PROFILE_PICTURE_BYTES = 5 * 1024 * 1024;
 const PROFILE_PICTURE_PATTERN = /^data:image\/(png|jpeg|jpg|gif|webp);base64,[A-Za-z0-9+/=]+$/;
 const uploadsDir = path.join(__dirname, '../../uploads/profile-pictures');
+
+function isCloudinaryPublicId(value) {
+    return typeof value === 'string' && value.includes('/') && !value.startsWith('http');
+}
+
+function isHttpUrl(value) {
+    return typeof value === 'string' && /^https?:\/\//i.test(value);
+}
+
+function toProfilePictureUrl(value) {
+    if (!value) return null;
+
+    if (isHttpUrl(value)) {
+        return value;
+    }
+
+    if (isCloudinaryPublicId(value)) {
+        return toCloudinaryUrl(value);
+    }
+
+    return `/api/profile-pictures/${value}`;
+}
 
 // GET /me - Returns the current authenticated user's profile
 async function getMe(req, res) {
@@ -38,10 +65,7 @@ async function getMe(req, res) {
             return res.status(404).json({ message: "Bruker ikke funnet" });
         }
 
-        // Convert filename to full API URL if profile picture exists
-        const profilePictureUrl = user.profile_picture 
-            ? `/api/profile-pictures/${user.profile_picture}`
-            : null;
+        const profilePictureUrl = toProfilePictureUrl(user.profile_picture);
 
         res.json({
             id: user.id,
@@ -209,14 +233,26 @@ async function updateEmail(req, res) {
 
 // PATCH /me/profile-picture - Stores the uploaded profile picture for the current user
 async function updateProfilePicture(req, res) {
-    console.log(`[updateProfilePicture] user id: ${req.user.id}`);
+    const startedAt = Date.now();
+    console.log(`[updateProfilePicture] start user=${req.user.id}`);
 
     if (!req.file) {
         console.warn('[updateProfilePicture] Validation failed: no file uploaded');
         return res.status(400).json({ message: "Profilbildet er påkrevd" });
     }
 
+    console.log(`[updateProfilePicture] file received field=${req.file.fieldname} mime=${req.file.mimetype} bytes=${req.file.size || req.file.buffer?.length || "n/a"}`);
+
     try {
+        console.log('[updateProfilePicture] uploading image to Cloudinary');
+        const publicId = await uploadProfilePictureBuffer({
+            userId: req.user?.id,
+            buffer: req.file.buffer,
+            mimetype: req.file.mimetype,
+        });
+        console.log(`[updateProfilePicture] cloudinary upload done publicId=${publicId}`);
+
+        console.log('[updateProfilePicture] fetching previous profile picture from database');
         // Get the old profile picture filename to delete it
         const oldResult = await pool.query(
             "SELECT profile_picture FROM users WHERE id = $1",
@@ -224,39 +260,55 @@ async function updateProfilePicture(req, res) {
         );
 
         const oldFilename = oldResult.rows[0]?.profile_picture;
+        console.log(`[updateProfilePicture] previous profile_picture=${oldFilename || "none"}`);
 
-        // Delete old file if it exists
+        // Best-effort cleanup for previously stored images.
         if (oldFilename && oldFilename !== 'default') {
-            const oldFilePath = path.join(uploadsDir, oldFilename);
-            try {
-                if (fs.existsSync(oldFilePath)) {
-                    fs.unlinkSync(oldFilePath);
-                    console.log(`[updateProfilePicture] Deleted old file: ${oldFilename}`);
+            if (isCloudinaryPublicId(oldFilename)) {
+                try {
+                    await destroyImageByPublicId(oldFilename);
+                    console.log(`[updateProfilePicture] Deleted old Cloudinary image: ${oldFilename}`);
+                } catch (err) {
+                    console.warn(`[updateProfilePicture] Failed to delete old Cloudinary image: ${err.message}`);
                 }
-            } catch (err) {
-                console.warn(`[updateProfilePicture] Failed to delete old file: ${err.message}`);
-                // Don't fail the request if cleanup fails
+            } else {
+                const oldFilePath = path.join(uploadsDir, oldFilename);
+                try {
+                    if (fs.existsSync(oldFilePath)) {
+                        fs.unlinkSync(oldFilePath);
+                        console.log(`[updateProfilePicture] Deleted old local file: ${oldFilename}`);
+                    }
+                } catch (err) {
+                    console.warn(`[updateProfilePicture] Failed to delete old local file: ${err.message}`);
+                }
             }
         }
 
-        // Save the filename to database
-        const filename = req.file.filename;
+        // Persist public_id so we can delete/replace old images later.
+        console.log(`[updateProfilePicture] storing new publicId=${publicId} in database`);
         const result = await pool.query(
             "UPDATE users SET profile_picture = $1 WHERE id = $2 RETURNING profile_picture",
-            [filename, req.user.id]
+            [publicId, req.user.id]
         );
 
-        console.log(`[updateProfilePicture] Profile picture updated for user id: ${req.user.id}, file: ${filename}`);
+        const profilePictureUrl = toProfilePictureUrl(result.rows[0]?.profile_picture);
+        console.log(`[updateProfilePicture] success user=${req.user.id} publicId=${publicId} durationMs=${Date.now() - startedAt}`);
         
         res.json({ 
-            profilePicture: `/api/profile-pictures/${result.rows[0]?.profile_picture}` || null 
+            profilePicture: profilePictureUrl
         });
     } catch (err) {
-        // Clean up uploaded file on error
-        if (req.file?.path && fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
+        const message = err?.message || "Ukjent feil";
+        console.error(`[updateProfilePicture] error after ${Date.now() - startedAt}ms:`, message);
+
+        if (/Invalid cloud_name/i.test(message)) {
+            return res.status(502).json({ message: "Cloudinary-oppsett er ugyldig: sjekk CLOUDINARY_CLOUD_NAME" });
         }
-        console.error("[updateProfilePicture] error:", err.message);
+
+        if (/api key|api secret|Invalid Signature|unauthorized|authentication/i.test(message)) {
+            return res.status(502).json({ message: "Cloudinary-autentisering feilet: sjekk API-nokler" });
+        }
+
         res.status(500).json({ message: "Kunne ikke oppdatere profilbildet" });
     }
 }

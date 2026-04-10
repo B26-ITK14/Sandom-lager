@@ -73,9 +73,17 @@ CREATE TABLE IF NOT EXISTS recipes (
     title TEXT NOT NULL,
     category TEXT NOT NULL,
     instructions TEXT,
+    image_url TEXT,
+    image_public_id TEXT,
     servings INT NOT NULL DEFAULT 4,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+ALTER TABLE recipes
+ADD COLUMN IF NOT EXISTS image_url TEXT;
+
+ALTER TABLE recipes
+ADD COLUMN IF NOT EXISTS image_public_id TEXT;
 
 -- RECIPE INGREDIENTS --
 CREATE TABLE recipe_ingredients (

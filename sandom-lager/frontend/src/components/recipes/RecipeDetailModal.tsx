@@ -80,6 +80,15 @@ export default function RecipeDetailModal({ recipe, onClose, canManage, onEdit, 
                 {/* Scrollable content */}
                 <div className="overflow-y-auto flex-1 px-5 py-4 flex flex-col gap-5">
 
+                    {recipe.image_url && (
+                        <img
+                            src={recipe.image_url}
+                            alt={recipe.title}
+                            className="w-full h-48 object-cover rounded-xl"
+                            style={{ border: "1px solid var(--color-border)" }}
+                        />
+                    )}
+
                     {loading && (
                         <div className="flex justify-center py-8">
                             <LoadingSpinner />

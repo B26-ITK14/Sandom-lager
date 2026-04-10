@@ -29,6 +29,8 @@ export interface Recipe {
     title: string;
     category: string;
     instructions: string | null;
+    image_url?: string | null;
+    image_public_id?: string | null;
     allergens: string[];
     servings: number;
     created_at: string;
