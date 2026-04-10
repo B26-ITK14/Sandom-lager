@@ -5,10 +5,9 @@
     * Opened when user clicks the recipe card image area.
 */
 
-import { useState } from "react";
-import { useEffect } from "react";
+import { useRef, useState } from "react";
 import LoadingSpinner from "../LoadingSpinner";
-import { useRecipeIngredients } from "../../hooks";
+import { useClickOutside, useEscapeKey, useRecipeIngredients } from "../../hooks";
 import type { Recipe, RecipeIngredient } from "../../types";
 
 interface RecipeDetailModalProps {
@@ -25,16 +24,10 @@ export default function RecipeDetailModal({ recipe, onClose, canManage, onEdit, 
     const [deleting, setDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState<string | null>(null);
 
-    useEffect(() => {
-        function handleKeyDown(event: KeyboardEvent) {
-            if (event.key === "Escape") {
-                onClose();
-            }
-        }
+    const modalPanelRef = useRef<HTMLDivElement>(null);
 
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [onClose]);
+    useEscapeKey(onClose);
+    useClickOutside(modalPanelRef, onClose);
 
     async function handleConfirmDelete() {
         if (!onDelete) return;
@@ -53,15 +46,14 @@ export default function RecipeDetailModal({ recipe, onClose, canManage, onEdit, 
         <div
             className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
             style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-            onClick={onClose}
         >
             <div
+                ref={modalPanelRef}
                 className="w-full max-w-lg rounded-2xl shadow-xl overflow-hidden flex flex-col h-[80vh]"
                 style={{ backgroundColor: "var(--color-background)", border: "1px solid var(--color-border)" }}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="recipe-detail-title"
-                onClick={(event) => event.stopPropagation()}
             >
                 {/* Header */}
                 <div className="flex items-start justify-between px-5 py-4" style={{ borderBottom: "1px solid var(--color-border)" }}>

@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { AUTH0_AUDIENCE } from "../../config/auth";
 import { createIngredient, createRecipe, updateRecipe, addRecipeIngredient, deleteRecipeIngredient, fetchIngredients, fetchAllergens, setRecipeAllergens, uploadRecipeImage } from "../../api/recipes";
+import { useClickOutside, useEscapeKey } from "../../hooks";
 import { INGREDIENT_UNITS, RECIPE_CATEGORIES } from "../../types";
 import type { Allergen, Ingredient, IngredientUnit, Recipe, RecipeIngredient } from "../../types";
 
@@ -73,16 +74,7 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
         titleRef.current?.focus();
     }, []);
 
-    useEffect(() => {
-        function handleKeyDown(event: KeyboardEvent) {
-            if (event.key === "Escape") {
-                onClose();
-            }
-        }
-
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [onClose]);
+    useEscapeKey(onClose);
 
     useEffect(() => {
         if (!recipeImageFile) {
@@ -229,20 +221,23 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
         border: "1px solid var(--color-border)",
     };
 
+    const modalPanelRef = useRef<HTMLDivElement>(null);
+
+    useClickOutside(modalPanelRef, onClose);
+
     return (
         /* Backdrop */
         <div
             className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
             style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-            onClick={onClose}
         >
             <div
+                ref={modalPanelRef}
                 className="w-full max-w-lg rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]"
                 style={{ backgroundColor: "var(--color-background)", border: "1px solid var(--color-border)" }}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="add-recipe-title"
-                onClick={(event) => event.stopPropagation()}
             >
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid var(--color-border)" }}>
