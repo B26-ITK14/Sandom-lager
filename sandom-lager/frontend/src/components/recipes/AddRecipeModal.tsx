@@ -74,6 +74,17 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
     }, []);
 
     useEffect(() => {
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === "Escape") {
+                onClose();
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [onClose]);
+
+    useEffect(() => {
         if (!recipeImageFile) {
             setRecipeImagePreview(null);
             return;
@@ -223,6 +234,7 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
         <div
             className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
             style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+            onClick={onClose}
         >
             <div
                 className="w-full max-w-lg rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]"
@@ -230,6 +242,7 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="add-recipe-title"
+                onClick={(event) => event.stopPropagation()}
             >
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid var(--color-border)" }}>

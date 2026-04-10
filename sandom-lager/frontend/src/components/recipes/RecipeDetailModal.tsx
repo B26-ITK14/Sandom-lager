@@ -6,6 +6,7 @@
 */
 
 import { useState } from "react";
+import { useEffect } from "react";
 import LoadingSpinner from "../LoadingSpinner";
 import { useRecipeIngredients } from "../../hooks";
 import type { Recipe, RecipeIngredient } from "../../types";
@@ -24,6 +25,17 @@ export default function RecipeDetailModal({ recipe, onClose, canManage, onEdit, 
     const [deleting, setDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState<string | null>(null);
 
+    useEffect(() => {
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === "Escape") {
+                onClose();
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [onClose]);
+
     async function handleConfirmDelete() {
         if (!onDelete) return;
         setDeleting(true);
@@ -41,6 +53,7 @@ export default function RecipeDetailModal({ recipe, onClose, canManage, onEdit, 
         <div
             className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
             style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+            onClick={onClose}
         >
             <div
                 className="w-full max-w-lg rounded-2xl shadow-xl overflow-hidden flex flex-col h-[80vh]"
@@ -48,6 +61,7 @@ export default function RecipeDetailModal({ recipe, onClose, canManage, onEdit, 
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="recipe-detail-title"
+                onClick={(event) => event.stopPropagation()}
             >
                 {/* Header */}
                 <div className="flex items-start justify-between px-5 py-4" style={{ borderBottom: "1px solid var(--color-border)" }}>

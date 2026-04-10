@@ -5,6 +5,7 @@
     * Author: Emil Berglund
 */
 
+import { useEffect } from 'react';
 import { X, Power } from 'lucide-react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useUppercaseUsername } from '../hooks/user/useName';
@@ -38,6 +39,17 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
         onClose();
     };
 
+    useEffect(() => {
+        function handleKeyDown(event: KeyboardEvent) {
+            if (isOpen && event.key === 'Escape') {
+                onClose();
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
+
     return (
         <>
             {/* Overlay */}
@@ -53,6 +65,7 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                 className={`fixed top-0 left-0 h-full w-full max-w-136 z-50 flex flex-col transition-transform duration-500 ease-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
                     }`}
                 style={{ backgroundColor: 'var(--color-surface)' }}
+                onClick={(event) => event.stopPropagation()}
             >
                 {/* Header with user info */}
                 <section
