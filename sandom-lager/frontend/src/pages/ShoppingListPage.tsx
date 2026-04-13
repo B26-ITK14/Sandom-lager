@@ -152,8 +152,18 @@ export default function ShoppingListPage() {
         <Layout>
             <section className="flex flex-col gap-6">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
-                    <ShoppingListToolbar onAddItem={() => setIsAddModalOpen(true)} />
-                    <div className="flex gap-3 flex-wrap">
+                    <ShoppingListToolbar />
+                    <div className="flex gap-3 flex-wrap items-center">
+                        <button
+                            onClick={() => setIsAddModalOpen(true)}
+                            className="py-2 px-4 rounded-md transition-colors"
+                            style={{
+                                background: "var(--color-primary)",
+                                color: "var(--color-on-primary)",
+                            }}
+                        >
+                            + Legg til vare
+                        </button>
                         <button
                             onClick={handleGenerateShoppingList}
                             disabled={selectedIds.size === 0 || isGenerating}
@@ -162,7 +172,8 @@ export default function ShoppingListPage() {
                                 background: "var(--color-primary)",
                                 color: "var(--color-on-primary)",
                                 opacity: selectedIds.size === 0 || isGenerating ? 0.6 : 1,
-                            }}>
+                            }}
+                        >
                             {isGenerating ? "Genererer..." : `Generer handleliste (${selectedIds.size})`}
                         </button>
                         <ShoppingListPrintExport items={items} />
