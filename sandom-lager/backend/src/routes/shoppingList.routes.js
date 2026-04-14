@@ -33,6 +33,13 @@ router.post(
     asyncHandler(shoppingListController.createShoppingListItem)
 );
 
+// GENERATE - Generate shopping list from selected recipe IDs
+router.post(
+    "/shopping-list/generate",
+    requireRole("user", "manager", "admin"),
+    asyncHandler(shoppingListController.generateShoppingList)
+);
+
 // PUT - Users can update shopping list items in their location
 router.put(
     "/shopping-list/:id",

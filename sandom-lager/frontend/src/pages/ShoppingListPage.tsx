@@ -2,8 +2,9 @@ import Layout from "../components/Layout";
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
-import { fetchShoppingList, fetchShoppingListHistory, updateShoppingListItem, removeFromShoppingList } from "../api";
+import { fetchShoppingList, fetchShoppingListHistory, generateShoppingListFromRecipes, updateShoppingListItem, removeFromShoppingList } from "../api";
 import type { IngredientUnit, ShoppingListHistoryRow, ShoppingListItem } from "../types";
+import { useSelectedRecipes } from "../context/SelectedRecipesContext";
 
 import ShoppingListToolbar from "../components/shoppingListPage/ShoppingListToolbar";
 import ShoppingListItemRow from "../components/shoppingListPage/ShoppingListItem";
@@ -15,11 +16,14 @@ import AddShoppingItemModal from "../components/shoppingListPage/AddShoppingItem
 
 export default function ShoppingListPage() {
     const { getAccessTokenSilently } = useAuth0();
+    const { selectedIds, clearSelected } = useSelectedRecipes();
 
     const [items, setItems] = useState<ShoppingListItem[]>([]);
     const [historyRows, setHistoryRows] = useState<ShoppingListHistoryRow[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isHistoryLoading, setIsHistoryLoading] = useState(true);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [generateError, setGenerateError] = useState<string | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     const loadShoppingList = async () => {
@@ -125,12 +129,53 @@ export default function ShoppingListPage() {
         }
     };
 
+    const handleGenerateShoppingList = async () => {
+        if (selectedIds.size === 0 || isGenerating) return;
+
+        setIsGenerating(true);
+        setGenerateError(null);
+
+        try {
+            const token = await getAccessTokenSilently();
+            await generateShoppingListFromRecipes(Array.from(selectedIds), token);
+            clearSelected();
+            await loadShoppingList();
+        } catch (error) {
+            console.error("Kunne ikke generere handleliste", error);
+            setGenerateError("Kunne ikke generere handleliste");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     return (
         <Layout>
             <section className="flex flex-col gap-6">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
-                    <ShoppingListToolbar onAddItem={() => setIsAddModalOpen(true)} />
-                    <div className="flex gap-3 flex-wrap">
+                    <ShoppingListToolbar />
+                    <div className="flex gap-3 flex-wrap items-center">
+                        <button
+                            onClick={() => setIsAddModalOpen(true)}
+                            className="py-2 px-4 rounded-md transition-colors"
+                            style={{
+                                background: "var(--color-primary)",
+                                color: "var(--color-on-primary)",
+                            }}
+                        >
+                            + Legg til vare
+                        </button>
+                        <button
+                            onClick={handleGenerateShoppingList}
+                            disabled={selectedIds.size === 0 || isGenerating}
+                            className="py-2 px-4 rounded-md transition-opacity"
+                            style={{
+                                background: "var(--color-primary)",
+                                color: "var(--color-on-primary)",
+                                opacity: selectedIds.size === 0 || isGenerating ? 0.6 : 1,
+                            }}
+                        >
+                            {isGenerating ? "Genererer..." : `Generer handleliste (${selectedIds.size})`}
+                        </button>
                         <ShoppingListPrintExport items={items} />
                         <DeleteShoppingListButton
                             onDeleted={async () => {
@@ -139,6 +184,12 @@ export default function ShoppingListPage() {
                         />
                     </div>
                 </div>
+
+                {generateError && (
+                    <p className="text-sm" style={{ color: "var(--color-error, #d32f2f)" }}>
+                        {generateError}
+                    </p>
+                )}
 
                 {isLoading ? (
                     <p style={{ color: "var(--color-text-secondary)" }}>Laster handleliste...</p>

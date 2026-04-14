@@ -101,6 +101,20 @@ export async function clearShoppingList(
     });
 }
 
+export async function generateShoppingListFromRecipes(
+    recipeIds: number[],
+    accessToken: string
+): Promise<{ message: string; recipeCount: number; itemCount: number }> {
+    return apiFetchJson<{ message: string; recipeCount: number; itemCount: number }>("/api/shopping-list/generate", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ recipe_ids: recipeIds }),
+    });
+}
+
 export async function fetchShoppingListHistory(accessToken: string): Promise<ShoppingListHistoryRow[]> {
     const data = await apiFetchJson<ShoppingListHistoryRow[]>("/api/shopping-list/history", {
         headers: { Authorization: `Bearer ${accessToken}` },
