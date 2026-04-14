@@ -1,5 +1,6 @@
 const pool = require("../db/pool");
 const ApiError = require("../utils/ApiError");
+const { createNotification } = require("../services/notification.service");
 
 // POST api/user-locations/request - User requests access to a location
 async function requestLocationAccess(req, res) {
@@ -27,7 +28,12 @@ async function approveLocationAccess(req, res) {
     const { id } = req.params;
 
     const result = await pool.query(
-        "UPDATE user_locations SET access_status = 'approved' WHERE id = $1 RETURNING *",
+        `UPDATE user_locations ul
+         SET access_status = 'approved'
+         FROM locations l
+         WHERE ul.id = $1
+         AND ul.location_id = l.id
+         RETURNING ul.*, l.name AS location_name`,
         [id]
     );
 
@@ -35,7 +41,17 @@ async function approveLocationAccess(req, res) {
         throw new ApiError(404, "Location access request not found");
     }
 
-    res.json(result.rows[0]);
+    const approved = result.rows[0];
+
+    await createNotification({
+        userId: approved.user_id,
+        type: "info",
+        title: "Tilgang godkjent",
+        message: `Du har fått tilgang til ${approved.location_name}`,
+        locationNickname: "settings-applications",
+    });
+
+    res.json(approved);
 }
 
 // PATCH api/user-locations/:id/deny - Admin denies location access request
@@ -44,7 +60,12 @@ async function denyLocationAccess(req, res) {
     const { id } = req.params;
 
     const result = await pool.query(
-        "UPDATE user_locations SET access_status = 'denied' WHERE id = $1 RETURNING *",
+        `UPDATE user_locations ul
+         SET access_status = 'denied'
+         FROM locations l
+         WHERE ul.id = $1
+         AND ul.location_id = l.id
+         RETURNING ul.*, l.name AS location_name`,
         [id]
     );
 
@@ -52,7 +73,17 @@ async function denyLocationAccess(req, res) {
         throw new ApiError(404, "Location access request not found");
     }
 
-    res.json(result.rows[0]);
+    const denied = result.rows[0];
+
+    await createNotification({
+        userId: denied.user_id,
+        type: "alert",
+        title: "Søknad avslått",
+        message: `Søknaden din til ${denied.location_name} ble avslått`,
+        locationNickname: "settings-applications",
+    });
+
+    res.json(denied);
 }
 
 // GET api/user-locations/me - User views their location access status

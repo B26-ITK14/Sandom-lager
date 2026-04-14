@@ -184,3 +184,17 @@ CREATE TABLE IF NOT EXISTS revoked_sessions (
 );
 
 
+-- NOTIFICATIONS --
+CREATE TABLE IF NOT EXISTS notifications(
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type TEXT NOT NULL CHECK (type IN ('warning', 'info', 'alert')),
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    location_nickname TEXT,
+    is_read BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS notifications_user_created_idx
+ON notifications (user_id, created_at DESC);
