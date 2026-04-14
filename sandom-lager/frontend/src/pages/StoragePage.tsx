@@ -4,18 +4,18 @@
  * Handles Auth0 token retrieval and shows loading, empty, and error states for data fetch.
  */
 
+import { useEffect, useMemo, useState } from "react";
+import { CircleAlert, Plus, X } from "lucide-react";
 import Layout from "../components/Layout";
 import LoadingSpinner from "../components/LoadingSpinner";
+import SearchInput from "../components/SearchInput";
 import ProductCard from "../components/storage/productCard";
 import StorageFilterButton from "../components/storage/StorageFilterBtn";
-import { CircleAlert, Plus, X } from "lucide-react";
-import SearchInput from "../components/SearchInput";
-import { useMemo, useState } from "react";
-import { useInventory } from "../hooks/storage/useInventory";
-import { useAuth0 } from "@auth0/auth0-react";
-import { useUser } from "../context/UserContext";
-import { AUTH0_AUDIENCE } from "../config/auth";
+import AddInventoryModal from "../components/storage/AddInventoryModal";
 import { deleteInventoryItem, updateInventoryQuantity } from "../api/storage";
+import { useUser } from "../context/UserContext";
+import { useApiAccessToken } from "../hooks/useApiAccessToken";
+import { useInventory } from "../hooks/storage/useInventory";
 import type { InventoryItem } from "../types";
 
 const FILTER_OPTIONS = ["Alle", "Mengde: lite -> mye", "Mengde: mye -> lite", "Favoritter"];
@@ -27,60 +27,71 @@ type Product = {
     unit: InventoryItem["unit"];
 };
 
-type Auth0ErrorShape = { error?: string; message?: string };
-
-function isAuth0Error(error: unknown): error is Auth0ErrorShape {
-    return typeof error === "object" && error !== null;
-}
-
 export default function StoragePage() {
     const { inventory, isLoading, errorMessage, refresh } = useInventory();
     const { role } = useUser();
-    const { getAccessTokenSilently, getAccessTokenWithPopup } = useAuth0();
+    const { getApiAccessToken } = useApiAccessToken();
 
     const [selectedFilter, setSelectedFilter] = useState(FILTER_OPTIONS[0]);
     const [searchQuery, setSearchQuery] = useState("");
     const [editingProductId, setEditingProductId] = useState<number | null>(null);
     const [deletingProductId, setDeletingProductId] = useState<number | null>(null);
     const [notice, setNotice] = useState<string | null>(null);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [favoriteProductIds, setFavoriteProductIds] = useState<number[]>(() => {
+        try {
+            const parsed = JSON.parse(localStorage.getItem("favoriteProducts") || "[]") as unknown;
+            if (!Array.isArray(parsed)) {
+                return [];
+            }
+
+            return parsed
+                .map((value) => Number(value))
+                .filter((value) => Number.isInteger(value) && value > 0);
+        } catch {
+            return [];
+        }
+    });
+
+    useEffect(() => {
+        localStorage.setItem("favoriteProducts", JSON.stringify(favoriteProductIds));
+    }, [favoriteProductIds]);
 
     const products = useMemo(() => mapInventoryToProducts(inventory), [inventory]);
 
-    const filteredProducts = useMemo(() => {
+    useEffect(() => {
+        setFavoriteProductIds((previous) =>
+            previous.filter((favoriteId) => products.some((product) => product.id === favoriteId))
+        );
+    }, [products]);
 
+    const filteredProducts = useMemo(() => {
         const normalizedQuery = searchQuery.trim().toLowerCase();
 
         let result = products.filter((product) => {
-            if (!normalizedQuery) return true;
+            if (!normalizedQuery) {
+                return true;
+            }
+
             return product.name.toLowerCase().includes(normalizedQuery);
         });
 
         if (selectedFilter === "Mengde: lite -> mye") {
-            result = [...result].sort(
-                (a, b) => a.quantity - b.quantity
-            );
+            result = [...result].sort((a, b) => a.quantity - b.quantity);
         }
 
         if (selectedFilter === "Mengde: mye -> lite") {
-            result = [...result].sort(
-                (a, b) => b.quantity - a.quantity
-            );
+            result = [...result].sort((a, b) => b.quantity - a.quantity);
         }
 
         if (selectedFilter === "Favoritter") {
-            try {
-                const favorites = JSON.parse(localStorage.getItem("favoriteProducts") || "[]") as string[];
-                const favoriteProducts = result.filter((product) => favorites.includes(product.name));
-                const nonFavoriteProducts = result.filter((product) => !favorites.includes(product.name));
-                result = [...favoriteProducts, ...nonFavoriteProducts];
-            } catch (err) {
-                console.error("Feil ved lesing av favoritter:", err);
-            }
+            const favoriteProducts = result.filter((product) => favoriteProductIds.includes(product.id));
+            const nonFavoriteProducts = result.filter((product) => !favoriteProductIds.includes(product.id));
+            result = [...favoriteProducts, ...nonFavoriteProducts];
         }
 
         return result;
-
-    }, [products, searchQuery, selectedFilter]);
+    }, [favoriteProductIds, products, searchQuery, selectedFilter]);
 
     const canEditInventory = role === "admin" || role === "manager";
     const canDeleteInventory = role === "admin";
@@ -89,68 +100,61 @@ export default function StoragePage() {
         setNotice(message);
     }
 
-    async function getInventoryToken(): Promise<string> {
-        try {
-            return await getAccessTokenSilently({
-                authorizationParams: { audience: AUTH0_AUDIENCE },
-            });
-        } catch (error) {
-            if (
-                isAuth0Error(error) &&
-                (error.error === "consent_required" || error.error === "login_required")
-            ) {
-                const popupToken = await getAccessTokenWithPopup({
-                    authorizationParams: { audience: AUTH0_AUDIENCE },
-                });
-
-                if (!popupToken) {
-                    throw new Error("Kunne ikke hente tilgang til lagerdata.");
-                }
-
-                return popupToken;
+    function toggleFavorite(productId: number) {
+        setFavoriteProductIds((previous) => {
+            if (previous.includes(productId)) {
+                return previous.filter((id) => id !== productId);
             }
 
-            throw error;
-        }
+            return [...previous, productId];
+        });
     }
 
-    async function handleSaveProductQuantity(product: Product, nextQuantity: number) {
+    async function handleSaveProductQuantity(product: Product, nextQuantity: number): Promise<boolean> {
         if (!canEditInventory) {
             showNotice("Du har ikke tilgang til å redigere lageret.");
-            return;
+            return false;
         }
 
         setEditingProductId(product.id);
 
         try {
-            const token = await getInventoryToken();
-
+            const token = await getApiAccessToken();
             await updateInventoryQuantity(product.id, nextQuantity, token);
             refresh();
+            return true;
         } catch (error) {
             showNotice(error instanceof Error ? error.message : "Kunne ikke oppdatere lageret.");
+            return false;
         } finally {
             setEditingProductId(null);
         }
     }
 
-    async function handleDeleteProduct(product: Product) {
+    async function handleDeleteProduct(product: Product): Promise<boolean> {
         if (!canDeleteInventory) {
             showNotice("Du har ikke tilgang til å slette varer fra lageret.");
-            return;
+            return false;
         }
 
         setDeletingProductId(product.id);
 
         try {
-            const token = await getInventoryToken();
+            const token = await getApiAccessToken();
             await deleteInventoryItem(product.id, token);
             refresh();
+            return true;
         } catch (error) {
             showNotice(error instanceof Error ? error.message : "Kunne ikke slette vare fra lageret.");
+            return false;
         } finally {
             setDeletingProductId(null);
         }
+    }
+
+    function handleInventoryCreated() {
+        setShowAddModal(false);
+        refresh();
     }
 
     if (isLoading) {
@@ -169,7 +173,7 @@ export default function StoragePage() {
                     boxShadow: "0 16px 36px -28px rgba(15, 23, 42, 0.8)",
                 }}
             >
-                <div className="mb-4 flex items-start justify-between gap-4">
+                <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
                     <section>
                         <h1 className="text-lg font-semibold sm:text-xl" style={{ color: "var(--color-header-text-primary)" }}>
                             Lageroversikt
@@ -180,20 +184,25 @@ export default function StoragePage() {
                         </p>
                     </section>
 
-                    <button
-                        type="button"
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl cursor-pointer transition-transform hover:-translate-y-0.5"
-                        style={{
-                            background: "linear-gradient(135deg, var(--color-primary-gradient-from), var(--color-primary-gradient-to))",
-                            color: "var(--color-on-primary)",
-                        }}
-                        aria-label="Legg til produkt"
-                    >
-                        <Plus size={18} />
-                    </button>
+                    {canEditInventory ? (
+                        <button
+                            type="button"
+                            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl cursor-pointer transition-transform hover:-translate-y-0.5"
+                            style={{
+                                background: "linear-gradient(135deg, var(--color-primary-gradient-from), var(--color-primary-gradient-to))",
+                                color: "var(--color-on-primary)",
+                            }}
+                            aria-label="Legg til produkt"
+                            onClick={() => {
+                                setShowAddModal(true);
+                            }}
+                        >
+                            <Plus size={18} />
+                        </button>
+                    ) : null}
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <SearchInput
                         id="storage-search"
                         value={searchQuery}
@@ -219,11 +228,9 @@ export default function StoragePage() {
                     >
                         <div className="flex items-start gap-3">
                             <CircleAlert size={18} className="mt-0.5 shrink-0" style={{ color: "var(--color-text-secondary)" }} />
-
                             <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
                                 {notice}
                             </p>
-
                             <button
                                 type="button"
                                 aria-label="Lukk melding"
@@ -270,25 +277,24 @@ export default function StoragePage() {
                     >
                         {filteredProducts.map((product, index) => (
                             <div
-                                key={`${product.name}-${index}`}
+                                key={product.id}
                                 className={index < filteredProducts.length - 1 ? "border-b" : ""}
                                 style={{ borderColor: "var(--color-border)" }}
                             >
                                 <ProductCard
+                                    id={product.id}
                                     name={product.name}
                                     quantity={product.quantity}
                                     unit={product.unit}
-                                    highlighted={false}
-                                    onSaveQuantity={(nextQuantity) => {
-                                        void handleSaveProductQuantity(product, nextQuantity);
-                                    }}
+                                    highlighted={index % 2 === 0}
+                                    onSaveQuantity={(nextQuantity) => handleSaveProductQuantity(product, nextQuantity)}
                                     editDisabled={editingProductId === product.id}
-                                    onDelete={() => {
-                                        void handleDeleteProduct(product);
-                                    }}
+                                    onDelete={() => handleDeleteProduct(product)}
                                     deleteDisabled={deletingProductId === product.id}
                                     canEdit={canEditInventory}
                                     canDelete={canDeleteInventory}
+                                    isFavorite={favoriteProductIds.includes(product.id)}
+                                    onToggleFavorite={toggleFavorite}
                                     onNotice={showNotice}
                                 />
                             </div>
@@ -296,6 +302,13 @@ export default function StoragePage() {
                     </div>
                 ) : null}
             </section>
+
+            {showAddModal ? (
+                <AddInventoryModal
+                    onClose={() => setShowAddModal(false)}
+                    onCreated={handleInventoryCreated}
+                />
+            ) : null}
         </Layout>
     );
 }

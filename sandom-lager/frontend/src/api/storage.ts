@@ -7,6 +7,12 @@
 import { apiFetchJson } from "./client";
 import type { IngredientUnit, InventoryItem, ShoppingListHistoryRow, ShoppingListItem } from "../types";
 
+type CreateInventoryPayload = {
+    ingredient_id: number;
+    location_id: number;
+    quantity: number;
+};
+
 export async function fetchInventory(accessToken: string): Promise<InventoryItem[]> {
     const data = await apiFetchJson<InventoryItem[]>("/api/inventory", {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -122,6 +128,20 @@ export async function updateInventoryQuantity(
             "Content-Type": "application/json",
         },
         body: JSON.stringify({ quantity }),
+    });
+}
+
+export async function createInventory(
+    data: CreateInventoryPayload,
+    accessToken: string
+): Promise<void> {
+    await apiFetchJson("/api/inventory", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
     });
 }
 
