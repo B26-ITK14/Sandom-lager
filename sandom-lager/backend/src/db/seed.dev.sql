@@ -156,26 +156,54 @@ VALUES
 -- =====================================
 -- RECIPES
 -- =====================================
-INSERT INTO recipes (title, category, instructions, created_at)
-VALUES ('Pannekaker', 'Frokost', 'Bland mel, melk og egg. Stek i panne med smør.', NOW() - INTERVAL '20 days');
+INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+VALUES (
+    'Pannekaker',
+    'Frokost',
+    'Bland mel, melk og egg. Stek i panne med smør.',
+    'https://res.cloudinary.com/sandom/image/upload/v1/recipe-images/recipe-1-1776118658004?_a=BAMAOGfk0',
+    'recipe-images/recipe-1-1776118658004',
+    NOW() - INTERVAL '20 days'
+);
 
-INSERT INTO recipes (title, category, instructions, created_at)
-VALUES ('Kyllinggryte', 'Middag', 'Stek kylling, løk og hvitløk. Tilsett tomater og paprika.', NOW() - INTERVAL '15 days');
+INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+VALUES (
+    'Kyllinggryte',
+    'Middag',
+    'Stek kylling, løk og hvitløk. Tilsett tomater og paprika.',
+    'https://res.cloudinary.com/sandom/image/upload/v1/recipe-images/recipe-2-1776118669298?_a=BAMAOGfk0',
+    'recipe-images/recipe-2-1776118669298',
+    NOW() - INTERVAL '15 days'
+);
 
-INSERT INTO recipes (title, category, instructions, created_at)
-VALUES ('Ovnsbakt laks', 'Middag', 'Bak laks i ovn. Server med poteter og gulrøtter.', NOW() - INTERVAL '10 days');
+INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+VALUES ('Ovnsbakt laks', 'Middag', 'Bak laks i ovn. Server med poteter og gulrøtter.', NULL, NULL, NOW() - INTERVAL '10 days');
 
-INSERT INTO recipes (title, category, instructions, created_at)
-VALUES ('Pasta med ostesaus', 'Middag', 'Kok pasta. Lag saus med smør, melk og ost.', NOW() - INTERVAL '8 days');
+INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+VALUES ('Pasta med ostesaus', 'Middag', 'Kok pasta. Lag saus med smør, melk og ost.', NULL, NULL, NOW() - INTERVAL '8 days');
 
-INSERT INTO recipes (title, category, instructions, created_at)
-VALUES ('Overnight oats', 'Frokost', 'Bland havregryn, yoghurt og melk. La stå over natten.', NOW() - INTERVAL '5 days');
+INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+VALUES ('Overnight oats', 'Frokost', 'Bland havregryn, yoghurt og melk. La stå over natten.', NULL, NULL, NOW() - INTERVAL '5 days');
 
-INSERT INTO recipes (title, category, instructions, created_at)
-VALUES ('Kikertcurry', 'Middag', 'Stek løk og hvitløk, tilsett kikerter og kokosmelk.', NOW() - INTERVAL '3 days');
+INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+VALUES (
+    'Kikertcurry',
+    'Middag',
+    'Stek løk og hvitløk, tilsett kikerter og kokosmelk.',
+    'https://res.cloudinary.com/sandom/image/upload/v1/recipe-images/recipe-6-1776118740207?_a=BAMAOGfk0',
+    'recipe-images/recipe-6-1776118740207',
+    NOW() - INTERVAL '3 days'
+);
 
-INSERT INTO recipes (title, category, instructions, created_at)
-VALUES ('Asiatisk nudelsalat', 'Lunsj', 'Bland nudler, grønnsaker, soyasaus, peanøtter og sesam.', NOW() - INTERVAL '1 day');
+INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+VALUES (
+    'Asiatisk nudelsalat',
+    'Lunsj',
+    'Bland nudler, grønnsaker, soyasaus, peanøtter og sesam.',
+    'https://res.cloudinary.com/sandom/image/upload/v1/recipe-images/recipe-7-1776118704553?_a=BAMAOGfk0',
+    'recipe-images/recipe-7-1776118704553',
+    NOW() - INTERVAL '1 day'
+);
 
 -- =====================================
 -- RECIPE INGREDIENTS
