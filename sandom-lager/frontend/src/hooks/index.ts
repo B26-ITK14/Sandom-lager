@@ -7,6 +7,7 @@ export { useInventory } from "./storage/useInventory";
 
 // Auth hooks
 export { useAuthenticatedFetch } from "./useAuthenticatedFetch";
+export { useNotifications } from "./useNotifications";
 
 // UI hooks
 export { useEscapeKey } from "./ui/useEscapeKey";

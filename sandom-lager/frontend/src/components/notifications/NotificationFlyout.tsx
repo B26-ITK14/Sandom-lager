@@ -2,33 +2,42 @@
     * NotificationFlyout.tsx
     * A flyout notification panel that slides in from the right, displaying system notifications such as 
     * low stock alerts, expiring items, and shopping list updates.
-    * Author: Emil Berglund
 */
 
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getRouteByNickname } from '../../router/nav';
 import { NotificationHeader } from './NotificationHeader';
 import { NotificationList } from './NotificationList';
 import { NotificationFooter } from './NotificationFooter';
-import { mockNotifications } from './mockNotifications';
 import type { Notification } from './types';
 
 interface NotificationFlyoutProps {
     isOpen: boolean;
     onClose: () => void;
+    notifications: Notification[];
+    unreadCount: number;
+    isLoading: boolean;
+    errorMessage?: string | null;
+    onRefresh: () => void;
+    onNotificationClick: (notificationId: number) => Promise<void>;
+    onMarkAllAsRead: () => Promise<void>;
 }
 
-export function NotificationFlyout({ isOpen, onClose }: NotificationFlyoutProps) {
+export function NotificationFlyout({
+    isOpen,
+    onClose,
+    notifications,
+    unreadCount,
+    isLoading,
+    errorMessage,
+    onRefresh,
+    onNotificationClick,
+    onMarkAllAsRead,
+}: NotificationFlyoutProps) {
     const navigate = useNavigate();
-    const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
-    const unreadCount = notifications.filter(n => !n.isRead).length;
 
-    const handleNotificationClick = (notification: Notification) => {
-        // Mark as read
-        setNotifications(notifications.map(n =>
-            n.id === notification.id ? { ...n, isRead: true } : n
-        ));
+    const handleNotificationClick = async (notification: Notification) => {
+        await onNotificationClick(notification.id);
 
         // Navigate to related route if location exists
         if (notification.locationNickname) {
@@ -38,10 +47,6 @@ export function NotificationFlyout({ isOpen, onClose }: NotificationFlyoutProps)
                 onClose();
             }
         }
-    };
-
-    const handleMarkAllAsRead = () => {
-        setNotifications(notifications.map(n => ({ ...n, isRead: true })));
     };
 
     return (
@@ -66,16 +71,42 @@ export function NotificationFlyout({ isOpen, onClose }: NotificationFlyoutProps)
                 </div>
 
                 <div className={`flex-1 overflow-y-auto ${isOpen ? 'animate-slide-in-right animate-delay-100' : ''}`}>
-                    <NotificationList 
-                        notifications={notifications} 
-                        onNotificationClick={handleNotificationClick}
-                    />
+                    {isLoading && notifications.length === 0 && (
+                        <div className="p-6 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                            Laster varsler...
+                        </div>
+                    )}
+
+                    {!isLoading && errorMessage && notifications.length === 0 && (
+                        <div className="p-6">
+                            <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary)' }}>
+                                Kunne ikke hente varsler.
+                            </p>
+                            <button
+                                className="px-3 py-2 text-sm rounded-md cursor-pointer"
+                                style={{
+                                    color: 'var(--color-text-primary)',
+                                    border: '1px solid var(--color-border)',
+                                }}
+                                onClick={onRefresh}
+                            >
+                                Prøv igjen
+                            </button>
+                        </div>
+                    )}
+
+                    {(!isLoading || notifications.length > 0) && (!errorMessage || notifications.length > 0) && (
+                        <NotificationList
+                            notifications={notifications}
+                            onNotificationClick={handleNotificationClick}
+                        />
+                    )}
                 </div>
 
                 <div className={isOpen ? 'animate-slide-in-right animate-delay-200' : ''}>
                     <NotificationFooter 
                         hasNotifications={notifications.length > 0} 
-                        onMarkAllAsRead={handleMarkAllAsRead}
+                        onMarkAllAsRead={onMarkAllAsRead}
                     />
                 </div>
             </section>

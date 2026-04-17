@@ -20,7 +20,7 @@ export function NotificationList({ notifications, onNotificationClick }: Notific
             <div className="flex flex-col items-center justify-center h-full p-6">
                 <Package size={48} style={{ color: 'var(--color-text-secondary)' }} className="mb-4" />
                 <p className="text-center" style={{ color: 'var(--color-text-secondary)' }}>
-                    Ingen varsler å vise
+                    Du har ingen varsler
                 </p>
             </div>
         );
