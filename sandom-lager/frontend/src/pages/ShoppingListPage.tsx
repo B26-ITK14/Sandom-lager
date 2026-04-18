@@ -25,6 +25,7 @@ export default function ShoppingListPage() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [generateError, setGenerateError] = useState<string | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [compact, setCompact] = useState(false);
 
     const loadShoppingList = async () => {
         try {
@@ -176,6 +177,18 @@ export default function ShoppingListPage() {
                         >
                             {isGenerating ? "Genererer..." : `Generer handleliste (${selectedIds.size})`}
                         </button>
+                        <button
+                            onClick={() => setCompact(prev => !prev)}
+                            className="py-2 px-4 rounded-md transition-colors"
+                            style={{
+                                background: "var(--color-secondary-surface)",
+                                border: "1px solid var(--color-border)",
+                                color: "var(--color-text-primary)",
+                            }}
+                            title={compact ? "Bytt til detaljert visning" : "Bytt til kompakt visning"}
+                        >
+                            {compact ? "Detaljert" : "Kompakt"}
+                        </button>
                         <ShoppingListPrintExport items={items} />
                         <DeleteShoppingListButton
                             onDeleted={async () => {
@@ -196,11 +209,12 @@ export default function ShoppingListPage() {
                 ) : items.length === 0 ? (
                     <EmptyShoppingList />
                 ) : (
-                    <ul className="flex flex-col gap-3">
+                    <ul className={`flex flex-col ${compact ? "gap-0" : "gap-3"}`}>
                         {items.map(item => (
                             <ShoppingListItemRow
                                 key={item.id}
                                 item={item}
+                                compact={compact}
                                 onIncrease={handleIncrease}
                                 onDecrease={handleDecrease}
                                 onDelete={handleDelete}

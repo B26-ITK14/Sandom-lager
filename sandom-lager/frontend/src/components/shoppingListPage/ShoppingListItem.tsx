@@ -4,6 +4,7 @@ import type { ShoppingListItem } from "../../types";
 
 interface Props {
     item: ShoppingListItem;
+    compact?: boolean;
     onIncrease: (id: number) => Promise<void>;
     onDecrease: (id: number) => Promise<void>;
     onDelete: (id: number) => Promise<void>;
@@ -11,7 +12,7 @@ interface Props {
     onSetQuantity: (id: number, nextQuantity: number) => Promise<void>;
 }
 
-export default function ShoppingListItem({ item, onIncrease, onDecrease, onDelete, onUpdateUnit, onSetQuantity }: Props) {
+export default function ShoppingListItem({ item, compact, onIncrease, onDecrease, onDelete, onUpdateUnit, onSetQuantity }: Props) {
     const [isLoading, setIsLoading] = useState(false);
     const [isUnitEditing, setIsUnitEditing] = useState(false);
     const [isQuantityEditing, setIsQuantityEditing] = useState(false);
@@ -84,6 +85,25 @@ export default function ShoppingListItem({ item, onIncrease, onDecrease, onDelet
             setIsQuantityEditing(false);
         }
     };
+
+    if (compact) {
+        return (
+            <li
+                className="flex items-center justify-between px-3 py-2"
+                style={{
+                    background: "var(--color-surface)",
+                    borderBottom: "1px solid var(--color-border)",
+                    opacity: isLoading ? 0.5 : 1,
+                }}>
+                <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                    {item.ingredient}
+                </span>
+                <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                    {formatQuantity(item.needed_quantity)} {item.unit}
+                </span>
+            </li>
+        );
+    }
 
     return (
         <li
