@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS recipes (
     instructions TEXT,
     image_url TEXT,
     image_public_id TEXT,
-    servings INT NOT NULL DEFAULT 4,
+    servings INT NOT NULL DEFAULT 8,
     created_at TIMESTAMP DEFAULT NOW()
 );
 

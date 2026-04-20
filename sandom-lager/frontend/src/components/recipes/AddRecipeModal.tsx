@@ -37,7 +37,7 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
     const [title, setTitle] = useState(initialRecipe?.title ?? "");
     const [category, setCategory] = useState<string>(initialRecipe?.category ?? "");
     const [instructions, setInstructions] = useState(initialRecipe?.instructions ?? "");
-    const [servings, setServings] = useState(String(initialRecipe?.servings ?? 4));
+    const [servings, setServings] = useState(String(initialRecipe?.servings ?? 8));
     const [recipeImageUrl, setRecipeImageUrl] = useState<string | null>(initialRecipe?.image_url ?? null);
     const [recipeImagePublicId, setRecipeImagePublicId] = useState<string | null>(initialRecipe?.image_public_id ?? null);
     const [recipeImageFile, setRecipeImageFile] = useState<File | null>(null);
@@ -170,7 +170,7 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
                 title: title.trim(),
                 category: category.trim(),
                 instructions: instructions.trim() || undefined,
-                servings: parseInt(servings, 10) || 4,
+                servings: parseInt(servings, 10) || 8,
                 image_url: uploadedImageUrl,
                 image_public_id: uploadedImagePublicId,
             };

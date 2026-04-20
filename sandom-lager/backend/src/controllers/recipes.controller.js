@@ -53,7 +53,7 @@ async function createRecipe(req, res) {
         (title, category, instructions, image_url, image_public_id, servings)
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *`,
-        [title, category, instructions, image_url ?? null, image_public_id ?? null, servings ?? 4]
+        [title, category, instructions, image_url ?? null, image_public_id ?? null, servings ?? 8]
     );
 
     const recipe = result.rows[0];
@@ -81,7 +81,7 @@ async function updateRecipe(req, res) {
          SET title = $1, category = $2, instructions = $3, image_url = $4, image_public_id = $5, servings = $6
          WHERE id = $7
          RETURNING *`,
-        [title, category, instructions, image_url ?? null, image_public_id ?? null, servings ?? 4, id]
+        [title, category, instructions, image_url ?? null, image_public_id ?? null, servings ?? 8, id]
     );
 
     if (updateResult.rows.length === 0) {
