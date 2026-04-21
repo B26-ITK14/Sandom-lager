@@ -9,7 +9,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import RecipeCard from "../components/recipes/RecipeCard";
 import RecipeFilterBar from "../components/recipes/RecipeFilterBar";
 import AddRecipeModal from "../components/recipes/AddRecipeModal";
-import RecipeDetailModal from "../components/recipes/RecipeDetailModal";
+import RecipeDetailModal from "../components/recipes/recipeDetailModal/RecipeDetailModal";
 import { useRecipes, useUserRole } from "../hooks";
 import { useSelectedRecipes } from "../context/SelectedRecipesContext";
 import { deleteRecipe } from "../api/recipes";

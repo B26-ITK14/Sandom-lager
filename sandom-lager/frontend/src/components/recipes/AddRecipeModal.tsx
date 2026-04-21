@@ -12,6 +12,7 @@ import { createIngredient, createRecipe, updateRecipe, addRecipeIngredient, dele
 import { useClickOutside, useEscapeKey } from "../../hooks";
 import { INGREDIENT_UNITS, RECIPE_CATEGORIES } from "../../types";
 import type { Allergen, Ingredient, IngredientUnit, Recipe, RecipeIngredient } from "../../types";
+import AllergenPicker from "./addRecipeModal/AllergenPicker";
 
 interface IngredientRow {
     // If existingId is set, we reuse an existing ingredient; otherwise we create a new one
@@ -405,35 +406,11 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
                     </div>
 
                     {/* Allergens */}
-                    <div className="flex flex-col gap-2">
-                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
-                            Allergener
-                        </span>
-                        {allAllergens.length > 0 && (
-                            <div className="grid grid-cols-3 gap-1.5">
-                                {allAllergens.map((allergen) => (
-                                    <label key={allergen.id} className="flex items-center gap-2 cursor-pointer select-none">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedAllergenIds.includes(allergen.id)}
-                                            onChange={(e) => {
-                                                setSelectedAllergenIds(prev =>
-                                                    e.target.checked
-                                                        ? [...prev, allergen.id]
-                                                        : prev.filter(id => id !== allergen.id)
-                                                );
-                                            }}
-                                            className="w-4 h-4 rounded cursor-pointer"
-                                            style={{ accentColor: "var(--color-primary)" }}
-                                        />
-                                        <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>
-                                            {allergen.name}
-                                        </span>
-                                    </label>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                    <AllergenPicker
+                        allAllergens={allAllergens}
+                        selectedAllergenIds={selectedAllergenIds}
+                        onChange={setSelectedAllergenIds}
+                    />
 
                     {/* Ingredients */}
                     <div className="flex flex-col gap-2">

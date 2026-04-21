@@ -6,9 +6,9 @@
 */
 
 import { useRef, useState } from "react";
-import { useClickOutside, useEscapeKey, useRecipeIngredients } from "../../hooks";
-import RecipeDetailContent from "./recipeDetailModal/RecipeDetailContent";
-import type { Recipe, RecipeIngredient } from "../../types";
+import { useClickOutside, useEscapeKey, useRecipeIngredients } from "../../../hooks";
+import RecipeDetailContent from "./RecipeDetailContent";
+import type { Recipe, RecipeIngredient } from "../../../types";
 
 interface RecipeDetailModalProps {
     recipe: Recipe;
