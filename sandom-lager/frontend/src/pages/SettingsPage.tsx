@@ -32,7 +32,6 @@ export default function SettingsPage() {
             {/* User profile header */}
             <UserHeader />
 
-
             {role === 'admin' && (
                 <SettingsNavItem title="Admin Panel" description="Administrer søknader" url="/admin" figureType="security" />
             )}

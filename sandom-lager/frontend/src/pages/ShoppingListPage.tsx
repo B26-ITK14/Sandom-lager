@@ -1,3 +1,8 @@
+/*
+    * ShoppingListPage.tsx
+    * Main page for managing the shopping list, including generating from recipes, editing items, and viewing history.
+*/
+
 import Layout from "../components/Layout";
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";

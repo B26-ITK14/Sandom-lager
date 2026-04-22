@@ -1,3 +1,9 @@
+/*
+    * UserContext.tsx
+    * Provides global user information and state, such as name, username, role, profile picture, and location.
+    * Fetches user data from the backend on app load and handles authentication errors globally.
+*/
+
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
