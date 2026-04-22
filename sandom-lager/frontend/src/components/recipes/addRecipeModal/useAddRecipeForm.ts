@@ -3,6 +3,7 @@
     * Custom hook that manages all state and logic for the add/edit recipe form.
     * Handles recipe fields, image, allergens, ingredient rows and form submission.
     * Used by AddRecipeModal.tsx
+    * Author: Sebastian Thomsen
 */
 
 import { useEffect, useState } from "react";
