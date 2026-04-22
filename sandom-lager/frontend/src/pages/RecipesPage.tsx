@@ -8,7 +8,7 @@ import Layout from "../components/Layout";
 import LoadingSpinner from "../components/LoadingSpinner";
 import RecipeCard from "../components/recipes/RecipeCard";
 import RecipeFilterBar from "../components/recipes/RecipeFilterBar";
-import AddRecipeModal from "../components/recipes/AddRecipeModal";
+import AddRecipeModal from "../components/recipes/addRecipeModal/AddRecipeModal";
 import RecipeDetailModal from "../components/recipes/recipeDetailModal/RecipeDetailModal";
 import { useRecipes, useUserRole } from "../hooks";
 import { useSelectedRecipes } from "../context/SelectedRecipesContext";

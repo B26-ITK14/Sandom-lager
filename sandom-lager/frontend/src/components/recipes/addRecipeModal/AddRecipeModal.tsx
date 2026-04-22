@@ -6,13 +6,13 @@
 */
 
 import { useRef } from "react";
-import { useClickOutside, useEscapeKey } from "../../hooks";
-import type { Recipe, RecipeIngredient } from "../../types";
-import AllergenPicker from "./addRecipeModal/AllergenPicker";
-import RecipeImagePicker from "./addRecipeModal/RecipeImagePicker";
-import RecipeFormFields from "./addRecipeModal/RecipeFormFields";
-import IngredientRows from "./addRecipeModal/IngredientRows";
-import { useAddRecipeForm } from "./addRecipeModal/useAddRecipeForm";
+import { useClickOutside, useEscapeKey } from "../../../hooks";
+import type { Recipe, RecipeIngredient } from "../../../types";
+import AllergenPicker from "./AllergenPicker";
+import RecipeImagePicker from "./RecipeImagePicker";
+import RecipeFormFields from "./RecipeFormFields";
+import IngredientRows from "./IngredientRows";
+import { useAddRecipeForm } from "./useAddRecipeForm";
 
 
 interface AddRecipeModalProps {
