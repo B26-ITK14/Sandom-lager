@@ -13,6 +13,7 @@ import { useClickOutside, useEscapeKey } from "../../hooks";
 import { INGREDIENT_UNITS, RECIPE_CATEGORIES } from "../../types";
 import type { Allergen, Ingredient, IngredientUnit, Recipe, RecipeIngredient } from "../../types";
 import AllergenPicker from "./addRecipeModal/AllergenPicker";
+import RecipeImagePicker from "./addRecipeModal/RecipeImagePicker";
 
 interface IngredientRow {
     // If existingId is set, we reuse an existing ingredient; otherwise we create a new one
@@ -68,7 +69,6 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
     const [error, setError] = useState<string | null>(null);
 
     const titleRef = useRef<HTMLInputElement>(null);
-    const imageInputRef = useRef<HTMLInputElement>(null);
 
     // Focus title input on mount
     useEffect(() => {
@@ -330,80 +330,22 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
                     </div>
 
                     {/* Recipe image */}
-                    <div className="flex flex-col gap-2">
-                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
-                            Bilde
-                        </span>
-
-                        {(recipeImagePreview || recipeImageUrl) && (
-                            <img
-                                src={recipeImagePreview || recipeImageUrl || undefined}
-                                alt="Forhåndsvisning av oppskriftsbilde"
-                                className="w-full h-36 object-cover rounded-lg"
-                                style={{ border: "1px solid var(--color-border)" }}
-                            />
-                        )}
-
-                        <div className="flex flex-wrap items-center gap-2">
-                            <button
-                                type="button"
-                                onClick={() => imageInputRef.current?.click()}
-                                className="rounded-lg px-3 py-2 text-sm font-medium cursor-pointer"
-                                style={{
-                                    backgroundColor: "var(--color-secondary-surface)",
-                                    color: "var(--color-text-primary)",
-                                    border: "1px solid var(--color-border)",
-                                }}
-                            >
-                                {recipeImagePreview || recipeImageUrl ? "Bytt bilde" : "Legg til bilde"}
-                            </button>
-
-                            {(recipeImageUrl || recipeImagePreview || recipeImageFile) && (
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setRecipeImageFile(null);
-                                        setRecipeImagePreview(null);
-                                        setRecipeImageUrl(null);
-                                        setRecipeImagePublicId(null);
-                                        setRemoveExistingImage(true);
-                                        if (imageInputRef.current) {
-                                            imageInputRef.current.value = "";
-                                        }
-                                    }}
-                                    className="rounded-lg px-3 py-2 text-sm font-medium cursor-pointer"
-                                    style={{
-                                        backgroundColor: "rgba(239,68,68,0.1)",
-                                        color: "#ef4444",
-                                        border: "1px solid rgba(239,68,68,0.25)",
-                                    }}
-                                >
-                                    Fjern bilde
-                                </button>
-                            )}
-
-                            {recipeImageFile && (
-                                <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                                    {recipeImageFile.name}
-                                </span>
-                            )}
-                        </div>
-
-                        <input
-                            id="recipe-image"
-                            ref={imageInputRef}
-                            type="file"
-                            accept="image/png,image/jpeg,image/webp,image/gif"
-                            onChange={(e) => {
-                                const nextFile = e.target.files?.[0] ?? null;
-                                setRecipeImageFile(nextFile);
-                                if (nextFile) {
-                                    setRemoveExistingImage(false);
-                                }
-                            }}
-                            className="hidden"
-                        />
-                    </div>
+                    <RecipeImagePicker
+                        imageUrl={recipeImageUrl}
+                        imagePreview={recipeImagePreview}
+                        imageFile={recipeImageFile}
+                        onFileChange={(file) => {
+                            setRecipeImageFile(file);
+                            if (file) setRemoveExistingImage(false);
+                        }}
+                        onRemove={() => {
+                            setRecipeImageFile(null);
+                            setRecipeImagePreview(null);
+                            setRecipeImageUrl(null);
+                            setRecipeImagePublicId(null);
+                            setRemoveExistingImage(true);
+                        }}
+                    />
 
                     {/* Allergens */}
                     <AllergenPicker
