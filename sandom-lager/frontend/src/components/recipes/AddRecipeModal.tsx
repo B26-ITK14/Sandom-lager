@@ -10,10 +10,11 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { AUTH0_AUDIENCE } from "../../config/auth";
 import { createIngredient, createRecipe, updateRecipe, addRecipeIngredient, deleteRecipeIngredient, fetchIngredients, fetchAllergens, setRecipeAllergens, uploadRecipeImage } from "../../api/recipes";
 import { useClickOutside, useEscapeKey } from "../../hooks";
-import { INGREDIENT_UNITS, RECIPE_CATEGORIES } from "../../types";
+import { INGREDIENT_UNITS } from "../../types";
 import type { Allergen, Ingredient, IngredientUnit, Recipe, RecipeIngredient } from "../../types";
 import AllergenPicker from "./addRecipeModal/AllergenPicker";
 import RecipeImagePicker from "./addRecipeModal/RecipeImagePicker";
+import RecipeFormFields from "./addRecipeModal/RecipeFormFields";
 
 interface IngredientRow {
     // If existingId is set, we reuse an existing ingredient; otherwise we create a new one
@@ -67,13 +68,6 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
 
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
-    const titleRef = useRef<HTMLInputElement>(null);
-
-    // Focus title input on mount
-    useEffect(() => {
-        titleRef.current?.focus();
-    }, []);
 
     useEscapeKey(onClose);
 
@@ -260,74 +254,16 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
 
                 {/* Scrollable form body */}
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4 overflow-y-auto px-5 py-4">
-                    {/* Title */}
-                    <div className="flex flex-col gap-1">
-                        <label htmlFor="recipe-title" className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
-                            Tittel <span aria-hidden="true">*</span>
-                        </label>
-                        <input
-                            id="recipe-title"
-                            ref={titleRef}
-                            type="text"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            required
-                            placeholder="F.eks. Pasta Carbonara"
-                            className="rounded-lg px-3 py-2 text-sm outline-none"
-                            style={inputStyle}
-                        />
-                    </div>
-
-                    {/* Category */}
-                    <div className="flex flex-col gap-1">
-                        <label htmlFor="recipe-category" className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
-                            Kategori <span aria-hidden="true">*</span>
-                        </label>
-                        <select
-                            id="recipe-category"
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className="rounded-lg px-3 py-2 text-sm outline-none cursor-pointer"
-                            style={inputStyle}
-                        >
-                            <option value="" disabled>Velg kategori</option>
-                            {RECIPE_CATEGORIES.map((cat) => (
-                                <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* Servings */}
-                    <div className="flex flex-col gap-1">
-                        <label htmlFor="recipe-servings" className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
-                            Antall porsjoner
-                        </label>
-                        <input
-                            id="recipe-servings"
-                            type="number"
-                            min={1}
-                            value={servings}
-                            onChange={(e) => setServings(e.target.value)}
-                            className="rounded-lg px-3 py-2 text-sm outline-none w-28"
-                            style={inputStyle}
-                        />
-                    </div>
-
-                    {/* Instructions */}
-                    <div className="flex flex-col gap-1">
-                        <label htmlFor="recipe-instructions" className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
-                            Fremgangsmåte
-                        </label>
-                        <textarea
-                            id="recipe-instructions"
-                            value={instructions}
-                            onChange={(e) => setInstructions(e.target.value)}
-                            rows={4}
-                            placeholder="Beskriv fremgangsmåten steg for steg..."
-                            className="rounded-lg px-3 py-2 text-sm outline-none resize-y"
-                            style={inputStyle}
-                        />
-                    </div>
+                    <RecipeFormFields
+                        title={title}
+                        onTitleChange={setTitle}
+                        category={category}
+                        onCategoryChange={setCategory}
+                        servings={servings}
+                        onServingsChange={setServings}
+                        instructions={instructions}
+                        onInstructionsChange={setInstructions}
+                    />
 
                     {/* Recipe image */}
                     <RecipeImagePicker
