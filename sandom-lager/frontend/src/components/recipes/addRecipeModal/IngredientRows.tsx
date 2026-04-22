@@ -4,6 +4,7 @@
     * Each row has a name (with datalist autocomplete), a unit selector and a quantity input.
     * Includes an "add row" button and a remove button per row.
     * Used by AddRecipeModal.tsx
+    * Author: Sebastian Thomsen
 */
 
 import { INGREDIENT_UNITS } from "../../../types";

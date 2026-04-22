@@ -3,6 +3,7 @@
     * Modal for creating a new recipe with ingredients.
     * Only rendered for admin/manager users.
     * Flow: fill in recipe details → add ingredients → submit creates recipe + adds all ingredients.
+    * Author: Sebastian Thomsen
 */
 
 import { useRef } from "react";

@@ -3,6 +3,7 @@
     * Displays a single recipe in a card format for the recipes grid.
     * - Toggle button (top-left) selects/deselects the recipe for the shopping list.
     * - Clicking the card body opens the recipe detail modal.
+    * Author: Sebastian Thomsen
 */
 
 import type { Recipe } from "../../types";

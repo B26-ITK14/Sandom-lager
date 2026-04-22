@@ -3,6 +3,7 @@
     * Basic text fields for the add/edit recipe form:
     * title, category, servings and instructions.
     * Used by AddRecipeModal.tsx
+    * Author: Sebastian Thomsen
 */
 
 import { useRef, useEffect } from "react";

@@ -3,6 +3,7 @@
     * Scrollable body of the recipe detail modal.
     * Shows recipe image, ingredient list, allergens and instructions.
     * Used by RecipeDetailModal.tsx
+    * Author: Sebastian Thomsen
 */
 
 import LoadingSpinner from "../../LoadingSpinner";

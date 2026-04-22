@@ -2,6 +2,7 @@
     * AllergenPicker.tsx
     * Renders a grid of allergen checkboxes for the add/edit recipe form.
     * Used by AddRecipeModal.tsx
+    * Author: Sebastian Thomsen
 */
 
 import type { Allergen } from "../../../types";

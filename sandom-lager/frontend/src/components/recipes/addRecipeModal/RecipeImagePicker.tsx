@@ -4,6 +4,7 @@
     * Shows a preview of the selected image, a button to pick a new file,
     * and a button to remove the current image.
     * Used by AddRecipeModal.tsx
+    * Author: Sebastian Thomsen
 */
 
 import { useRef } from "react";

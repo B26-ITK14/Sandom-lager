@@ -3,6 +3,7 @@
     * Modal that shows full recipe details: title, category, servings,
     * ingredient list, and instructions/description.
     * Opened when user clicks the recipe card image area.
+    * Author: Sebastian Thomsen
 */
 
 import { useRef, useState } from "react";
