@@ -14,8 +14,16 @@ import { ROUTES } from "../../router/routes";
 import { fetchLocations, requestLocationAccess } from "../../api/userLocations";
 import { LogoutLoadingOverlay, useAppLogout } from "../../auth";
 import { useUser } from "../../context/UserContext";
+import { usePageMeta } from "../../hooks";
 
 export default function RequestAccessPage() {
+    usePageMeta({
+        title: "Request Access - Sandom Lager",
+        description: "Request access to a location to start managing your inventory",
+        keywords: "request access, location, onboarding, approval",
+        ogTitle: "Request Access - Sandom Lager",
+        ogDescription: "Request location access",
+    });
     const navigate = useNavigate();
     const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0();
     const { logoutUser, isLoggingOut } = useAppLogout();

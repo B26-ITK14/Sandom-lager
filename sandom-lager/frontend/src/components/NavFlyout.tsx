@@ -55,6 +55,7 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
 
             {/* Flyout */}
             <section
+                id="app-nav-flyout"
                 ref={flyoutRef}
                 className={`fixed top-0 left-0 h-full w-full max-w-136 z-50 flex flex-col transition-transform duration-500 ease-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
                     }`}
@@ -85,9 +86,11 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
                         </div>
                     </div>
                     <button
+                        type="button"
                         onClick={onClose}
                         className="p-8 hover:opacity-70 cursor-pointer"
                         style={{ color: 'var(--color-text-primary)' }}
+                        aria-label="Lukk meny"
                     >
                         <X size={28} />
                     </button>

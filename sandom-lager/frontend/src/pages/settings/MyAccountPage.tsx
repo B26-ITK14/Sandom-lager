@@ -10,12 +10,20 @@ import SettingsLayout from "../../components/settings/SettingsLayout";
 import PersonalInfoCard from '../../components/settings/accountSettings/PersonalInfoCard';
 import AccountDetailsCard from '../../components/settings/accountSettings/AccountDetailsCard';
 import SecurityPrivacyCard from '../../components/settings/accountSettings/SecurityPrivacyCard';
+import { usePageMeta } from '../../hooks';
 
 import { updateName, updateUsername } from '../../api/user';
 import { useUser } from '../../context/UserContext';
 import { useUsername } from '../../hooks';
 
 export default function MyAccountPage() {
+    usePageMeta({
+        title: "My Account - Sandom Lager",
+        description: "Manage your personal information, security settings, and account preferences",
+        keywords: "account, profile, personal info, security",
+        ogTitle: "My Account - Sandom Lager",
+        ogDescription: "Manage your account settings",
+    });
     const username = useUsername();
     const { user, getAccessTokenSilently } = useAuth0();
     const {

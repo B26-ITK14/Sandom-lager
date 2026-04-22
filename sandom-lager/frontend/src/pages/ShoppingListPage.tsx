@@ -1,6 +1,7 @@
 import Layout from "../components/Layout";
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { usePageMeta } from "../hooks";
 
 import { fetchShoppingList, fetchShoppingListHistory, generateShoppingListFromRecipes, updateShoppingListItem, removeFromShoppingList } from "../api";
 import type { IngredientUnit, ShoppingListHistoryRow, ShoppingListItem } from "../types";
@@ -15,6 +16,13 @@ import { EmptyShoppingList }  from "../components/shoppingListPage/EmptyShopping
 import AddShoppingItemModal from "../components/shoppingListPage/AddShoppingItemModal";
 
 export default function ShoppingListPage() {
+    usePageMeta({
+        title: "Shopping List - Sandom Lager",
+        description: "Create and manage shopping lists from your recipes with history tracking",
+        keywords: "shopping list, grocery list, meal planning, recipes",
+        ogTitle: "Shopping List - Sandom Lager",
+        ogDescription: "Manage your shopping lists",
+    });
     const { getAccessTokenSilently } = useAuth0();
     const { selectedIds, clearSelected } = useSelectedRecipes();
 

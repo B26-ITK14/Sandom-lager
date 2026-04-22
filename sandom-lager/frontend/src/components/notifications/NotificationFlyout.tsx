@@ -56,6 +56,7 @@ export function NotificationFlyout({ isOpen, onClose }: NotificationFlyoutProps)
 
             {/* Flyout */}
             <section
+                id="app-notification-flyout"
                 className={`fixed top-0 right-0 h-full w-full max-w-md transition-transform duration-200 ease-out z-50 flex flex-col ${
                     isOpen ? 'translate-x-0' : 'translate-x-full'
                 }`}

@@ -12,6 +12,9 @@ export { useAuthenticatedFetch } from "./useAuthenticatedFetch";
 export { useEscapeKey } from "./ui/useEscapeKey";
 export { useClickOutside } from "./ui/useClickOutside";
 
+// Meta/SEO hooks
+export { usePageMeta } from "./usePageMeta";
+
 // Version hooks
 export * from "./version/appVersion";
 export * from "./version/appStability";

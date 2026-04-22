@@ -10,9 +10,16 @@ import UserHeader from "../components/settings/SettingsUserHeader";
 import SettingsNavItem from "../components/settings/SettingsNavItem";
 import { ROUTES } from "../router/routes";
 import { LogoutLoadingOverlay, useAppLogout } from "../auth";
-import { useUserRole } from "../hooks";
+import { useUserRole, usePageMeta } from "../hooks";
 
 export default function SettingsPage() {
+    usePageMeta({
+        title: "Settings - Sandom Lager",
+        description: "Manage your account settings, preferences, and personal information",
+        keywords: "settings, account, preferences, security, profile",
+        ogTitle: "Settings - Sandom Lager",
+        ogDescription: "Manage your account settings",
+    });
     const { logoutUser, isLoggingOut } = useAppLogout();
     const { role } = useUserRole();   
 

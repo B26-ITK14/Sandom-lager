@@ -10,6 +10,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import SettingsLayout from "../../components/settings/SettingsLayout";
 import ApplicationsHistorySection from "../../components/settings/myApplications/ApplicationsHistorySection";
 import NewApplicationSection from "../../components/settings/myApplications/NewApplicationSection";
+import { usePageMeta } from "../../hooks";
 import type {
     AccessStatus,
     LocationOption,
@@ -23,6 +24,13 @@ import {
 import { ACCESS_STATUS } from "../../constants/accessStatus";
 
 export default function MyApplicationsPage() {
+    usePageMeta({
+        title: "My Applications - Sandom Lager",
+        description: "View and manage your location access applications and approval status",
+        keywords: "applications, locations, access, status",
+        ogTitle: "My Applications - Sandom Lager",
+        ogDescription: "Manage your location applications",
+    });
     const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0();
     const [locations, setLocations] = useState<LocationOption[]>([]);
     const [applications, setApplications] = useState<MyApplication[]>([]);

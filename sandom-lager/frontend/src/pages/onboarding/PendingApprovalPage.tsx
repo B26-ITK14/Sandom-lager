@@ -12,6 +12,7 @@ import { User, MapPin, Clock } from "lucide-react";
 import OnBoardingTitle from "../../components/onBoarding/OnBoardingTitle";
 import { ROUTES } from "../../router/routes";
 import { fetchMyLocationAccess } from "../../api/userLocations";
+import { usePageMeta } from "../../hooks";
 import {
     ACCESS_STATUS,
     ACCESS_STATUS_LABELS,
@@ -20,6 +21,13 @@ import {
 } from "../../constants/accessStatus";
 
 export default function PendingApprovalPage() {
+    usePageMeta({
+        title: "Pending Approval - Sandom Lager",
+        description: "Your access request is pending admin approval",
+        keywords: "pending approval, waiting, access request",
+        ogTitle: "Pending Approval - Sandom Lager",
+        ogDescription: "Waiting for access approval",
+    });
     const navigate = useNavigate();
     const { getAccessTokenSilently, user } = useAuth0();
     const [locationName, setLocationName] = useState<string>("Laster...");
