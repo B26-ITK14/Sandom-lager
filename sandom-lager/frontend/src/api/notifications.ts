@@ -43,6 +43,7 @@ export async function fetchNotifications(accessToken: string, unreadOnly?: boole
     const data = await apiFetchJson<NotificationDto[]>(path, {
         headers: { Authorization: `Bearer ${accessToken}` },
         method: "GET",
+        cache: "no-store",
     });
 
     return data.map((notification) => ({

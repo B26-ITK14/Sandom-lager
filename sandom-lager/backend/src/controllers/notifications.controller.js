@@ -6,6 +6,8 @@ async function getNotifications(req, res) {
     const userId = req.user.id;
     const unreadOnly = String(req.query.unreadOnly || "").toLowerCase() === "true";
 
+    res.set("Cache-Control", "no-store");
+
     const params = [userId];
     let whereClause = "WHERE user_id = $1";
 
