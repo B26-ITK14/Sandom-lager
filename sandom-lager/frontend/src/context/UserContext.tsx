@@ -1,3 +1,9 @@
+/*
+    * UserContext.tsx
+    * Provides global user information and state, such as name, username, role, profile picture, and location.
+    * Fetches user data from the backend on app load and handles authentication errors globally.
+*/
+
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -40,26 +46,20 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const [error, setError] = useState<string | null>(null);
 
     function load() {
-        console.log('[UserContext] load() called — authLoading:', authLoading, 'isAuthenticated:', isAuthenticated);
-
         if (authLoading || !isAuthenticated) {
-            console.log('[UserContext] Skipping fetch (not ready or not authenticated)');
             setLoading(false);
             return;
         }
 
         let cancelled = false;
         setLoading(true);
-        console.log('[UserContext] Fetching /api/me ...');
 
         getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } })
             .then((token) => {
-                console.log('[UserContext] Got access token, calling fetchMe');
                 return fetchMe(token);
             })
             .then((data) => {
                 if (!cancelled) {
-                    console.log('[UserContext] fetchMe success →', { name: data.name, role: data.role, blocked: data.blocked, profilePicture: !!data.profilePicture });
                     setName(data.name);
                     setUsername(data.username);
                     setRole(data.role);
@@ -70,8 +70,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 }
             })
             .catch((err) => {
-                console.error('[UserContext] fetchMe error:', err);
-                
                 // Handle 401 (Unauthorized) errors
                 if (err instanceof ApiError && err.status === 401) {
                     handleAuthError(401, err.detail || err.message);

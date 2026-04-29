@@ -29,11 +29,11 @@ export default function AccessibilityCard() {
     return (
         <SectionCard title="Tilgjengelighet" icon={<Accessibility size={22} />}>
             <SettingRow label="Redusert bevegelse" description="Skru av animasjoner og overganger">
-                <Toggle checked={reducedMotion} onChange={handleReducedMotion} />
+                <Toggle ariaLabel="Slå av eller på redusert bevegelse" checked={reducedMotion} onChange={handleReducedMotion} />
             </SettingRow>
             <Divider />
             <SettingRow label="Høy kontrast" description="Øk kontrasten for bedre lesbarhet">
-                <Toggle checked={highContrast} onChange={handleHighContrast} />
+                <Toggle ariaLabel="Slå av eller på høy kontrast" checked={highContrast} onChange={handleHighContrast} />
             </SettingRow>
         </SectionCard>
     );

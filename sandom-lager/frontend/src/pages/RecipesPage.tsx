@@ -10,13 +10,20 @@ import RecipeCard from "../components/recipes/RecipeCard";
 import RecipeFilterBar from "../components/recipes/RecipeFilterBar";
 import AddRecipeModal from "../components/recipes/AddRecipeModal";
 import RecipeDetailModal from "../components/recipes/RecipeDetailModal";
-import { useRecipes, useUserRole } from "../hooks";
+import { useRecipes, useUserRole, usePageMeta } from "../hooks";
 import { useSelectedRecipes } from "../context/SelectedRecipesContext";
 import { deleteRecipe } from "../api/recipes";
 import { AUTH0_AUDIENCE } from "../config/auth";
 import type { Recipe, RecipeIngredient } from "../types";
 
 export default function RecipesPage() {
+    usePageMeta({
+        title: "Recipes - Sandom Lager",
+        description: "Browse, create, and manage your recipes with ingredient tracking and categories",
+        keywords: "recipes, cooking, ingredients, recipe management, meal planning",
+        ogTitle: "Recipes - Sandom Lager",
+        ogDescription: "Manage and organize your recipes",
+    });
     const { getAccessTokenSilently } = useAuth0();
     const { recipes, loading, error, refresh } = useRecipes();
     const { selectedIds, toggleSelected } = useSelectedRecipes();

@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useUserRole } from "../hooks/user/useUserRole";
+import { useUserRole, usePageMeta } from "../hooks";
 import { CheckCircle, XCircle, Clock } from "lucide-react";
 import PendingCard, { type AccessRequest } from "../components/onBoarding/PendingCard";
 import type { UserLocationResponse } from "../types";
@@ -29,6 +29,13 @@ const statCards = [
 ];
 
 export default function AdminPage() {
+    usePageMeta({
+        title: "Admin Panel - Sandom Lager",
+        description: "Manage user access requests and approve location access for team members",
+        keywords: "admin, access control, user management, approvals",
+        ogTitle: "Admin Panel - Sandom Lager",
+        ogDescription: "Manage user access and permissions",
+    });
     const { role, loading: roleLoading } = useUserRole();
     const { getAccessTokenSilently } = useAuth0();
     const [requests, setRequests] = useState<AccessRequest[]>([]);

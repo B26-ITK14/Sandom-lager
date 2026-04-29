@@ -1,6 +1,12 @@
+/*
+    * ShoppingListPage.tsx
+    * Main page for managing the shopping list, including generating from recipes, editing items, and viewing history.
+*/
+
 import Layout from "../components/Layout";
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { usePageMeta } from "../hooks";
 
 import { fetchShoppingList, fetchShoppingListHistory, generateShoppingListFromRecipes, updateShoppingListItem, removeFromShoppingList } from "../api";
 import type { IngredientUnit, ShoppingListHistoryRow, ShoppingListItem } from "../types";
@@ -15,6 +21,13 @@ import { EmptyShoppingList }  from "../components/shoppingListPage/EmptyShopping
 import AddShoppingItemModal from "../components/shoppingListPage/AddShoppingItemModal";
 
 export default function ShoppingListPage() {
+    usePageMeta({
+        title: "Shopping List - Sandom Lager",
+        description: "Create and manage shopping lists from your recipes with history tracking",
+        keywords: "shopping list, grocery list, meal planning, recipes",
+        ogTitle: "Shopping List - Sandom Lager",
+        ogDescription: "Manage your shopping lists",
+    });
     const { getAccessTokenSilently } = useAuth0();
     const { selectedIds, clearSelected } = useSelectedRecipes();
 
@@ -32,8 +45,8 @@ export default function ShoppingListPage() {
             const token = await getAccessTokenSilently();
             const data = await fetchShoppingList(token);
             setItems(data);
-        } catch (error) {
-            console.error("Kunne ikke hente handlelisten", error);
+        } catch {
+            // Ignore load failures here; the page will remain in its current state.
         }
     };
 
@@ -42,8 +55,8 @@ export default function ShoppingListPage() {
             const token = await getAccessTokenSilently();
             const data = await fetchShoppingListHistory(token);
             setHistoryRows(data);
-        } catch (error) {
-            console.error("Kunne ikke hente historikk", error);
+        } catch {
+            // Ignore load failures here; the page will remain in its current state.
         }
     };
 
@@ -73,8 +86,8 @@ export default function ShoppingListPage() {
                     i.id === id ? { ...i, needed_quantity: nextQuantity } : i
                 )
             );
-        } catch (error) {
-            console.error("Kunne ikke øke mengde", error);
+        } catch {
+            // Ignore update failures here.
         }
     };
 
@@ -95,8 +108,8 @@ export default function ShoppingListPage() {
                     i.id === id ? { ...i, needed_quantity: nextQuantity } : i
                 )
             );
-        } catch (error) {
-            console.error("Kunne ikke redusere mengde", error);
+        } catch {
+            // Ignore update failures here.
         }
     };
 
@@ -105,8 +118,8 @@ export default function ShoppingListPage() {
             const token = await getAccessTokenSilently();
             await updateShoppingListItem(id, { unit }, token);
             setItems((prev) => prev.map((item) => (item.id === id ? { ...item, unit } : item)));
-        } catch (error) {
-            console.error("Kunne ikke oppdatere enhet", error);
+        } catch {
+            // Ignore update failures here.
         }
     };
 
@@ -115,8 +128,8 @@ export default function ShoppingListPage() {
             const token = await getAccessTokenSilently();
             await updateShoppingListItem(id, { needed_quantity: nextQuantity }, token);
             setItems((prev) => prev.map((item) => (item.id === id ? { ...item, needed_quantity: nextQuantity } : item)));
-        } catch (error) {
-            console.error("Kunne ikke sette mengde", error);
+        } catch {
+            // Ignore update failures here.
         }
     };
 
@@ -125,8 +138,8 @@ export default function ShoppingListPage() {
             const token = await getAccessTokenSilently();
             await removeFromShoppingList(id, token);
             setItems(prev => prev.filter(i => i.id !== id));
-        } catch (error) {
-            console.error("Kunne ikke slette vare", error);
+        } catch {
+            // Ignore delete failures here.
         }
     };
 
@@ -141,8 +154,7 @@ export default function ShoppingListPage() {
             await generateShoppingListFromRecipes(Array.from(selectedIds), token);
             clearSelected();
             await loadShoppingList();
-        } catch (error) {
-            console.error("Kunne ikke generere handleliste", error);
+        } catch {
             setGenerateError("Kunne ikke generere handleliste");
         } finally {
             setIsGenerating(false);

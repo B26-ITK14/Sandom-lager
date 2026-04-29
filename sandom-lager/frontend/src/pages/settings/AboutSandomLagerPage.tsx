@@ -5,9 +5,17 @@
 */
 
 import SettingsLayout from "../../components/settings/SettingsLayout";
+import { usePageMeta } from "../../hooks";
 import { useAppLastUpdated, useAppVersion } from "../../hooks";
 
 export default function AboutSandomLagerPage() {
+    usePageMeta({
+        title: "About Sandom Lager",
+        description: "Learn more about Sandom Lager, version information, and app details",
+        keywords: "about, info, version, sandom lager",
+        ogTitle: "About Sandom Lager",
+        ogDescription: "About the Sandom Lager app",
+    });
     const appVersion = useAppVersion();
     const appLastUpdated = useAppLastUpdated();
 

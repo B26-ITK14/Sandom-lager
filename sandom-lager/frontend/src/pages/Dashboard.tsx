@@ -15,8 +15,16 @@ import { AUTH0_AUDIENCE } from "../config/auth";
 import type { ShoppingListItem } from "../types";
 import { ROUTES } from "../router/routes";
 import { BookOpen, ShoppingCart, Package, AlertTriangle } from "lucide-react";
+import { usePageMeta } from "../hooks";
 
 export default function Dashboard() {
+    usePageMeta({
+        title: "Dashboard - Sandom Lager",
+        description: "View your inventory statistics, active recipes, and shopping list at a glance",
+        keywords: "dashboard, inventory overview, recipes, shopping list",
+        ogTitle: "Dashboard - Sandom Lager",
+        ogDescription: "Manage your inventory and recipes",
+    });
     const navigate = useNavigate();
     const { recipes, loading: recipesLoading } = useRecipes();
     const { inventory, isLoading: inventoryLoading } = useInventory();
@@ -81,129 +89,131 @@ export default function Dashboard() {
 
     return (
         <Layout>
-            {/* Stat-kort */}
-            <section className="grid grid-cols-2 gap-3 mb-6">
-                {statCards.map(({ label, value, icon: Icon, color, bg }) => (
-                    <div
-                        key={label}
-                        className="rounded-2xl p-4"
-                        style={{ backgroundColor: bg, border: `1px solid ${bg}` }}
-                    >
-                        <div className="flex items-center gap-2 mb-1">
-                            <Icon size={16} style={{ color }} />
-                            <p className="text-xs font-medium" style={{ color }}>
-                                {label}
+            <main>
+                {/* Stat-kort */}
+                <section className="flex flex-wrap gap-3 mb-6">
+                    {statCards.map(({ label, value, icon: Icon, color, bg }) => (
+                        <div
+                            key={label}
+                            className="flex-1 min-w-[140px] rounded-2xl p-4"
+                            style={{ backgroundColor: bg, border: `1px solid ${bg}` }}
+                        >
+                            <div className="flex items-center gap-2 mb-1">
+                                <Icon size={16} style={{ color }} />
+                                <p className="text-xs font-medium" style={{ color }}>
+                                    {label}
+                                </p>
+                            </div>
+                            <p className="text-2xl font-bold" style={{ color }}>
+                                {value}
                             </p>
                         </div>
-                        <p className="text-2xl font-bold" style={{ color }}>
-                            {value}
-                        </p>
-                    </div>
-                ))}
-            </section>
+                    ))}
+                </section>
 
-            {/* Handleliste-snarvei */}
-            <section
-                className="rounded-2xl p-5 mb-6"
-                style={{
-                    backgroundColor: "var(--color-surface)",
-                    border: "1px solid var(--color-border)",
-                }}
-            >
-                <div className="flex items-center justify-between mb-3">
-                    <h2
-                        className="text-base font-semibold"
-                        style={{ color: "var(--color-text-primary)" }}
-                    >
-                        Handleliste
-                    </h2>
-                    <span
-                        className="text-sm font-medium"
-                        style={{ color: "var(--color-text-secondary)" }}
-                    >
-                        {shoppingLoading ? "..." : `${shoppingListCount} Varer`}
-                    </span>
-                </div>
-                <button
-                    onClick={() => navigate(ROUTES.SHOPPING_LIST.path)}
-                    className="w-full rounded-xl py-2.5 text-sm font-semibold transition-all duration-150 active:scale-95 cursor-pointer"
+                {/* Handleliste-snarvei */}
+                <section
+                    className="rounded-2xl p-5 mb-6"
                     style={{
-                        backgroundColor: "var(--color-primary)",
-                        color: "var(--color-on-primary)",
+                        backgroundColor: "var(--color-surface)",
+                        border: "1px solid var(--color-border)",
                     }}
                 >
-                    Gå til handleliste
-                </button>
-            </section>
-
-            {/* Aktive oppskrifter */}
-            <section
-                className="rounded-2xl p-5"
-                style={{
-                    backgroundColor: "var(--color-surface)",
-                    border: "1px solid var(--color-border)",
-                }}
-            >
-                <div className="flex items-center justify-between mb-4">
-                    <h2
-                        className="text-base font-semibold"
-                        style={{ color: "var(--color-text-primary)" }}
-                    >
-                        Aktive oppskrifter
-                    </h2>
-                    <button
-                        onClick={() => navigate(ROUTES.RECIPES.path)}
-                        className="text-xs font-medium cursor-pointer"
-                        style={{ color: "var(--color-primary)" }}
-                    >
-                        Se alle
-                    </button>
-                </div>
-
-                {recipesLoading ? (
-                    <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                        Laster oppskrifter...
-                    </p>
-                ) : featuredRecipes.length === 0 ? (
-                    <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                        Ingen oppskrifter lagt til ennå.
-                    </p>
-                ) : (
-                    <div className="space-y-3">
-                        {featuredRecipes.map((recipe) => (
-                            <div
-                                key={recipe.id}
-                                className="flex items-center gap-3 rounded-xl p-3"
-                                style={{ border: "1px solid var(--color-border)" }}
-                            >
-                                <div
-                                    className="flex h-10 w-10 items-center justify-center rounded-full shrink-0"
-                                    style={{
-                                        backgroundColor: "var(--color-secondary-surface)",
-                                        color: "var(--color-primary)",
-                                    }}
-                                >
-                                    <BookOpen size={16} />
-                                </div>
-                                <div>
-                                    <p
-                                        className="text-sm font-semibold"
-                                        style={{ color: "var(--color-text-primary)" }}
-                                    >
-                                        {recipe.title}
-                                    </p>
-                                    <p
-                                        className="text-xs"
-                                        style={{ color: "var(--color-text-secondary)" }}
-                                    >
-                                        {recipe.category}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
+                    <div className="flex items-center justify-between mb-3">
+                        <h2
+                            className="text-base font-semibold"
+                            style={{ color: "var(--color-text-primary)" }}
+                        >
+                            Handleliste
+                        </h2>
+                        <span
+                            className="text-sm font-medium"
+                            style={{ color: "var(--color-text-secondary)" }}
+                        >
+                            {shoppingLoading ? "..." : `${shoppingListCount} Varer`}
+                        </span>
                     </div>
-                )}
-            </section>
+                    <button
+                        onClick={() => navigate(ROUTES.SHOPPING_LIST.path)}
+                        className="w-full rounded-xl py-2.5 text-sm font-semibold transition-all duration-150 active:scale-95 cursor-pointer"
+                        style={{
+                            backgroundColor: "var(--color-primary)",
+                            color: "var(--color-on-primary)",
+                        }}
+                    >
+                        Gå til handleliste
+                    </button>
+                </section>
+
+                {/* Aktive oppskrifter */}
+                <section
+                    className="rounded-2xl p-5"
+                    style={{
+                        backgroundColor: "var(--color-surface)",
+                        border: "1px solid var(--color-border)",
+                    }}
+                >
+                    <div className="flex items-center justify-between mb-4">
+                        <h2
+                            className="text-base font-semibold"
+                            style={{ color: "var(--color-text-primary)" }}
+                        >
+                            Aktive oppskrifter
+                        </h2>
+                        <button
+                            onClick={() => navigate(ROUTES.RECIPES.path)}
+                            className="text-xs font-medium cursor-pointer"
+                            style={{ color: "var(--color-primary)" }}
+                        >
+                            Se alle
+                        </button>
+                    </div>
+
+                    {recipesLoading ? (
+                        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                            Laster oppskrifter...
+                        </p>
+                    ) : featuredRecipes.length === 0 ? (
+                        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                            Ingen oppskrifter lagt til ennå.
+                        </p>
+                    ) : (
+                        <div className="flex flex-wrap gap-3">
+                            {featuredRecipes.map((recipe) => (
+                                <div
+                                    key={recipe.id}
+                                    className="flex items-center gap-3 rounded-xl p-3 flex-1 min-w-[200px]"
+                                    style={{ border: "1px solid var(--color-border)" }}
+                                >
+                                    <div
+                                        className="flex h-10 w-10 items-center justify-center rounded-full shrink-0"
+                                        style={{
+                                            backgroundColor: "var(--color-secondary-surface)",
+                                            color: "var(--color-primary)",
+                                        }}
+                                    >
+                                        <BookOpen size={16} />
+                                    </div>
+                                    <div>
+                                        <p
+                                            className="text-sm font-semibold"
+                                            style={{ color: "var(--color-text-primary)" }}
+                                        >
+                                            {recipe.title}
+                                        </p>
+                                        <p
+                                            className="text-xs"
+                                            style={{ color: "var(--color-text-secondary)" }}
+                                        >
+                                            {recipe.category}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </section>
+            </main>
         </Layout>
     );
 }
