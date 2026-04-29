@@ -3,6 +3,7 @@
     * Displays a single recipe in a card format for the recipes grid.
     * - Toggle button (top-left) selects/deselects the recipe for the shopping list.
     * - Clicking the card body opens the recipe detail modal.
+    * Author: Sebastian Thomsen
 */
 
 import type { Recipe } from "../../types";
@@ -12,9 +13,10 @@ interface RecipeCardProps {
     selected: boolean;
     onToggle: () => void;
     onOpenDetail: () => void;
+    style?: React.CSSProperties;
 }
 
-export default function RecipeCard({ recipe, selected, onToggle, onOpenDetail }: RecipeCardProps) {
+export default function RecipeCard({ recipe, selected, onToggle, onOpenDetail, style }: RecipeCardProps) {
 
     return (
         <article
@@ -22,6 +24,7 @@ export default function RecipeCard({ recipe, selected, onToggle, onOpenDetail }:
             style={{
                 backgroundColor: "var(--color-surface)",
                 outline: selected ? "2px solid var(--color-primary)" : "none",
+                ...style,
             }}
         >
             {/* Clickable background area – opens detail modal */}

@@ -1,3 +1,10 @@
+/*
+    * RecipeFilterBar.tsx
+    * Search bar, category filter, and add-recipe button for the recipes page.
+    * The add-recipe button is only visible for admin/manager users.
+    * Author: Sebastian Thomsen
+*/
+
 import SearchInput from "../SearchInput";
 
 interface RecipeFilterBarProps {
