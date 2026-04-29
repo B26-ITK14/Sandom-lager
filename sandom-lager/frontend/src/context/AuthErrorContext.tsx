@@ -22,11 +22,6 @@ export function AuthErrorProvider({ children }: { children: ReactNode }) {
 
     const handleAuthError = useCallback((status: number, errorMessage?: string) => {
         if (status === 401) {
-            console.warn('[AuthError] Unauthorized (401) - Session expired or invalid credentials. Forcing logout.');
-            if (errorMessage) {
-                console.warn(`[AuthError] Details: ${errorMessage}`);
-            }
-            
             // Logout user and redirect to login
             void logoutUser();
             navigate('/login', { replace: true });

@@ -62,9 +62,8 @@ export default function MyAccountPage() {
                 const savedUsername = await updateUsername(trimmedUsername, token);
                 setUsername(savedUsername);
             }
-        } catch (err) {
-            console.error('[MyAccountPage] Failed to update profile:', err);
-            throw err;
+        } catch {
+            throw new Error('Kunne ikke oppdatere profil');
         }
     };
 

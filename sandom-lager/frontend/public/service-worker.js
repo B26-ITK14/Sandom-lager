@@ -15,7 +15,6 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE).catch((err) => {
         // Some assets might fail, continue anyway
-        console.warn('Cache install incomplete:', err);
       });
     })
   );
