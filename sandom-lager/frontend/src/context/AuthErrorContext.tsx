@@ -20,7 +20,7 @@ export function AuthErrorProvider({ children }: { children: ReactNode }) {
     const navigate = useNavigate();
     const { logoutUser } = useAppLogout();
 
-    const handleAuthError = useCallback((status: number, errorMessage?: string) => {
+    const handleAuthError = useCallback((status: number, _errorMessage?: string) => {
         if (status === 401) {
             // Logout user and redirect to login
             void logoutUser();
