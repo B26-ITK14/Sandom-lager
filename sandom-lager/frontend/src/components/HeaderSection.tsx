@@ -39,16 +39,22 @@ export default function HeaderSection({ notifications, backMenu }: HeaderSection
             <section className="mb-6 flex flex-row items-center justify-between">
                 {backMenu ? (
                     <button
+                        type="button"
                         className="py-2 pr-4 cursor-pointer"
                         style={{ color: 'var(--color-header-text-primary)' }}
                         onClick={() => navigate(-1)}
+                        aria-label="Gå tilbake"
                     >
                         <ArrowLeft size={24} />
                     </button>
                 ) : (
                     <button
+                        type="button"
                         className="py-2 pr-4 text-gray-600 hover:text-gray-900 cursor-pointer"
                         onClick={handleMenuClick}
+                        aria-label={isMenuOpen ? 'Lukk meny' : 'Åpne meny'}
+                        aria-controls="app-nav-flyout"
+                        aria-expanded={isMenuOpen}
                     >
                         <svg
                             className="w-6 h-6"
@@ -72,9 +78,13 @@ export default function HeaderSection({ notifications, backMenu }: HeaderSection
                     {currentPage}
                 </h2>
                 <button
+                    type="button"
                     className="p-2 hover:opacity-70 cursor-pointer relative"
                     style={{ color: 'var(--color-header-text-primary)' }}
                     onClick={handleNotificationClick}
+                    aria-label={isNotificationOpen ? 'Lukk varsler' : 'Åpne varsler'}
+                    aria-controls="app-notification-flyout"
+                    aria-expanded={isNotificationOpen}
                 >
                     <Bell size={24} />
                     {notifications && (

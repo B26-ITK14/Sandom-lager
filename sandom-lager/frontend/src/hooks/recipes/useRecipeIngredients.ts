@@ -44,7 +44,6 @@ export function useRecipeIngredients(recipeId: number | null): UseRecipeIngredie
 
                 if (!cancelled) setIngredients(data);
             } catch (err) {
-                console.error('[useRecipeIngredients] Error:', err);
                 if (!cancelled) setError(err instanceof Error ? err.message : 'Kunne ikke laste ingredienser');
             } finally {
                 if (!cancelled) setLoading(false);

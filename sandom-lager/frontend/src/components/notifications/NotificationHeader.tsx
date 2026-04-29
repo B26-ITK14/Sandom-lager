@@ -26,9 +26,11 @@ export function NotificationHeader({ unreadCount, onClose }: NotificationHeaderP
                 )}
             </div>
             <button
+                type="button"
                 onClick={onClose}
                 className="p-2 hover:opacity-70 cursor-pointer"
                 style={{ color: 'var(--color-text-primary)' }}
+                aria-label="Lukk varsler"
             >
                 <X size={24} />
             </button>

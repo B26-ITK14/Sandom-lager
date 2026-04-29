@@ -28,8 +28,7 @@ export default function DeleteShoppingListButton({ onDeleted }: Props) {
             await clearShoppingList(token);
             setIsOpen(false);
             onDeleted?.();
-        } catch (err) {
-            console.error("Kunne ikke slette handlelisten", err);
+        } catch {
             setError("Kunne ikke slette handlelisten");
         } finally {
             setIsDeleting(false);

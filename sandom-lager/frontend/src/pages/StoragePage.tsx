@@ -16,6 +16,7 @@ import { deleteInventoryItem, updateInventoryQuantity } from "../api/storage";
 import { useUser } from "../context/UserContext";
 import { useApiAccessToken } from "../hooks/useApiAccessToken";
 import { useInventory } from "../hooks/storage/useInventory";
+import { usePageMeta } from "../hooks";
 import type { InventoryItem } from "../types";
 
 const FILTER_OPTIONS = ["Alle", "Mengde: lite -> mye", "Mengde: mye -> lite", "Favoritter"];
@@ -28,6 +29,13 @@ type Product = {
 };
 
 export default function StoragePage() {
+    usePageMeta({
+        title: "Storage - Sandom Lager",
+        description: "Manage your inventory with advanced search, filtering, and quantity tracking",
+        keywords: "storage, inventory, products, quantity, warehouse",
+        ogTitle: "Storage - Sandom Lager",
+        ogDescription: "Manage your inventory items",
+    });
     const { inventory, isLoading, errorMessage, refresh } = useInventory();
     const { role } = useUser();
     const { getApiAccessToken } = useApiAccessToken();

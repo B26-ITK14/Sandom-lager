@@ -41,8 +41,7 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                 unit: item.unit,
             }));
             setIngredients(uniqueIngredients);
-        } catch (err) {
-            console.error("Failed to load ingredients:", err);
+        } catch {
             setError("Kunne ikke laste ingredienser");
         } finally {
             setIsHydratingIngredients(false);
@@ -114,8 +113,7 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
             setQuantityInput("1");
             onItemAdded?.();
             onClose();
-        } catch (err) {
-            console.error("Failed to add item:", err);
+        } catch {
             setError("Kunne ikke legge til vare");
         } finally {
             setIsLoading(false);

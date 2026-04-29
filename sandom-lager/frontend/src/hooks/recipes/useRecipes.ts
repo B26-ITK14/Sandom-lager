@@ -48,7 +48,6 @@ export function useRecipes(): UseRecipesResult {
 
                 if (!cancelled) setRecipes(data);
             } catch (err) {
-                console.error('[useRecipes] Error:', err);
                 if (!cancelled) setError(err instanceof Error ? err.message : 'Kunne ikke laste oppskrifter');
             } finally {
                 if (!cancelled) setLoading(false);

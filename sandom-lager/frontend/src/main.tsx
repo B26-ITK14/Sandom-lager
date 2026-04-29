@@ -8,6 +8,16 @@ import type { AppState } from "@auth0/auth0-react";
 import { AUTH0_AUDIENCE, AUTH0_SCOPE } from "./config/auth";
 import { env } from "./config/env";
 
+// Register Service Worker for offline support and caching
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .catch(() => {
+        // Ignore service worker registration failures in development.
+      });
+  });
+}
+
 const savedReducedMotion = window.localStorage.getItem('app:reducedMotion');
 if (savedReducedMotion) {
   try {

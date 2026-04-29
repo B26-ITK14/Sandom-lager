@@ -17,9 +17,6 @@ export class ApiError extends Error {
 }
 
 export async function apiFetchJson<T>(path: string, init?: RequestInit): Promise<T> {
-    const method = init?.method ?? 'GET';
-    console.log(`[API] ${method} ${path}`);
-
     const response = await fetch(path, init);
 
     if (!response.ok) {
@@ -33,10 +30,8 @@ export async function apiFetchJson<T>(path: string, init?: RequestInit): Promise
             // If response is not JSON, ignore
         }
 
-        console.error(`[API] ${method} ${path} → ${response.status} ${response.statusText}`);
         throw new ApiError(response.status, `API request failed (${response.status})`, errorDetail);
     }
 
-    console.log(`[API] ${method} ${path} → ${response.status} OK`);
     return response.json() as Promise<T>;
 }

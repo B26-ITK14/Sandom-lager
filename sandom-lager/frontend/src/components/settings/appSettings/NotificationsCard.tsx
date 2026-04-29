@@ -26,15 +26,15 @@ export default function NotificationsCard() {
             icon={notifySystem ? <Bell size={22} /> : <BellOff size={22} />}
         >
             <SettingRow label="Lagerbeholdning" description="Varsle når ingredienser er i ferd med å gå tomt">
-                <Toggle checked={notifyInventory} onChange={handle(setNotifyInventory, 'app:notifyInventory')} />
+                <Toggle ariaLabel="Varsle om lav lagerbeholdning" checked={notifyInventory} onChange={handle(setNotifyInventory, 'app:notifyInventory')} />
             </SettingRow>
             <Divider />
             <SettingRow label="Oppskrifter" description="Varsle om nye eller oppdaterte oppskrifter">
-                <Toggle checked={notifyRecipes} onChange={handle(setNotifyRecipes, 'app:notifyRecipes')} />
+                <Toggle ariaLabel="Varsle om oppskriftsoppdateringer" checked={notifyRecipes} onChange={handle(setNotifyRecipes, 'app:notifyRecipes')} />
             </SettingRow>
             <Divider />
             <SettingRow label="Systemvarsler" description="Generelle varsler om appoppdateringer og vedlikehold">
-                <Toggle checked={notifySystem} onChange={handle(setNotifySystem, 'app:notifySystem')} />
+                <Toggle ariaLabel="Varsle om systemoppdateringer" checked={notifySystem} onChange={handle(setNotifySystem, 'app:notifySystem')} />
             </SettingRow>
         </SectionCard>
     );

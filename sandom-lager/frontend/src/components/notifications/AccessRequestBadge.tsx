@@ -17,8 +17,10 @@ export default function AccessRequestBadge({ count, onClick }: AccessRequestBadg
 
     return (
         <button
+            type="button"
             onClick={onClick}
             title={`${count} ventende tilgangssøknad${count !== 1 ? "er" : ""}`}
+            aria-label={`${count} ventende tilgangssøknad${count !== 1 ? "er" : ""}`}
             className="relative inline-flex items-center justify-center rounded-full p-2 transition-colors duration-150"
             style={{ color: 'var(--color-text-secondary)' }}
             onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-secondary-surface)')}

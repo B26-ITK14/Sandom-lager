@@ -37,11 +37,13 @@ export function Divider() {
     return <div className="border-t" style={{ borderColor: 'var(--color-border)' }} />;
 }
 
-export function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+export function Toggle({ checked, onChange, ariaLabel }: { checked: boolean; onChange: (v: boolean) => void; ariaLabel?: string }) {
     return (
         <button
+            type="button"
             role="switch"
             aria-checked={checked}
+            aria-label={ariaLabel ?? 'Bytt innstilling'}
             onClick={() => onChange(!checked)}
             className="relative inline-flex h-6 w-11 flex-shrink-0 rounded-full transition-colors duration-200 cursor-pointer"
             style={{ backgroundColor: checked ? 'var(--color-primary)' : 'var(--color-border)' }}

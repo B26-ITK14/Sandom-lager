@@ -1,0 +1,23 @@
+# Robots.txt for Sandom Lager
+# This file tells search engines and web crawlers how to interact with the website
+
+# Default rule for all user-agents (search engines, bots)
+User-agent: *
+# Allow search engines to crawl the public pages (login, home)
+Allow: /login
+Allow: /
+# Disallow crawling authenticated pages and internal routes
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /settings
+Disallow: /recipes
+Disallow: /storage
+Disallow: /shopping-list
+Disallow: /request-access
+Disallow: /pending-approval
+
+# Sitemap location (if you create one in the future)
+# Sitemap: https://sandom-lager.no/sitemap.xml
+
+# Crawl delay for all bots (optional - prevents server overload)
+Crawl-delay: 1
