@@ -91,11 +91,11 @@ export default function Dashboard() {
         <Layout>
             <main>
                 {/* Stat-kort */}
-                <section className="grid grid-cols-2 gap-3 mb-6">
+                <section className="flex flex-wrap gap-3 mb-6">
                     {statCards.map(({ label, value, icon: Icon, color, bg }) => (
                         <div
                             key={label}
-                            className="rounded-2xl p-4"
+                            className="flex-1 min-w-[140px] rounded-2xl p-4"
                             style={{ backgroundColor: bg, border: `1px solid ${bg}` }}
                         >
                             <div className="flex items-center gap-2 mb-1">
@@ -178,11 +178,11 @@ export default function Dashboard() {
                             Ingen oppskrifter lagt til ennå.
                         </p>
                     ) : (
-                        <div className="space-y-3">
+                        <div className="flex flex-wrap gap-3">
                             {featuredRecipes.map((recipe) => (
                                 <div
                                     key={recipe.id}
-                                    className="flex items-center gap-3 rounded-xl p-3"
+                                    className="flex items-center gap-3 rounded-xl p-3 flex-1 min-w-[200px]"
                                     style={{ border: "1px solid var(--color-border)" }}
                                 >
                                     <div
