@@ -169,7 +169,7 @@ export default function ShoppingListPage() {
                     <div className="flex gap-3 flex-wrap items-center">
                         <button
                             onClick={() => setIsAddModalOpen(true)}
-                            className="py-2 px-4 rounded-md transition-colors"
+                            className="py-2 px-4 rounded-md transition-colors cursor-pointer"
                             style={{
                                 background: "var(--color-primary)",
                                 color: "var(--color-on-primary)",
@@ -180,7 +180,7 @@ export default function ShoppingListPage() {
                         <button
                             onClick={handleGenerateShoppingList}
                             disabled={selectedIds.size === 0 || isGenerating}
-                            className="py-2 px-4 rounded-md transition-opacity"
+                            className="py-2 px-4 rounded-md transition-opacity cursor-pointer disabled:cursor-not-allowed"
                             style={{
                                 background: "var(--color-primary)",
                                 color: "var(--color-on-primary)",
@@ -191,7 +191,7 @@ export default function ShoppingListPage() {
                         </button>
                         <button
                             onClick={() => setCompact(prev => !prev)}
-                            className="py-2 px-4 rounded-md transition-colors"
+                            className="py-2 px-4 rounded-md transition-colors cursor-pointer"
                             style={{
                                 background: "var(--color-secondary-surface)",
                                 border: "1px solid var(--color-border)",

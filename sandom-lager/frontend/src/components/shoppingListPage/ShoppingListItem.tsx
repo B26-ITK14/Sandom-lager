@@ -152,7 +152,7 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
                         <button
                             type="button"
                             disabled={isLoading}
-                            className="underline-offset-2 hover:underline"
+                            className="underline-offset-2 hover:underline cursor-pointer disabled:cursor-not-allowed"
                             style={{ color: "var(--color-text-primary)" }}
                             onClick={openQuantityEditor}>
                             {formatQuantity(item.needed_quantity)}
@@ -179,7 +179,7 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
                         <button
                             type="button"
                             disabled={isLoading}
-                            className="underline-offset-2 hover:underline"
+                            className="underline-offset-2 hover:underline cursor-pointer disabled:cursor-not-allowed"
                             style={{ color: "var(--color-text-primary)" }}
                             onClick={() => setIsUnitEditing(true)}>
                             {item.unit}
@@ -195,7 +195,7 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
                 <button
                     onClick={handleDecrease}
                     disabled={isLoading}
-                    className="h-9 w-9 rounded-full text-lg transition-colors disabled:opacity-50"
+                    className="h-9 w-9 rounded-full text-lg transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                     style={{
                         background: "var(--color-secondary-surface)",
                         border: "1px solid var(--color-border)",
@@ -208,7 +208,7 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
                 <button
                     onClick={handleIncrease}
                     disabled={isLoading}
-                    className="h-9 w-9 rounded-full text-lg transition-colors disabled:opacity-50"
+                    className="h-9 w-9 rounded-full text-lg transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                     style={{
                         background: "var(--color-primary)",
                         color: "var(--color-on-primary)",
@@ -220,7 +220,7 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
                 <button
                     onClick={handleDelete}
                     disabled={isLoading}
-                    className="h-9 w-9 rounded-full text-lg transition-colors disabled:opacity-50"
+                    className="h-9 w-9 rounded-full text-lg transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                     style={{
                         background: "var(--color-secondary-surface)",
                         border: "1px solid var(--color-border)",

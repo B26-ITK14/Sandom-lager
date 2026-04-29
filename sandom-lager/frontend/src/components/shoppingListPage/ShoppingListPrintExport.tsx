@@ -50,7 +50,7 @@ export default function ShoppingListPrintExport({ items }: Props) {
             {/* Button to trigger print */}
             <button
                 onClick={() => window.print()}
-                className="py-2 px-4 rounded-md"
+                className="py-2 px-4 rounded-md cursor-pointer"
                 style={{ 
                     background: "var(--color-secondary-surface)",
                     border: "1px solid var(--color-border)",
@@ -61,7 +61,7 @@ export default function ShoppingListPrintExport({ items }: Props) {
             {/* Button to trigger Excel export */}
             <button
                 onClick={exportToExcel}
-                className="py-2 px-4 rounded-md"
+                className="py-2 px-4 rounded-md cursor-pointer"
                 style={{ 
                     background: "var(--color-primary)",
                     color: "var(--color-on-primary)",

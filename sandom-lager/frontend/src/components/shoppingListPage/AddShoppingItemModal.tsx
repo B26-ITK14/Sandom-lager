@@ -154,7 +154,7 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                         <button
                             type="button"
                             onClick={() => setEntryMode("existing")}
-                            className="py-2 px-3 rounded-md"
+                            className="py-2 px-3 rounded-md cursor-pointer"
                             style={{
                                 background: entryMode === "existing" ? "var(--color-primary)" : "var(--color-secondary-surface)",
                                 color: entryMode === "existing" ? "var(--color-on-primary)" : "var(--color-text-primary)",
@@ -165,7 +165,7 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                         <button
                             type="button"
                             onClick={() => setEntryMode("new")}
-                            className="py-2 px-3 rounded-md"
+                            className="py-2 px-3 rounded-md cursor-pointer"
                             style={{
                                 background: entryMode === "new" ? "var(--color-primary)" : "var(--color-secondary-surface)",
                                 color: entryMode === "new" ? "var(--color-on-primary)" : "var(--color-text-primary)",
@@ -301,7 +301,7 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                     <button
                         onClick={onClose}
                         disabled={isLoading}
-                        className="py-2 px-4 rounded-md transition-opacity"
+                        className="py-2 px-4 rounded-md transition-opacity cursor-pointer disabled:cursor-not-allowed"
                         style={{
                             background: "var(--color-secondary-surface)",
                             border: "1px solid var(--color-border)",
@@ -313,7 +313,7 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                     <button
                         onClick={handleAddItem}
                         disabled={isLoading}
-                        className="py-2 px-4 rounded-md transition-opacity"
+                        className="py-2 px-4 rounded-md transition-opacity cursor-pointer disabled:cursor-not-allowed"
                         style={{
                             background: "var(--color-primary)",
                             color: "var(--color-on-primary)",

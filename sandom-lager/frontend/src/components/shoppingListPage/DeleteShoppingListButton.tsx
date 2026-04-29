@@ -42,7 +42,7 @@ export default function DeleteShoppingListButton({ onDeleted }: Props) {
                     setError(null);
                     setIsOpen(true);
                 }}
-                className="py-2 px-4 rounded-md transition-colors"
+                className="py-2 px-4 rounded-md transition-colors cursor-pointer"
                 style={{
                     background: "var(--color-secondary-surface)",
                     border: "1px solid var(--color-border)",
@@ -88,7 +88,7 @@ export default function DeleteShoppingListButton({ onDeleted }: Props) {
                                 <button
                                     onClick={handleConfirmDelete}
                                     disabled={isDeleting}
-                                    className="py-2 px-4 rounded-md transition-opacity"
+                                    className="py-2 px-4 rounded-md transition-opacity cursor-pointer disabled:cursor-not-allowed"
                                     style={{
                                         background: "#c62828",
                                         color: "#ffffff",
@@ -101,7 +101,7 @@ export default function DeleteShoppingListButton({ onDeleted }: Props) {
                             <button
                                 onClick={() => setIsOpen(false)}
                                 disabled={isDeleting}
-                                className="py-2 px-4 rounded-md transition-opacity"
+                                className="py-2 px-4 rounded-md transition-opacity cursor-pointer disabled:cursor-not-allowed"
                                 style={{
                                     background: "var(--color-primary)",
                                     color: "var(--color-on-primary)",
