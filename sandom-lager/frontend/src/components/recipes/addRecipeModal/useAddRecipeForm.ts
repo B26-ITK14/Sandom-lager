@@ -120,8 +120,20 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
         setRows((prev) => prev.filter((_, i) => i !== index));
     }
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
+    function handleImageChange(file: File | null) {
+        setRecipeImageFile(file);
+        if (file) setRemoveExistingImage(false);
+    }
+
+    function handleRemoveImage() {
+        setRecipeImageFile(null);
+        setRecipeImagePreview(null);
+        setRecipeImageUrl(null);
+        setRecipeImagePublicId(null);
+        setRemoveExistingImage(true);
+    }
+
+    async function submitRecipe() {
         setError(null);
 
         if (!title.trim()) {
@@ -196,16 +208,21 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
         }
     }
 
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        await submitRecipe();
+    }
+
     return {
         title, setTitle,
         category, setCategory,
         instructions, setInstructions,
         servings, setServings,
-        recipeImageUrl, recipeImagePublicId,
-        recipeImageFile, setRecipeImageFile,
-        recipeImagePreview, setRecipeImagePreview,
-        removeExistingImage, setRemoveExistingImage,
-        setRecipeImageUrl, setRecipeImagePublicId,
+        recipeImageUrl,
+        recipeImageFile,
+        recipeImagePreview,
+        handleImageChange,
+        handleRemoveImage,
         rows,
         allAllergens,
         selectedAllergenIds, setSelectedAllergenIds,

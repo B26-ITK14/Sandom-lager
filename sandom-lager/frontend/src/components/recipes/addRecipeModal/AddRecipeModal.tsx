@@ -30,8 +30,7 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
         instructions, setInstructions,
         servings, setServings,
         recipeImageUrl, recipeImageFile, recipeImagePreview,
-        setRecipeImageFile, setRemoveExistingImage,
-        setRecipeImageUrl, setRecipeImagePublicId, setRecipeImagePreview,
+        handleImageChange, handleRemoveImage,
         allAllergens, selectedAllergenIds, setSelectedAllergenIds,
         existingIngredients,
         rows, updateRow, handleIngredientNameChange, addRow, removeRow,
@@ -94,17 +93,8 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
                         imageUrl={recipeImageUrl}
                         imagePreview={recipeImagePreview}
                         imageFile={recipeImageFile}
-                        onFileChange={(file) => {
-                            setRecipeImageFile(file);
-                            if (file) setRemoveExistingImage(false);
-                        }}
-                        onRemove={() => {
-                            setRecipeImageFile(null);
-                            setRecipeImagePreview(null);
-                            setRecipeImageUrl(null);
-                            setRecipeImagePublicId(null);
-                            setRemoveExistingImage(true);
-                        }}
+                        onFileChange={handleImageChange}
+                        onRemove={handleRemoveImage}
                     />
 
                     {/* Allergens */}
