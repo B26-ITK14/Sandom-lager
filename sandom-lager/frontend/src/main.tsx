@@ -2,15 +2,11 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles/App.css";
 import App from "./App.tsx";
-import { initPerformanceMonitoring } from "./utils/performanceMonitoring";
 
 import { Auth0Provider } from "@auth0/auth0-react";
 import type { AppState } from "@auth0/auth0-react";
 import { AUTH0_AUDIENCE, AUTH0_SCOPE } from "./config/auth";
 import { env } from "./config/env";
-
-// Initialize performance monitoring
-initPerformanceMonitoring();
 
 // Register Service Worker for offline support and caching
 if ('serviceWorker' in navigator) {
