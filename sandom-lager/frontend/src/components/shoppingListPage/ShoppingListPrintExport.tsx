@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import writeXlsxFile, { type SheetData } from 'write-excel-file/browser';
 import type { ShoppingListItem } from '../../types';
 
 interface Props {
@@ -7,44 +7,41 @@ interface Props {
 
 export default function ShoppingListPrintExport({ items }: Props) {
 
-    const exportToExcel = () => {
-        // Format data with proper headers
-        const formattedData = items.map(item => ({
-            "Vare": item.ingredient,
-            "Mengde": item.needed_quantity,
-            "Enhet": item.unit,
-        }));
-
-        const worksheet = XLSX.utils.json_to_sheet(formattedData);
-        
-        // Set column widths
-        worksheet['!cols'] = [
-            { wch: 35 },  // Vare
-            { wch: 12 },  // Mengde
-            { wch: 12 },  // Enhet
+    const exportToExcel = async () => {
+        const sheetData: SheetData = [
+            [
+                { value: 'Vare', fontWeight: 'bold', textColor: '#FFFFFF', backgroundColor: '#4472C4', align: 'center' },
+                { value: 'Mengde', fontWeight: 'bold', textColor: '#FFFFFF', backgroundColor: '#4472C4', align: 'center' },
+                { value: 'Enhet', fontWeight: 'bold', textColor: '#FFFFFF', backgroundColor: '#4472C4', align: 'center' },
+            ],
+            ...items.map(item => [
+                { value: item.ingredient },
+                { value: item.needed_quantity },
+                { value: item.unit },
+            ]),
         ];
 
-        // Style header row
-        const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
-        for (let col = range.s.c; col <= range.e.c; col++) {
-            const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
-            if (!worksheet[cellAddress]) continue;
-            
-            worksheet[cellAddress].s = {
-                font: { bold: true, color: { rgb: "FFFFFF" } },
-                fill: { fgColor: { rgb: "4472C4" } },
-                alignment: { horizontal: "center", vertical: "center" },
-            };
-        }
+        const blob = await writeXlsxFile(sheetData, {
+            sheet: 'Handleliste',
+            columns: [
+                { width: 35 },
+                { width: 12 },
+                { width: 12 },
+            ],
+            showGridLines: true,
+            stickyRowsCount: 1,
+        }).toBlob();
 
-        // Add autofilter
-        worksheet['!autofilter'] = { ref: XLSX.utils.encode_range(range) };
-
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, `Handleliste`);
-        
+        const url = URL.createObjectURL(blob);
         const filename = `handleliste-${new Date().toLocaleDateString('no-NO').replace(/\//g, '-')}.xlsx`;
-        XLSX.writeFile(workbook, filename);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
     };
 
     return (
