@@ -7,20 +7,20 @@ This project supports local development with Docker using `docker-compose`. The 
 ## Prerequisites
 
 - Docker and Docker Compose installed
-- Your Auth0 credentials (for the `.env.local` file)
+- Your Auth0 credentials (for the `frontend/.env` file)
 - Repository cloned: `sandom-lager`
 
 ## Setup Steps
 
-### 1. Create frontend/.env.local
+### 1. Create `frontend/.env`
 
 Copy the template and fill in your Auth0 credentials:
 
 ```bash
-cp frontend/.env.example frontend/.env.local
+cp frontend/.env.example frontend/.env
 ```
 
-Edit `frontend/.env.local`:
+Edit `frontend/.env`:
 ```env
 VITE_AUTH0_DOMAIN=your-auth0-domain.auth0.com
 VITE_AUTH0_CLIENT_ID=your-auth0-client-id
@@ -28,7 +28,7 @@ VITE_API_BASE_URL=http://backend:5000
 VITE_AUTH0_AUDIENCE=https://sandom-api
 ```
 
-### 2. Create backend/.env.local (or .env for Docker)
+### 2. Create backend/.env
 
 ```bash
 cp backend/.env.example backend/.env
@@ -80,14 +80,14 @@ The Vite dev server should automatically connect for live reloading. If you see 
 Just use default config - Vite auto-detects and uses `localhost:5173`
 
 **Solution 2 - If WebSocket fails:**
-Add to `frontend/.env.local`:
+Add to `frontend/.env`:
 ```env
 VITE_HMR_HOST=localhost
 VITE_HMR_PORT=5173
 ```
 
 **Solution 3 - Docker Desktop on Mac/Windows:**
-Add to `frontend/.env.local`:
+Add to `frontend/.env`:
 ```env
 VITE_HMR_HOST=host.docker.internal
 VITE_HMR_PORT=5173
@@ -109,7 +109,7 @@ VITE_HMR_PORT=5173
 ### Issue: WebSocket connection fails
 **Error**: `WebSocket connection to 'ws://localhost:5173' failed`
 
-**Fix**: Add to `frontend/.env.local`:
+**Fix**: Add to `frontend/.env`:
 ```env
 VITE_HMR_HOST=localhost
 VITE_HMR_PORT=5173
@@ -133,7 +133,7 @@ DATABASE_URL=postgresql://user:password@postgres:5432/sandom_db
 **Error**: `Invalid hook call. Hooks can only be called inside of the body of a function component.`
 
 **Fix**: 
-1. Ensure `frontend/.env.local` has Auth0 domain and client ID
+1. Ensure `frontend/.env` has Auth0 domain and client ID
 2. Frontend defaults to demo values if not set (for development only)
 3. Make sure `Auth0Provider` wraps the app in `main.tsx`
 
@@ -198,7 +198,7 @@ docker-compose down -v
 
 ## Environment Variables Reference
 
-### Frontend (frontend/.env.local)
+### Frontend (frontend/.env)
 - `VITE_AUTH0_DOMAIN` - Auth0 tenant domain
 - `VITE_AUTH0_CLIENT_ID` - Auth0 application client ID
 - `VITE_AUTH0_AUDIENCE` - Auth0 API identifier (default: `https://sandom-api`)
