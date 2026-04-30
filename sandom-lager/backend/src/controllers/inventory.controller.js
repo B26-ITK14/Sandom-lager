@@ -1,6 +1,9 @@
 const pool = require("../db/pool");
 const ApiError = require("../utils/ApiError");
 const { logAction } = require("../utils/logger");
+const { createLowStockNotifications } = require("../services/notification.service");
+
+const LOW_STOCK_THRESHOLD = 5;
 
 // GET api/inventory - Get all inventory items
 async function getInventory(req, res) {
@@ -64,10 +67,26 @@ async function createInventory(req, res) {
         const ingredientName =
             ingredientResult.rows[0]?.name || ingredient_id;
 
+        const locationResult = await pool.query(
+            `SELECT name FROM locations WHERE id = $1`,
+            [location_id]
+        );
+
+        const locationName = locationResult.rows[0]?.name || null;
+
         await logAction(
             req.user,
             `La til inventar: ${ingredientName} (${quantity})`
         );
+
+        if (Number(quantity) <= LOW_STOCK_THRESHOLD) {
+            await createLowStockNotifications({
+                locationId: Number(location_id),
+                ingredientName,
+                quantity: Number(quantity),
+                locationName,
+            });
+        }
 
         res.status(201).json(result.rows[0]);
 
@@ -82,6 +101,21 @@ async function updateInventory(req, res) {
     if (quantity === undefined) {
         throw new ApiError(400, "Missing required field: quantity");
     }
+
+    const existingResult = await pool.query(
+        `SELECT inv.id, inv.location_id, inv.ingredient_id, inv.quantity, i.name AS ingredient_name, l.name AS location_name
+         FROM inventory inv
+         JOIN ingredients i ON inv.ingredient_id = i.id
+         JOIN locations l ON inv.location_id = l.id
+         WHERE inv.id = $1`,
+        [id]
+    );
+
+    if (existingResult.rows.length === 0) {
+        throw new ApiError(404, "Inventory item not found");
+    }
+
+    const existingItem = existingResult.rows[0];
 
     const result = await pool.query(
         `UPDATE inventory inv
@@ -99,10 +133,21 @@ async function updateInventory(req, res) {
 
     const item = result.rows[0];
 
+    const nextQuantity = Number(quantity);
+
     await logAction(
         req.user,
         `Oppdaterte inventar: ${item.name} → ny mengde ${item.quantity}`
     );
+
+    if (Number(existingItem.quantity) > LOW_STOCK_THRESHOLD && nextQuantity <= LOW_STOCK_THRESHOLD) {
+        await createLowStockNotifications({
+            locationId: Number(existingItem.location_id),
+            ingredientName: existingItem.ingredient_name,
+            quantity: nextQuantity,
+            locationName: existingItem.location_name,
+        });
+    }
 
     res.json(item);
 }
