@@ -4,7 +4,7 @@
     * Covers recipes, recipe ingredients, and ingredients.
 */
 
-import { apiFetchJson } from "./client";
+import { apiFetchJson, apiUrl } from "./client";
 import type { Allergen, Ingredient, Recipe, RecipeIngredient } from "../types";
 
 export type RecipesListResponse = Recipe[];
@@ -70,7 +70,7 @@ export async function uploadRecipeImage(
         formData.append("recipeId", String(recipeId));
     }
 
-    const response = await fetch("/api/upload/recipe-image", {
+    const response = await fetch(apiUrl("/api/upload/recipe-image"), {
         method: "POST",
         headers: {
             Authorization: `Bearer ${accessToken}`,

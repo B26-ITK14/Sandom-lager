@@ -1,3 +1,5 @@
+import { apiUrl } from "../api/client";
+
 /*
     * AdminPage.tsx
     * Admin-panel for håndtering av brukertilgangssøknader.
@@ -50,7 +52,7 @@ export default function AdminPage() {
         async function fetchRequests() {
             try {
                 const token = await getAccessTokenSilently();
-                const res = await fetch("/api/user-locations", {
+                const res = await fetch(apiUrl("/api/user-locations"), {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!res.ok) throw new Error("Feil ved henting av søknader");
@@ -99,7 +101,7 @@ export default function AdminPage() {
         setLoadingId(id);
         try {
             const token = await getAccessTokenSilently();
-            const res = await fetch(`/api/user-locations/${id}/approve`, {
+            const res = await fetch(apiUrl(`/api/user-locations/${id}/approve`), {
                 method: "PATCH",
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -116,7 +118,7 @@ export default function AdminPage() {
         setLoadingId(id);
         try {
             const token = await getAccessTokenSilently();
-            const res = await fetch(`/api/user-locations/${id}/deny`, {
+            const res = await fetch(apiUrl(`/api/user-locations/${id}/deny`), {
                 method: "PATCH",
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -133,7 +135,7 @@ export default function AdminPage() {
         setLoadingId(id);
         try {
             const token = await getAccessTokenSilently();
-            const res = await fetch(`/api/user-locations/${id}/revoke`, {
+            const res = await fetch(apiUrl(`/api/user-locations/${id}/revoke`), {
                 method: "PATCH",
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -150,7 +152,7 @@ export default function AdminPage() {
         setLoadingId(id);
         try {
             const token = await getAccessTokenSilently();
-            const res = await fetch(`/api/user-locations/${id}/block`, {
+            const res = await fetch(apiUrl(`/api/user-locations/${id}/block`), {
                 method: "PATCH",
                 headers: { Authorization: `Bearer ${token}` },
             });

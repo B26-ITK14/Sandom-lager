@@ -13,12 +13,18 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    // Bind to 0.0.0.0 to accept connections from all interfaces
+    // This allows WebSocket HMR to work from other machines and Docker
+    host: '0.0.0.0',
+    // HMR configuration for proper WebSocket connection
+    hmr: {
+      host: process.env.VITE_HMR_HOST || 'localhost',
+      port: process.env.VITE_HMR_PORT ? parseInt(process.env.VITE_HMR_PORT) : 5173,
+    },
     // Enable compression for dev server
     middlewareMode: false,
   },
   build: {
-    // Enable minification for production builds
-    minify: 'terser',
     // Optimize CSS and JS splitting
     rollupOptions: {
       output: {
@@ -73,12 +79,6 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
     // Report compressed file sizes
     reportCompressedSize: true,
-    // Minify while preserving comments for licenses
-    terserOptions: {
-      compress: {
-        drop_console: false, // Keep console for now for debugging
-      },
-    },
   },
   // Optimize dependencies
   optimizeDeps: {

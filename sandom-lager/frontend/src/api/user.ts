@@ -5,6 +5,7 @@
 */
 
 import { apiFetchJson } from "./client";
+import { apiUrl } from "./client";
 import type { UserRole } from "../types";
 
 export type { UserRole };
@@ -37,7 +38,7 @@ export async function fetchMe(accessToken: string): Promise<{ role: UserRole; na
  * Only works for users with an auth0 (username/password) connection.
  */
 export async function updateName(name: string, accessToken: string): Promise<void> {
-    const response = await fetch('/api/me/name', {
+    const response = await fetch(apiUrl('/api/me/name'), {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -52,7 +53,7 @@ export async function updateName(name: string, accessToken: string): Promise<voi
 }
 
 export async function updateUsername(username: string, accessToken: string): Promise<string | null> {
-    const response = await fetch('/api/me/username', {
+    const response = await fetch(apiUrl('/api/me/username'), {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -124,7 +125,7 @@ export async function fetchSessions(accessToken: string): Promise<Auth0Session[]
 }
 
 export async function revokeSession(sessionId: string, accessToken: string): Promise<void> {
-    const response = await fetch(`/api/me/sessions/${encodeURIComponent(sessionId)}`, {
+    const response = await fetch(apiUrl(`/api/me/sessions/${encodeURIComponent(sessionId)}`), {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${accessToken}` },
     });
@@ -134,7 +135,7 @@ export async function revokeSession(sessionId: string, accessToken: string): Pro
 }
 
 export async function revokeOtherSessions(accessToken: string): Promise<number> {
-    const response = await fetch('/api/me/sessions/others', {
+    const response = await fetch(apiUrl('/api/me/sessions/others'), {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${accessToken}` },
     });
@@ -149,7 +150,7 @@ export async function revokeOtherSessions(accessToken: string): Promise<number> 
 
 
 export async function requestEmailChange(newEmail: string, accessToken: string): Promise<void> {
-    const response = await fetch('/api/me/email', {
+    const response = await fetch(apiUrl('/api/me/email'), {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -167,7 +168,7 @@ export async function updateProfilePicture(file: File, accessToken: string): Pro
     const formData = new FormData();
     formData.append('profilePicture', file);
 
-    const response = await fetch('/api/me/profile-picture', {
+    const response = await fetch(apiUrl('/api/me/profile-picture'), {
         method: 'PATCH',
         headers: {
             Authorization: `Bearer ${accessToken}`,

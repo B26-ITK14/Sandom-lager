@@ -104,7 +104,20 @@ async function syncUser(req, res, next) {
         console.log(`[syncUser] Done — proceeding to next middleware for ${req.method} ${req.path}`);
         next();
     } catch (err) {
-        console.error("[syncUser] Unexpected error:", err);
+        console.error("[syncUser] Unexpected error", {
+            method: req.method,
+            path: req.originalUrl,
+            authSub: req.auth?.sub,
+            code: err.code,
+            message: err.message,
+            detail: err.detail,
+            stack: err.stack,
+        });
+
+        if (err?.code === "42P01") {
+            console.error("[syncUser] Hint: one or more database tables are missing. Ensure backend/src/db/schema.sql has been applied to the Render DATABASE_URL database.");
+        }
+
         res.status(500).json({ message: "User sync failed" });
     }
 }
