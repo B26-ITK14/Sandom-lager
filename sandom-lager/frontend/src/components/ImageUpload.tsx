@@ -1,3 +1,5 @@
+import { apiUrl } from "../api/client";
+
 /*
     * ImageUpload.tsx
     * Component for uploading images to the server and displaying a preview.
@@ -21,7 +23,7 @@ export default function ImageUpload({ onUpload }: { onUpload: (url: string) => v
         const formData = new FormData();
         formData.append("image", file);
 
-        const res = await fetch("/api/upload", {
+        const res = await fetch(apiUrl("/api/upload"), {
             method: "POST",
             body: formData,
         });

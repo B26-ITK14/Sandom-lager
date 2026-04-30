@@ -17,8 +17,6 @@ export default defineConfig({
     middlewareMode: false,
   },
   build: {
-    // Enable minification for production builds
-    minify: 'terser',
     // Optimize CSS and JS splitting
     rollupOptions: {
       output: {
@@ -73,12 +71,6 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
     // Report compressed file sizes
     reportCompressedSize: true,
-    // Minify while preserving comments for licenses
-    terserOptions: {
-      compress: {
-        drop_console: false, // Keep console for now for debugging
-      },
-    },
   },
   // Optimize dependencies
   optimizeDeps: {

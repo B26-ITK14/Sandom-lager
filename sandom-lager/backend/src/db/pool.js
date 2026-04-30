@@ -3,6 +3,12 @@ const { Pool } = require("pg");
 // PostgreSQL connection (Docker service name = db)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl:
+    process.env.PGSSLMODE === "disable"
+      ? false
+      : process.env.DATABASE_URL?.includes("supabase.co")
+        ? { rejectUnauthorized: false }
+        : undefined,
 });
 
 let userSchemaPromise = null;
