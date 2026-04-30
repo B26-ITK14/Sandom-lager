@@ -2,7 +2,6 @@
     * NotificationList.tsx
     * A list component displaying multiple notifications.
     * Shows empty state when no notifications are available.
-    * Author: Emil Berglund
 */
 
 import { Package } from 'lucide-react';

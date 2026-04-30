@@ -1,7 +1,7 @@
 /*
     * NotificationFlyout.tsx
-    * A flyout notification panel that slides in from the right, displaying system notifications such as 
-    * low stock alerts, expiring items, and shopping list updates.
+    * A flyout notification panel that slides in from the right, displaying system notifications
+    * such as low stock alerts or access approvals. 
 */
 
 import { useNavigate } from 'react-router-dom';

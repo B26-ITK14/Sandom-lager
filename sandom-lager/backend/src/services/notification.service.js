@@ -1,3 +1,9 @@
+/**
+ * notification.service.js
+ * Service for creating notifications in the system. This includes both user-initiated notifications (e.g. admin approving location access) 
+ * and system-generated notifications (e.g. low stock alerts).
+ */
+
 const pool = require("../db/pool");
 
 async function createNotification({ userId, type, title, message, locationNickname = null }) {
