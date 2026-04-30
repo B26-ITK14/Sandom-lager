@@ -23,15 +23,31 @@ const app = express();
 app.use(express.json({ limit: "8mb" }));
 
 // Allow requests from the Vite dev server
+// CORS middleware: allow origins configured via ALLOWED_ORIGINS (comma-separated).
+// If ALLOWED_ORIGINS is not set, fall back to allowing all origins.
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "http://localhost:5173");
-    res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  const allowedEnv = process.env.ALLOWED_ORIGINS || "";
+  const allowed = allowedEnv
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
-    if (req.method === "OPTIONS") return res.sendStatus(204);
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  const origin = req.headers.origin;
 
-    next();
+  if (allowed.length === 0) {
+    // No specific origins configured — allow all (useful for quick deployments).
+    res.header("Access-Control-Allow-Origin", "*");
+  } else if (origin && allowed.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+
+  res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+
+  next();
 });
 
 // Health check endpoint
