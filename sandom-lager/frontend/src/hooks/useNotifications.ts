@@ -56,25 +56,18 @@ export function useNotifications() {
     }, [getApiAccessToken, isAuthenticated]);
 
     const markOneAsRead = useCallback(async (notificationId: number) => {
-        let shouldCallApi = false;
-
-        setNotifications((prev) =>
-            prev.map((notification) => {
-                if (notification.id !== notificationId) {
-                    return notification;
-                }
-
-                if (!notification.isRead) {
-                    shouldCallApi = true;
-                }
-
-                return { ...notification, isRead: true };
-            })
-        );
-
-        if (!shouldCallApi) {
+        const target = notifications.find((notification) => notification.id === notificationId);
+        if (!target || target.isRead) {
             return;
         }
+
+        setNotifications((prev) =>
+            prev.map((notification) =>
+                notification.id === notificationId
+                    ? { ...notification, isRead: true }
+                    : notification
+            )
+        );
 
         try {
             const token = await getApiAccessToken();
@@ -84,7 +77,7 @@ export function useNotifications() {
             setErrorMessage(error instanceof Error ? error.message : 'Kunne ikke oppdatere varsel.');
             await refresh({ force: true });
         }
-    }, [getApiAccessToken, refresh]);
+    }, [getApiAccessToken, notifications, refresh]);
 
     const markAllAsRead = useCallback(async () => {
         setNotifications((prev) => prev.map((notification) => ({ ...notification, isRead: true })));

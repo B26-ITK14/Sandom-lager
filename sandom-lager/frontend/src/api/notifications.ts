@@ -70,3 +70,18 @@ export async function markAllNotificationsRead(accessToken: string): Promise<voi
         method: "PATCH",
     });
 }
+
+/**
+ * Determines the navigation path based on notification type.
+ * - warning: low-stock alerts → /storage
+ * - alert: access-related notifications → /admin/access
+ */
+export function getNotificationPath(type: "warning" | "info" | "alert"): string {
+    if (type === "warning") {
+        return "/storage";
+    }
+    if (type === "alert") {
+        return "/admin/access";
+    }
+    return "/"; // Fallback to home
+}

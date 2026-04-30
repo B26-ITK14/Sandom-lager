@@ -5,7 +5,7 @@
 */
 
 import { useNavigate } from 'react-router-dom';
-import { getRouteByNickname } from '../../router/nav';
+import { getNotificationPath } from '../../api/notifications';
 import { NotificationHeader } from './NotificationHeader';
 import { NotificationList } from './NotificationList';
 import { NotificationFooter } from './NotificationFooter';
@@ -39,14 +39,10 @@ export function NotificationFlyout({
     const handleNotificationClick = async (notification: Notification) => {
         await onNotificationClick(notification.id);
 
-        // Navigate to related route if location exists
-        if (notification.locationNickname) {
-            const route = getRouteByNickname(notification.locationNickname);
-            if (route) {
-                navigate(route.path);
-                onClose();
-            }
-        }
+        // Navigate to the appropriate page based on notification type
+        const path = getNotificationPath(notification.type);
+        navigate(path);
+        onClose();
     };
 
     return (
