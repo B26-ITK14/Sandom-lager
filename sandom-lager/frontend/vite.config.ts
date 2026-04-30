@@ -3,6 +3,11 @@ import react from '@vitejs/plugin-react'
 
 const apiTarget = process.env.API_TARGET ?? 'http://localhost:5000';
 
+// Detect if running in Docker by checking for Docker hostname or env var
+const isDocker = process.env.DOCKER_HOST !== undefined || process.env.CONTAINER_ENV !== undefined;
+const hmrHost = process.env.VITE_HMR_HOST || (isDocker ? 'localhost' : 'localhost');
+const hmrPort = process.env.VITE_HMR_PORT ? parseInt(process.env.VITE_HMR_PORT) : 5173;
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -12,6 +17,11 @@ export default defineConfig({
         target: apiTarget,
         changeOrigin: true,
       },
+    },
+    // HMR configuration for Docker and local development
+    hmr: {
+      host: hmrHost,
+      port: hmrPort,
     },
     // Enable compression for dev server
     middlewareMode: false,
