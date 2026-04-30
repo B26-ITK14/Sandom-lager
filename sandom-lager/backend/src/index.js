@@ -134,7 +134,7 @@ app.use((req, res, next) => {
   }
 
   res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
 
   if (req.method === "OPTIONS") return res.sendStatus(204);
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);

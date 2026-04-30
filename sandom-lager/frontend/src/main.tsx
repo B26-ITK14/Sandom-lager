@@ -43,16 +43,6 @@ const onRedirectCallback = (appState?: AppState) => {
   window.history.replaceState({}, document.title, target);
 };
 
-// TEMP DEBUG: log build-time VITE_ env values to help verify Cloudflare Pages injected them.
-// Remove this after verification.
-try {
-  console.log("[DEBUG VITE] VITE_AUTH0_DOMAIN=", import.meta.env.VITE_AUTH0_DOMAIN);
-  console.log("[DEBUG VITE] VITE_AUTH0_CLIENT_ID=", import.meta.env.VITE_AUTH0_CLIENT_ID);
-  console.log("[DEBUG VITE] VITE_API_BASE_URL=", import.meta.env.VITE_API_BASE_URL);
-} catch (e) {
-  // ignore runtime errors here
-}
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Auth0Provider
