@@ -9,11 +9,13 @@ import { AUTH0_AUDIENCE, AUTH0_SCOPE } from "./config/auth";
 import { env } from "./config/env";
 
 // Register Service Worker for offline support and caching
-if ('serviceWorker' in navigator) {
+// DISABLED IN DEVELOPMENT to avoid intercepting API calls
+// Enable only in production builds
+if ('serviceWorker' in navigator && import.meta.env.MODE === 'production') {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
       .catch(() => {
-        // Ignore service worker registration failures in development.
+        // Ignore service worker registration failures.
       });
   });
 }

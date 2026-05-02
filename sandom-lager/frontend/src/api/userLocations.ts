@@ -5,9 +5,10 @@
 
 import type { UserLocationResponse } from "../types";
 import { notifyAdminsOfAccessRequest } from "./notifications";
+import { apiUrl } from "./client";
 
 export async function fetchLocations(token: string) {
-    const res = await fetch("/api/locations", {
+    const res = await fetch(apiUrl("/api/locations"), {
         headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) throw new Error("Feil ved henting av lokasjoner");
@@ -15,7 +16,7 @@ export async function fetchLocations(token: string) {
 }
 
 export async function requestLocationAccess(token: string, locationId: number): Promise<void> {
-    const res = await fetch("/api/user-locations/request", {
+    const res = await fetch(apiUrl("/api/user-locations/request"), {
         method: "POST",
         headers: {
             Authorization: `Bearer ${token}`,
@@ -33,7 +34,7 @@ export async function requestLocationAccess(token: string, locationId: number): 
 }
 
 export async function fetchMyLocationAccess(token: string): Promise<UserLocationResponse[]> {
-    const res = await fetch("/api/user-locations/me", {
+    const res = await fetch(apiUrl("/api/user-locations/me"), {
         headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) throw new Error("Feil ved henting av søknadsstatus");

@@ -4,6 +4,12 @@
     * It includes error handling and a custom error class (ApiError) to standardize error responses from the API.
  */
 
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "";
+
+    export function apiUrl(path: string): string {
+        return `${API_BASE_URL}${path}`;
+    }
+
 export class ApiError extends Error {
     status: number;
     detail?: string;
@@ -17,7 +23,7 @@ export class ApiError extends Error {
 }
 
 export async function apiFetchJson<T>(path: string, init?: RequestInit): Promise<T> {
-    const response = await fetch(path, init);
+    const response = await fetch(apiUrl(path), init);
 
     if (!response.ok) {
         let errorDetail: string | undefined;
