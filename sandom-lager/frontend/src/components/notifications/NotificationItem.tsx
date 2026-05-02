@@ -5,7 +5,7 @@
     * Author: Emil Berglund
 */
 
-import { AlertCircle, Clock, ShoppingCart, Package } from 'lucide-react';
+import { AlertCircle, Clock, ShoppingCart, Package, Key, CheckCircle, Ban } from 'lucide-react';
 import type { Notification } from './types';
 
 interface NotificationItemProps {
@@ -14,8 +14,24 @@ interface NotificationItemProps {
 }
 
 export function NotificationItem({ notification, onClick }: NotificationItemProps) {
-    const getNotificationIcon = (type: string) => {
-        switch (type) {
+    const getNotificationIcon = (notification: Notification) => {
+        const title = (notification.title || '').toLowerCase();
+
+        // Access / admin related notifications
+        if (title.includes('ny tilgang') || title.includes('tilgangssøknad') || title.includes('tilgangssøknad')) {
+            return <Key size={20} className="text-yellow-500" />; // user-key in gold
+        }
+
+        if (title.includes('tilgang godkjent') || title.includes('tilgang godkjent') || title.includes('godkjent')) {
+            return <CheckCircle size={20} className="text-green-500" />; // access granted in green
+        }
+
+        if (title.includes('avslått') || title.includes('avslå') || title.includes('avslatt') || title.includes('denied')) {
+            return <Ban size={20} className="text-red-500" />; // access denied in red
+        }
+
+        // Fallback to icon by type
+        switch (notification.type) {
             case 'warning':
                 return <AlertCircle size={20} className="text-yellow-500" />;
             case 'alert':
@@ -38,8 +54,8 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
             }}
         >
             <div className="flex gap-3">
-                <div className="flex-shrink-0 mt-1">
-                    {getNotificationIcon(notification.type)}
+                    <div className="flex-shrink-0 mt-1">
+                    {getNotificationIcon(notification)}
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-1">
