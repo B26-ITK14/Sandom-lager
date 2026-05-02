@@ -1,5 +1,6 @@
 const pool = require("../db/pool");
 const ApiError = require("../utils/ApiError");
+const { createAdminAccessRequestNotifications } = require("../services/notification.service");
 
 // GET /api/notifications?unreadOnly=true
 async function getNotifications(req, res) {
@@ -74,9 +75,44 @@ async function markAllNotificationsRead(req, res) {
     });
 }
 
+// POST /api/notifications/access-request
+async function notifyAdminsOfAccessRequest(req, res) {
+    const requesterId = req.user.id;
+    const { location_id } = req.body;
+
+    if (!location_id) {
+        throw new ApiError(400, "Missing required field: location_id");
+    }
+
+    const requestDetailsResult = await pool.query(
+        `SELECT u.name AS user_name, l.name AS location_name
+         FROM users u
+         JOIN locations l ON l.id = $1
+         WHERE u.id = $2`,
+        [location_id, requesterId]
+    );
+
+    if (requestDetailsResult.rows.length === 0) {
+        throw new ApiError(404, "Could not resolve access request details");
+    }
+
+    const requestDetails = requestDetailsResult.rows[0];
+
+    const notifications = await createAdminAccessRequestNotifications({
+        requesterName: requestDetails.user_name,
+        locationName: requestDetails.location_name,
+    });
+
+    res.status(201).json({
+        message: "Admin notifications created",
+        count: notifications.length,
+    });
+}
+
 module.exports = {
     getNotifications,
     markNotificationRead,
     markAllNotificationsRead,
+    notifyAdminsOfAccessRequest,
 };
 

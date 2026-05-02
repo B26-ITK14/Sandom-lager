@@ -93,7 +93,41 @@ async function createLowStockNotifications({ locationId, ingredientName, quantit
     return notifications;
 }
 
+async function createAdminAccessRequestNotifications({ requesterName, locationName }) {
+    const adminsResult = await pool.query(
+        `SELECT id
+         FROM users
+         WHERE role = 'admin'`
+    );
+
+    if (adminsResult.rows.length === 0) {
+        return [];
+    }
+
+    const notifications = [];
+
+    for (const admin of adminsResult.rows) {
+        const result = await pool.query(
+            `INSERT INTO notifications (user_id, type, title, message, location_nickname)
+             VALUES ($1, $2, $3, $4, $5)
+             RETURNING *`,
+            [
+                admin.id,
+                "alert",
+                "Ny tilgangssøknad",
+                `${requesterName} har søkt om tilgang til ${locationName}`,
+                "admin",
+            ]
+        );
+
+        notifications.push(result.rows[0]);
+    }
+
+    return notifications;
+}
+
 module.exports = {
     createNotification,
     createLowStockNotifications,
+    createAdminAccessRequestNotifications,
 };

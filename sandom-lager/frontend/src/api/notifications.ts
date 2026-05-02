@@ -71,6 +71,17 @@ export async function markAllNotificationsRead(accessToken: string): Promise<voi
     });
 }
 
+export async function notifyAdminsOfAccessRequest(accessToken: string, locationId: number): Promise<void> {
+    await apiFetchJson<{ message: string; count: number }>("/api/notifications/access-request", {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ location_id: locationId }),
+    });
+}
+
 /**
  * Determines the navigation path based on notification type.
  * - warning: low-stock alerts → /storage

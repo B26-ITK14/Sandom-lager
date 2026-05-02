@@ -30,4 +30,10 @@ router.patch(
     asyncHandler(notificationsController.markAllNotificationsRead)
 );
 
+router.post(
+    "/notifications/access-request",
+    requireRole("user", "manager", "admin"),
+    asyncHandler(notificationsController.notifyAdminsOfAccessRequest)
+);
+
 module.exports = router;
