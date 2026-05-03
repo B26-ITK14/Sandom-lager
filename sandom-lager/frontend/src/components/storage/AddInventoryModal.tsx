@@ -168,26 +168,37 @@ export default function AddInventoryModal({ onClose, onCreated }: AddInventoryMo
         >
             <section
                 className="w-full max-w-md rounded-2xl border p-5"
-                style={{ borderColor: "#d4d6db", backgroundColor: "#ffffff" }}
+                style={{
+                    borderColor: "var(--color-border)",
+                    backgroundColor: "var(--color-surface)",
+                }}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="add-storage-item-title"
                 onClick={(event) => event.stopPropagation()}
             >
                 <header className="mb-4 flex items-center justify-between">
-                    <h2 id="add-storage-item-title" className="text-lg font-semibold" style={{ color: "#253042" }}>
+                    <h2
+                        id="add-storage-item-title"
+                        className="text-lg font-semibold"
+                        style={{ color: "var(--color-text-primary)" }}
+                    >
                         Legg til vare i lageret
                     </h2>
                 </header>
 
                 {loading ? (
-                    <p className="text-sm" style={{ color: "#5f6470" }}>
+                    <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
                         Laster valg...
                     </p>
                 ) : (
                     <form className="space-y-3" onSubmit={(event) => void handleSubmit(event)}>
                         <fieldset className="m-0 border-0 p-0">
-                            <label className="mb-1 block text-sm font-medium" htmlFor="storage-add-ingredient" style={{ color: "#4c5561" }}>
+                            <label
+                                className="mb-1 block text-sm font-medium"
+                                htmlFor="storage-add-ingredient"
+                                style={{ color: "var(--color-text-secondary)" }}
+                            >
                                 Ingrediens
                             </label>
                             <select
@@ -195,7 +206,11 @@ export default function AddInventoryModal({ onClose, onCreated }: AddInventoryMo
                                 value={ingredientId}
                                 onChange={(event) => setIngredientId(event.target.value)}
                                 className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
-                                style={{ borderColor: "#c7c8cb", color: "#253042", backgroundColor: "#f7f7f8" }}
+                                style={{
+                                    borderColor: "var(--color-border)",
+                                    color: "var(--color-text-primary)",
+                                    backgroundColor: "var(--color-secondary-surface)",
+                                }}
                                 disabled={availableIngredients.length === 0}
                             >
                                 {availableIngredients.length === 0 ? (
@@ -210,7 +225,11 @@ export default function AddInventoryModal({ onClose, onCreated }: AddInventoryMo
                         </fieldset>
 
                         <fieldset className="m-0 border-0 p-0">
-                            <label className="mb-1 block text-sm font-medium" htmlFor="storage-add-location" style={{ color: "#4c5561" }}>
+                            <label
+                                className="mb-1 block text-sm font-medium"
+                                htmlFor="storage-add-location"
+                                style={{ color: "var(--color-text-secondary)" }}
+                            >
                                 Lokasjon
                             </label>
                             <select
@@ -218,7 +237,11 @@ export default function AddInventoryModal({ onClose, onCreated }: AddInventoryMo
                                 value={locationId}
                                 onChange={(event) => setLocationId(event.target.value)}
                                 className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
-                                style={{ borderColor: "#c7c8cb", color: "#253042", backgroundColor: "#f7f7f8" }}
+                                style={{
+                                    borderColor: "var(--color-border)",
+                                    color: "var(--color-text-primary)",
+                                    backgroundColor: "var(--color-secondary-surface)",
+                                }}
                             >
                                 {locations.map((location) => (
                                     <option key={location.id} value={location.id}>
@@ -229,7 +252,11 @@ export default function AddInventoryModal({ onClose, onCreated }: AddInventoryMo
                         </fieldset>
 
                         <fieldset className="m-0 border-0 p-0">
-                            <label className="mb-1 block text-sm font-medium" htmlFor="storage-add-quantity" style={{ color: "#4c5561" }}>
+                            <label
+                                className="mb-1 block text-sm font-medium"
+                                htmlFor="storage-add-quantity"
+                                style={{ color: "var(--color-text-secondary)" }}
+                            >
                                 Mengde
                             </label>
                             <input
@@ -240,12 +267,23 @@ export default function AddInventoryModal({ onClose, onCreated }: AddInventoryMo
                                 value={quantity}
                                 onChange={(event) => setQuantity(event.target.value)}
                                 className="w-full rounded-lg border px-3 py-2 text-sm outline-none"
-                                style={{ borderColor: "#c7c8cb", color: "#253042", backgroundColor: "#f7f7f8" }}
+                                style={{
+                                    borderColor: "var(--color-border)",
+                                    color: "var(--color-text-primary)",
+                                    backgroundColor: "var(--color-secondary-surface)",
+                                }}
                             />
                         </fieldset>
 
                         {error ? (
-                            <p className="rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "#ee9da1", color: "#7d2126", backgroundColor: "#fff3f3" }}>
+                            <p
+                                className="rounded-lg border px-3 py-2 text-sm"
+                                style={{
+                                    borderColor: "var(--color-danger, #dc2626)",
+                                    color: "var(--color-danger, #dc2626)",
+                                    backgroundColor: "var(--color-secondary-surface)",
+                                }}
+                            >
                                 {error}
                             </p>
                         ) : null}
@@ -254,8 +292,12 @@ export default function AddInventoryModal({ onClose, onCreated }: AddInventoryMo
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="rounded-lg border px-3 py-2 text-sm font-semibold"
-                                style={{ borderColor: "#c7c8cb", color: "#4c5561", backgroundColor: "#f7f7f8" }}
+                                className="rounded-lg border px-3 py-2 text-sm font-semibold cursor-pointer"
+                                style={{
+                                    borderColor: "var(--color-border)",
+                                    color: "var(--color-text-primary)",
+                                    backgroundColor: "var(--color-secondary-surface)",
+                                }}
                             >
                                 Avbryt
                             </button>
@@ -263,7 +305,7 @@ export default function AddInventoryModal({ onClose, onCreated }: AddInventoryMo
                                 type="submit"
                                 disabled={!canSubmit || submitting}
                                 className="rounded-lg px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
-                                style={{ backgroundColor: "#0a9a82" }}
+                                style={{ backgroundColor: "var(--color-primary)" }}
                             >
                                 {submitting ? "Lagrer..." : "Legg til"}
                             </button>

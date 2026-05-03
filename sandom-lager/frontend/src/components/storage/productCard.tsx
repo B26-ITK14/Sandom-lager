@@ -54,15 +54,24 @@ export default function ProductCard({
         }
     }, [quantity, isEditing]);
 
-    async function handleEditButtonClick() {
+    function handleStartEdit() {
         if (!canEdit) {
             onNotice?.("Du har ikke tilgang til å redigere lageret.");
             return;
         }
 
-        if (!isEditing) {
-            setQuantityInput(String(quantity));
-            setIsEditing(true);
+        setQuantityInput(String(quantity));
+        setIsEditing(true);
+    }
+
+    function handleCancelEdit() {
+        setQuantityInput(String(quantity));
+        setIsEditing(false);
+    }
+
+    async function handleConfirmEdit() {
+        if (!canEdit) {
+            onNotice?.("Du har ikke tilgang til å redigere lageret.");
             return;
         }
 
@@ -110,8 +119,8 @@ export default function ProductCard({
                                 step="any"
                                 className="w-24 rounded-md border px-2 py-1 text-md font-semibold outline-none"
                                 style={{
-                                    borderColor: "var(--color-border)",
-                                    color: "var(--color-text-secondary)",
+                                    borderColor: "var(--color-primary)",
+                                    color: "var(--color-text-primary)",
                                     backgroundColor: "var(--color-surface)",
                                 }}
                                 value={quantityInput}
@@ -136,14 +145,31 @@ export default function ProductCard({
                         onClick={() => onToggleFavorite?.(id)}
                         isSaved={isFavorite}
                     />
-                    <StorageEditCardBtn
-                        name={name}
-                        onClick={() => {
-                            void handleEditButtonClick();
-                        }}
-                        disabled={editDisabled}
-                        isSaving={isEditing || editDisabled}
-                    />
+                    {isEditing ? (
+                        <>
+                            <StorageEditCardBtn
+                                name={name}
+                                variant="confirm"
+                                onClick={() => {
+                                    void handleConfirmEdit();
+                                }}
+                                disabled={editDisabled}
+                            />
+                            <StorageEditCardBtn
+                                name={name}
+                                variant="cancel"
+                                onClick={handleCancelEdit}
+                                disabled={editDisabled}
+                            />
+                        </>
+                    ) : (
+                        <StorageEditCardBtn
+                            name={name}
+                            variant="edit"
+                            onClick={handleStartEdit}
+                            disabled={editDisabled}
+                        />
+                    )}
                     <StorageDelCardBtn
                         name={name}
                         onClick={() => {
@@ -160,17 +186,33 @@ export default function ProductCard({
             </div>
 
             {isConfirmingDelete ? (
-                <div className="mt-4">
-                    <DelCardQ
-                        name={name}
-                        onConfirm={() => {
-                            void handleConfirmDelete();
-                        }}
-                        onCancel={() => {
+                <div
+                    className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 p-4 sm:items-center"
+                    role="presentation"
+                    onClick={() => {
+                        if (!deleteDisabled) {
                             setIsConfirmingDelete(false);
+                        }
+                    }}
+                >
+                    <div
+                        className="w-full max-w-sm"
+                        role="presentation"
+                        onClick={(event) => {
+                            event.stopPropagation();
                         }}
-                        disabled={deleteDisabled}
-                    />
+                    >
+                        <DelCardQ
+                            name={name}
+                            onConfirm={() => {
+                                void handleConfirmDelete();
+                            }}
+                            onCancel={() => {
+                                setIsConfirmingDelete(false);
+                            }}
+                            disabled={deleteDisabled}
+                        />
+                    </div>
                 </div>
             ) : null}
         </article>

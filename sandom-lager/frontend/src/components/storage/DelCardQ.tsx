@@ -18,32 +18,48 @@ export default function DelCardQ({
     disabled = false,
 }: DelCardQProps) {
     return(
-        <article className="rounded-xl border px-4 py-3" style={{ borderColor: "#d4d6db", backgroundColor: "#f8fafc" }}>
-            <p className="text-sm font-semibold" style={{ color: "#253042" }}>
+        <article
+            className="rounded-2xl border px-4 py-4 shadow-lg"
+            style={{
+                borderColor: "var(--color-border)",
+                backgroundColor: "var(--color-surface)",
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Bekreft sletting av ${name}`}
+        >
+            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
                 Slett {name} fra lageret?
             </p>
-            <p className="mt-1 text-xs" style={{ color: "#5f6470" }}>
+            <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>
                 Denne handlingen kan ikke angres.
             </p>
 
-            <section className="mt-3 flex gap-2">
-                <button
-                    type="button"
-                    onClick={onConfirm}
-                    disabled={disabled}
-                    className="rounded-md px-3 py-1 text-xs font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-                    style={{ backgroundColor: "#ee9da1", color: "#111" }}
-                >
-                    Ja, slett
-                </button>
+            <section className="mt-4 flex justify-end gap-2">
                 <button
                     type="button"
                     onClick={onCancel}
                     disabled={disabled}
-                    className="rounded-md border px-3 py-1 text-xs font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-                    style={{ borderColor: "#c7c8cb", color: "#4c5561", backgroundColor: "#f7f7f8" }}
+                    className="rounded-md border px-3 py-1.5 text-xs font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                    style={{
+                        borderColor: "var(--color-border)",
+                        color: "var(--color-text-primary)",
+                        backgroundColor: "var(--color-secondary-surface)",
+                    }}
                 >
-                    Nei
+                    Avbryt
+                </button>
+                <button
+                    type="button"
+                    onClick={onConfirm}
+                    disabled={disabled}
+                    className="rounded-md px-3 py-1.5 text-xs font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                    style={{
+                        backgroundColor: "var(--color-danger, #dc2626)",
+                        color: "#ffffff",
+                    }}
+                >
+                    Slett vare
                 </button>
             </section>
         </article>
