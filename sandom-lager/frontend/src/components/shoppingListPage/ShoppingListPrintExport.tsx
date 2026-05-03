@@ -1,4 +1,5 @@
 import writeXlsxFile, { type SheetData } from 'write-excel-file/browser';
+import { Printer, FileSpreadsheet } from 'lucide-react';
 import type { ShoppingListItem } from '../../types';
 
 interface Props {
@@ -45,29 +46,35 @@ export default function ShoppingListPrintExport({ items }: Props) {
     };
 
     return (
-        <div className="flex gap-3">
+        <div className="flex gap-2">
 
             {/* Button to trigger print */}
             <button
                 onClick={() => window.print()}
-                className="py-2 px-4 rounded-md cursor-pointer"
+                className="flex items-center gap-2 py-2 px-4 rounded-md font-medium transition-all hover:shadow-md cursor-pointer"
                 style={{ 
                     background: "var(--color-secondary-surface)",
+                    color: "var(--color-text-primary)",
                     border: "1px solid var(--color-border)",
-                    }}>
-                Skriv ut
+                }}
+                title="Skriv ut handlelisten"
+            >
+                <Printer size={20} />
+                <span>Skriv ut</span>
             </button>
 
             {/* Button to trigger Excel export */}
             <button
                 onClick={exportToExcel}
-                className="py-2 px-4 rounded-md cursor-pointer"
+                className="flex items-center gap-2 py-2 px-4 rounded-md font-medium transition-all hover:shadow-md cursor-pointer"
                 style={{ 
-                    background: "var(--color-primary)",
-                    color: "var(--color-on-primary)",
-                    }}
+                    background: "#10b981",
+                    color: "white",
+                }}
+                title="Eksporter til Excel-fil"
             >
-                Eksporter til Excel
+                <FileSpreadsheet size={20} />
+                <span>Excel</span>
             </button>
         </div>
     );

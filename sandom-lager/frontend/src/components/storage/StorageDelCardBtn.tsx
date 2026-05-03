@@ -20,7 +20,7 @@ export default function StorageDelCardBtn({
         <button
             type="button"
             className="grid h-11 w-11 place-items-center rounded-full cursor-pointer transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
-            style={{ backgroundColor: "#ee9da1", color: "#000" }}
+            style={{ backgroundColor: "var(--color-danger, #dc2626)", color: "#ffffff" }}
             aria-label={`Slett ${name}`}
             onClick={onClick}
             disabled={disabled}

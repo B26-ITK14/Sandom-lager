@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { clearShoppingList } from "../../api";
 import { useUser } from "../../context/UserContext";
@@ -42,13 +43,15 @@ export default function DeleteShoppingListButton({ onDeleted }: Props) {
                     setError(null);
                     setIsOpen(true);
                 }}
-                className="py-2 px-4 rounded-md transition-colors cursor-pointer"
+                className="flex items-center gap-2 py-2 px-4 rounded-md font-medium transition-all hover:shadow-md cursor-pointer"
                 style={{
-                    background: "var(--color-secondary-surface)",
-                    border: "1px solid var(--color-border)",
-                    color: "var(--color-text-primary)",
-                }}>
-                Slett handleliste
+                    background: "var(--color-danger, #f44336)",
+                    color: "white",
+                }}
+                title="Slett hele handlelisten"
+            >
+                <Trash2 size={20} />
+                <span>Slett</span>
             </button>
 
             {isOpen && (

@@ -61,6 +61,7 @@ export default function Dashboard() {
             icon: BookOpen,
             color: "#15803D",
             bg: "#DCFCE7",
+            route: ROUTES.RECIPES.path,
         },
         {
             label: "Varer på Lager",
@@ -68,6 +69,7 @@ export default function Dashboard() {
             icon: Package,
             color: "#1D4ED8",
             bg: "#DBEAFE",
+            route: ROUTES.STORAGE.path,
         },
         {
             label: "Handleliste",
@@ -75,6 +77,7 @@ export default function Dashboard() {
             icon: ShoppingCart,
             color: "#A16207",
             bg: "#FEF9C3",
+            route: ROUTES.SHOPPING_LIST.path,
         },
         {
             label: "Mangler på Lager",
@@ -82,6 +85,7 @@ export default function Dashboard() {
             icon: AlertTriangle,
             color: "#B91C1C",
             bg: "#FEE2E2",
+            route: ROUTES.STORAGE.path,
         },
     ];
 
@@ -92,22 +96,27 @@ export default function Dashboard() {
             <main>
                 {/* Stat-kort */}
                 <section className="flex flex-wrap gap-3 mb-6">
-                    {statCards.map(({ label, value, icon: Icon, color, bg }) => (
-                        <div
+                    {statCards.map(({ label, value, icon: Icon, color, bg, route }) => (
+                        <button
                             key={label}
-                            className="flex-1 min-w-[140px] rounded-2xl p-4"
-                            style={{ backgroundColor: bg, border: `1px solid ${bg}` }}
+                            onClick={() => navigate(route)}
+                            className="flex-1 min-w-[140px] rounded-2xl p-4 transition-all duration-150 hover:shadow-md active:scale-95 cursor-pointer"
+                            style={{ 
+                                backgroundColor: bg,
+                                border: `1px solid ${bg}`,
+                            }}
+                            aria-label={`Gå til ${label}`}
                         >
                             <div className="flex items-center gap-2 mb-1">
                                 <Icon size={16} style={{ color }} />
-                                <p className="text-xs font-medium" style={{ color }}>
+                                <p className="text-xs font-medium text-left" style={{ color }}>
                                     {label}
                                 </p>
                             </div>
-                            <p className="text-2xl font-bold" style={{ color }}>
+                            <p className="text-2xl font-bold text-left" style={{ color }}>
                                 {value}
                             </p>
-                        </div>
+                        </button>
                     ))}
                 </section>
 
