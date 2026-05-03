@@ -43,11 +43,10 @@ export default function DeleteShoppingListButton({ onDeleted }: Props) {
                     setError(null);
                     setIsOpen(true);
                 }}
-                className="flex items-center gap-2 py-2 px-4 rounded-md font-medium transition-all border hover:shadow-md cursor-pointer"
+                className="flex items-center gap-2 py-2 px-4 rounded-md font-medium transition-all hover:shadow-md cursor-pointer"
                 style={{
                     background: "var(--color-danger, #f44336)",
-                    borderColor: "var(--color-border)",
-                    color: "var(--color-text-primary)",
+                    color: "white",
                 }}
                 title="Slett hele handlelisten"
             >

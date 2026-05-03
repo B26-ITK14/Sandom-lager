@@ -51,11 +51,11 @@ export default function ShoppingListPrintExport({ items }: Props) {
             {/* Button to trigger print */}
             <button
                 onClick={() => window.print()}
-                className="flex items-center gap-2 py-2 px-4 rounded-md font-medium transition-all border hover:shadow-md cursor-pointer"
+                className="flex items-center gap-2 py-2 px-4 rounded-md font-medium transition-all hover:shadow-md cursor-pointer"
                 style={{ 
                     background: "var(--color-secondary-surface)",
-                    borderColor: "var(--color-border)",
                     color: "var(--color-text-primary)",
+                    border: "1px solid var(--color-border)",
                 }}
                 title="Skriv ut handlelisten"
             >

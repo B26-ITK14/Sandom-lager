@@ -17,6 +17,7 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
     const [isUnitEditing, setIsUnitEditing] = useState(false);
     const [isQuantityEditing, setIsQuantityEditing] = useState(false);
     const [quantityInput, setQuantityInput] = useState("");
+    const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
     const formatQuantity = (value: number) => {
         return new Intl.NumberFormat("nb-NO", { maximumFractionDigits: 2 }).format(value);
@@ -46,6 +47,7 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
             await onDelete(item.id);
         } finally {
             setIsLoading(false);
+            setIsConfirmingDelete(false);
         }
     };
 
@@ -107,16 +109,17 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
 
     return (
         <li
-        className="flex items-center justify-between rounded-xl p-4"
-        style={{
-             background: "var(--color-surface)",
-             border: "1px solid var(--color-border)",
-             opacity: isLoading ? 0.5 : 1,
-             }}>
+            className="flex items-center justify-between rounded-xl p-4"
+            style={{
+                background: "var(--color-surface)",
+                border: "1px solid var(--color-border)",
+                opacity: isLoading ? 0.5 : 1,
+            }}>
 
             <dl className="flex flex-col gap-4 m-0">
                 <dt className="font-semibold" style={{
-                    color: "var(--color-text-primary)"}}>
+                    color: "var(--color-text-primary)"
+                }}>
                     {item.ingredient}
                 </dt>
                 <dd className="m-0 text-sm"
@@ -197,9 +200,8 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
                     disabled={isLoading}
                     className="h-9 w-9 rounded-full text-lg transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                     style={{
-                        background: "var(--color-secondary-surface)",
-                        border: "1px solid var(--color-border)",
-                        color: "var(--color-text-primary)",
+                        background: "var(--color-warning, #f59e0b)",
+                        color: "#ffffff",
                     }}
                     aria-label={`Reduser mengde for ${item.ingredient}`}>
                     −
@@ -210,26 +212,86 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
                     disabled={isLoading}
                     className="h-9 w-9 rounded-full text-lg transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                     style={{
-                        background: "var(--color-primary)",
-                        color: "var(--color-on-primary)",
+                        background: "var(--color-success, #10b981)",
+                        color: "#ffffff",
                     }}
                     aria-label={`Øk mengde for ${item.ingredient}`}>
                     +
                 </button>
 
                 <button
-                    onClick={handleDelete}
+                    onClick={() => setIsConfirmingDelete(true)}
                     disabled={isLoading}
                     className="h-9 w-9 rounded-full text-lg transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                     style={{
-                        background: "var(--color-secondary-surface)",
-                        border: "1px solid var(--color-border)",
-                        color: "var(--color-text-primary)",
+                        background: "var(--color-danger, #dc2626)",
+                        color: "#ffffff",
                     }}
                     aria-label={`Slett ${item.ingredient} fra handlelisten`}>
                     ×
                 </button>
             </menu>
+
+            {isConfirmingDelete && (
+                <div
+                    className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 p-4 sm:items-center"
+                    role="presentation"
+                    onClick={() => {
+                        if (!isLoading) {
+                            setIsConfirmingDelete(false);
+                        }
+                    }}
+                >
+                    <div
+                        className="w-full max-w-sm rounded-2xl border p-4 shadow-lg"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label={`Bekreft sletting av ${item.ingredient}`}
+                        style={{
+                            borderColor: "var(--color-border)",
+                            backgroundColor: "var(--color-surface)",
+                        }}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                        }}
+                    >
+                        <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                            Slett {item.ingredient} fra handlelisten?
+                        </p>
+                        <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                            Denne handlingen kan ikke angres.
+                        </p>
+
+                        <div className="mt-4 flex justify-end gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setIsConfirmingDelete(false)}
+                                disabled={isLoading}
+                                className="rounded-md border px-3 py-1.5 text-xs font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                                style={{
+                                    borderColor: "var(--color-border)",
+                                    color: "var(--color-text-primary)",
+                                    backgroundColor: "var(--color-secondary-surface)",
+                                }}
+                            >
+                                Avbryt
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => void handleDelete()}
+                                disabled={isLoading}
+                                className="rounded-md px-3 py-1.5 text-xs font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                                style={{
+                                    backgroundColor: "var(--color-danger, #dc2626)",
+                                    color: "#ffffff",
+                                }}
+                            >
+                                {isLoading ? "Sletter..." : "Slett vare"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </li>
     );
 }
