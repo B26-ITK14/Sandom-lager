@@ -13,7 +13,6 @@ import type { Language } from './utils';
 
 const LANGUAGE_OPTIONS: { value: Language; label: string }[] = [
     { value: 'nb', label: 'Norsk (Bokmål)' },
-    { value: 'en', label: 'English' },
 ];
 
 export default function LanguageCard() {
