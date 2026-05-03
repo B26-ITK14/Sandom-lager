@@ -12,10 +12,8 @@ import { fetchShoppingList, fetchShoppingListHistory, generateShoppingListFromRe
 import type { IngredientUnit, ShoppingListHistoryRow, ShoppingListItem } from "../types";
 import { useSelectedRecipes } from "../context/SelectedRecipesContext";
 
-import ShoppingListToolbar from "../components/shoppingListPage/ShoppingListToolbar";
+import ShoppingListHeader from "../components/shoppingListPage/ShoppingListHeader";
 import ShoppingListItemRow from "../components/shoppingListPage/ShoppingListItem";
-import ShoppingListPrintExport from "../components/shoppingListPage/ShoppingListPrintExport";
-import DeleteShoppingListButton from "../components/shoppingListPage/DeleteShoppingListButton";
 import ShoppingListHistory from "../components/shoppingListPage/ShoppingListHistory";
 import { EmptyShoppingList }  from "../components/shoppingListPage/EmptyShoppingList";
 import AddShoppingItemModal from "../components/shoppingListPage/AddShoppingItemModal";
@@ -164,51 +162,18 @@ export default function ShoppingListPage() {
     return (
         <Layout>
             <section className="flex flex-col gap-6">
-                <div className="flex items-start justify-between gap-4 flex-wrap">
-                    <ShoppingListToolbar />
-                    <div className="flex gap-3 flex-wrap items-center">
-                        <button
-                            onClick={() => setIsAddModalOpen(true)}
-                            className="py-2 px-4 rounded-md transition-colors cursor-pointer"
-                            style={{
-                                background: "var(--color-primary)",
-                                color: "var(--color-on-primary)",
-                            }}
-                        >
-                            + Legg til vare
-                        </button>
-                        <button
-                            onClick={handleGenerateShoppingList}
-                            disabled={selectedIds.size === 0 || isGenerating}
-                            className="py-2 px-4 rounded-md transition-opacity cursor-pointer disabled:cursor-not-allowed"
-                            style={{
-                                background: "var(--color-primary)",
-                                color: "var(--color-on-primary)",
-                                opacity: selectedIds.size === 0 || isGenerating ? 0.6 : 1,
-                            }}
-                        >
-                            {isGenerating ? "Genererer..." : `Generer handleliste (${selectedIds.size})`}
-                        </button>
-                        <button
-                            onClick={() => setCompact(prev => !prev)}
-                            className="py-2 px-4 rounded-md transition-colors cursor-pointer"
-                            style={{
-                                background: "var(--color-secondary-surface)",
-                                border: "1px solid var(--color-border)",
-                                color: "var(--color-text-primary)",
-                            }}
-                            title={compact ? "Bytt til detaljert visning" : "Bytt til kompakt visning"}
-                        >
-                            {compact ? "Detaljert" : "Kompakt"}
-                        </button>
-                        <ShoppingListPrintExport items={items} />
-                        <DeleteShoppingListButton
-                            onDeleted={async () => {
-                                await Promise.all([loadShoppingList(), loadShoppingListHistory()]);
-                            }}
-                        />
-                    </div>
-                </div>
+                <ShoppingListHeader
+                    items={items}
+                    onAddItemClick={() => setIsAddModalOpen(true)}
+                    onGenerateClick={handleGenerateShoppingList}
+                    selectedCount={selectedIds.size}
+                    isGenerating={isGenerating}
+                    isCompact={compact}
+                    onCompactChange={setCompact}
+                    onDeleted={async () => {
+                        await Promise.all([loadShoppingList(), loadShoppingListHistory()]);
+                    }}
+                />
 
                 {generateError && (
                     <p className="text-sm" style={{ color: "var(--color-error, #d32f2f)" }}>
