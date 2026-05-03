@@ -8,6 +8,8 @@ import type { Route } from "../types";
 
 export type RouteNickname =
     | "dashboard"
+    | "login"
+    | "post-auth"
     | "shopping-list"
     | "storage"
     | "recipes"
@@ -21,6 +23,16 @@ export type RouteNickname =
     | "admin";
 
 export const ROUTES: Record<string, Route> = {
+    LOGIN: {
+        nickname: "login",
+        path: "/login",
+        displayName: "Logg inn",
+    },
+    POST_AUTH: {
+        nickname: "post-auth",
+        path: "/auth/continue",
+        displayName: "Autentisering",
+    },
     DASHBOARD: {
         nickname: "dashboard",
         path: "/",

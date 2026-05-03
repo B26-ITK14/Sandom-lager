@@ -21,6 +21,7 @@ const AboutSandomLagerPage = lazy(() => import("./pages/settings/AboutSandomLage
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const RequestAccessPage = lazy(() => import("./pages/onboarding/RequestAccessPage"));
 const PendingApprovalPage = lazy(() => import("./pages/onboarding/PendingApprovalPage"));
+const PostAuthRedirectPage = lazy(() => import("./pages/auth/PostAuthRedirectPage"));
 
 import { ROUTES } from "./router/routes";
 
@@ -47,7 +48,17 @@ export default function App() {
               <Suspense fallback={<PageFallback />}>
                 <Routes>
                   {/* Public route */}
-                  <Route path="/login" element={<LoginPage />} />
+                  <Route path={ROUTES.LOGIN.path} element={<LoginPage />} />
+
+                  {/* Post-auth loading gate */}
+                  <Route
+                    path={ROUTES.POST_AUTH.path}
+                    element={
+                      <ProtectedRoute requireLocation={false}>
+                        <PostAuthRedirectPage />
+                      </ProtectedRoute>
+                    }
+                  />
 
                   {/* Onboarding – krever innlogging, men ikke godkjent lokasjon */}
                   <Route

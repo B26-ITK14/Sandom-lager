@@ -25,12 +25,12 @@ export function NavFlyout({ isOpen, onClose }: NavFlyoutProps) {
     const flyoutRef = useRef<HTMLElement>(null);
     const username = useUppercaseUsername();
     const { user } = useAuth0();
-    const { profilePicture, location: userLocation } = useUser();
+    const { location: userLocation } = useUser();
     const { logoutUser, isLoggingOut } = useAppLogout(onClose);
     const { display: appVersion } = useAppVersion();
     const navigate = useNavigate();
     const routeLocation = useLocation();
-    const imageSrc = profilePicture ?? user?.picture ?? 'src/assets/temp_EmilB04.png';
+    const imageSrc = user?.picture;
 
     const handleLogout = () => {
         void logoutUser();

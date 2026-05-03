@@ -24,7 +24,33 @@ export async function requestLocationAccess(token: string, locationId: number): 
         },
         body: JSON.stringify({ location_id: locationId }),
     });
-    if (!res.ok) throw new Error("Søknad feilet");
+    if (!res.ok) {
+        let errorMessage = "Søknad feilet";
+        let errorCode: string | undefined;
+        let errorDetail: string | undefined;
+
+        try {
+            const responseText = await res.text();
+            const errorData = responseText ? JSON.parse(responseText) as {
+                message?: string;
+                code?: string;
+                detail?: string;
+            } : null;
+
+            errorMessage = errorData?.message || responseText || "Søknad feilet";
+            errorCode = errorData?.code;
+            errorDetail = errorData?.detail;
+        } catch {
+            // Could not parse error response, use default message
+        }
+
+        const error = new Error(errorMessage) as Error & { code?: string };
+        error.code = errorCode;
+        if (errorDetail) {
+            error.message = `${error.message} ${errorDetail}`;
+        }
+        throw error;
+    }
 
     try {
         await notifyAdminsOfAccessRequest(token, locationId);

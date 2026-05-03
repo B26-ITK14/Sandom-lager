@@ -12,13 +12,15 @@ import { User, MapPin, Clock } from "lucide-react";
 import OnBoardingTitle from "../../components/onBoarding/OnBoardingTitle";
 import { ROUTES } from "../../router/routes";
 import { fetchMyLocationAccess } from "../../api/userLocations";
+import { LogoutLoadingOverlay, useAppLogout } from "../../auth";
 import { usePageMeta } from "../../hooks";
+import type { UserLocationResponse } from "../../types";
 import {
     ACCESS_STATUS,
     ACCESS_STATUS_LABELS,
     ACCESS_STATUS_STYLES,
-    type AccessStatus,
-} from "../../constants/accessStatus";
+} from "../../constants/accessStatus"
+const ACCESS_STATUS_CONST = ACCESS_STATUS;
 
 export default function PendingApprovalPage() {
     usePageMeta({
@@ -30,34 +32,67 @@ export default function PendingApprovalPage() {
     });
     const navigate = useNavigate();
     const { getAccessTokenSilently, user } = useAuth0();
-    const [locationName, setLocationName] = useState<string>("Laster...");
-    const [status, setStatus] = useState<AccessStatus | null>(null);
+    const { logoutUser, isLoggingOut } = useAppLogout();
+    const [applications, setApplications] = useState<UserLocationResponse[]>([]);
+    const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         async function loadStatus() {
             try {
                 const token = await getAccessTokenSilently();
                 const data = await fetchMyLocationAccess(token);
-                if (data.length > 0) {
-                    setLocationName(data[0].location_name);
-                    setStatus(data[0].access_status);
-                }
+                setApplications(data);
             } catch {
-                setLocationName("Ukjent");
-                setStatus(null);
+                setApplications([]);
             }
         }
         loadStatus();
     }, [getAccessTokenSilently]);
 
-    const badgeStatus = status ?? ACCESS_STATUS.PENDING;
-    const badgeStyle = ACCESS_STATUS_STYLES[badgeStatus];
-    const statusLabel = status ? ACCESS_STATUS_LABELS[status] : "Ukjent";
+    const hasApprovedApplication = applications.some((application) => application.access_status === ACCESS_STATUS.APPROVED);
+
+    async function handleCheckStatus() {
+        setError(null);
+        setIsCheckingStatus(true);
+        try {
+            const token = await getAccessTokenSilently();
+            const data = await fetchMyLocationAccess(token);
+            setApplications(data);
+
+            // If there is approved access, navigate to dashboard
+            if (data && data.length > 0 && data.some((item) => item.access_status === ACCESS_STATUS_CONST.APPROVED)) {
+                navigate(ROUTES.DASHBOARD.path, { replace: true });
+            } else if (data && data.length > 0) {
+                // Show pending/denied status
+                const isPending = data.some((item) => item.access_status === ACCESS_STATUS_CONST.PENDING);
+                setError(isPending ? "Søknaden din venter på godkjenning." : "Søknaden din ble avslått.");
+            } else {
+                setError("Du har ingen aktive søknader.");
+            }
+        } catch {
+            setError("Kunne ikke sjekke status. Prøv igjen.");
+        } finally {
+            setIsCheckingStatus(false);
+        }
+    }
 
     const infoRows = [
         { icon: User, label: "Navn", value: user?.name ?? "Ukjent" },
-        { icon: MapPin, label: "Sted", value: locationName },
-        { icon: Clock, label: "Tilgang", value: statusLabel },
+        {
+            icon: MapPin,
+            label: "Sted",
+            value: applications.length > 0
+                ? `${applications.length} søknad${applications.length === 1 ? "" : "er"}`
+                : "Ukjent",
+        },
+        {
+            icon: Clock,
+            label: "Tilgang",
+            value: applications.length > 0
+                ? `${applications.filter((application) => application.access_status === ACCESS_STATUS.PENDING).length} venter`
+                : "Ukjent",
+        },
     ];
 
     return (
@@ -66,7 +101,7 @@ export default function PendingApprovalPage() {
             style={{ backgroundColor: 'var(--color-background)' }}
         >
             <div className="w-full max-w-sm flex flex-col gap-6 animate-slide-in-left">
-                <OnBoardingTitle description="Din konto er registrert og søknaden din er under behandling. Du vil bli varslet når kontoen din er godkjent." />
+                <OnBoardingTitle description="Din konto og søknad er registrert. Du vil kunne bruke appen etter at admin har godkjent." />
 
                 <section
                     className="rounded-2xl p-6"
@@ -80,14 +115,8 @@ export default function PendingApprovalPage() {
                             className="text-base font-semibold"
                             style={{ color: 'var(--color-text-primary)' }}
                         >
-                            Tilgangssøknad
+                            Tilgangssøknad:
                         </h2>
-                        <span
-                            className="rounded-full px-3 py-1 text-xs font-medium"
-                            style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
-                        >
-                            {status ? ACCESS_STATUS_LABELS[status] : "Under behandling"}
-                        </span>
                     </div>
 
                     <div className="space-y-4">
@@ -110,7 +139,7 @@ export default function PendingApprovalPage() {
                                         {label}
                                     </p>
                                     <p
-                                        className="text-sm font-medium"
+                                        className="text-sm font-medium rounded py-1"
                                         style={{ color: 'var(--color-text-primary)' }}
                                     >
                                         {value}
@@ -121,20 +150,148 @@ export default function PendingApprovalPage() {
                     </div>
                 </section>
 
-                <button
-                    onClick={() => navigate(ROUTES.DASHBOARD.path)}
-                    className="w-full rounded-xl border py-3 text-sm font-medium transition-colors duration-150"
+                <section
+                    className="rounded-2xl p-6"
                     style={{
-                        borderColor: 'var(--color-border)',
-                        color: 'var(--color-text-secondary)',
-                        backgroundColor: 'transparent',
+                        backgroundColor: 'var(--color-surface)',
+                        border: '1px solid var(--color-border)',
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-secondary-surface)')}
-                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
                 >
-                    Gå til innlogging
-                </button>
+                    <h3
+                        className="mb-4 text-sm font-semibold"
+                        style={{ color: 'var(--color-text-primary)' }}
+                    >
+                        Alle søknader
+                    </h3>
+
+                    {applications.length === 0 ? (
+                        <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                            Ingen aktive søknader.
+                        </p>
+                    ) : (
+                        <div className="space-y-3">
+                            {applications.map((application) => {
+                                const statusStyle = ACCESS_STATUS_STYLES[application.access_status];
+
+                                return (
+                                    <div
+                                        key={application.id}
+                                        className="rounded-xl border px-4 py-3"
+                                        style={{
+                                            borderColor: 'var(--color-border)',
+                                            backgroundColor: 'var(--color-background)',
+                                        }}
+                                    >
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div>
+                                                <p
+                                                    className="text-sm font-medium"
+                                                    style={{ color: 'var(--color-text-primary)' }}
+                                                >
+                                                    {application.location_name}
+                                                </p>
+                                                <p
+                                                    className="text-xs mt-1"
+                                                    style={{ color: 'var(--color-text-secondary)' }}
+                                                >
+                                                    {application.email}
+                                                </p>
+                                            </div>
+
+                                            <span
+                                                className="rounded-full px-2 py-1 text-xs font-semibold"
+                                                style={{
+                                                    backgroundColor: statusStyle.bg,
+                                                    color: statusStyle.text,
+                                                }}
+                                            >
+                                                {ACCESS_STATUS_LABELS[application.access_status]}
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </section>
+
+                {error && (
+                    <p
+                        className="mb-4 rounded-lg px-3 py-2 text-xs"
+                        style={{
+                            backgroundColor: '#FEE2E2',
+                            color: 'var(--color-danger)',
+                        }}
+                    >
+                        {error}
+                    </p>
+                )}
+
+                <section className="flex flex-col gap-3">
+                    <button
+                        onClick={() => navigate(ROUTES.DASHBOARD.path)}
+                        disabled={!hasApprovedApplication}
+                        className="w-full rounded-xl border py-3 text-sm font-medium transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        style={{
+                            borderColor: hasApprovedApplication ? 'var(--color-primary)' : 'var(--color-border)',
+                            color: hasApprovedApplication ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                            backgroundColor: 'transparent',
+                        }}
+                        onMouseEnter={e => {
+                            if (hasApprovedApplication) {
+                                e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.08)';
+                            }
+                        }}
+                        onMouseLeave={e => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
+                    >
+                        Gå til applikasjonen
+                    </button>
+
+                    {/*Check Status button */}
+                    <button
+                        onClick={handleCheckStatus}
+                        disabled={isCheckingStatus}
+                        className="w-full rounded-xl py-3 text-sm font-semibold transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        style={{
+                            backgroundColor: 'var(--color-surface)',
+                            color: 'var(--color-primary)',
+                            border: '1px solid var(--color-primary)',
+                        }}
+                        onMouseEnter={e => {
+                            if (!isCheckingStatus)
+                                e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.08)';
+                        }}
+                        onMouseLeave={e => {
+                            e.currentTarget.style.backgroundColor = 'var(--color-surface)';
+                        }}
+                    >
+                        {isCheckingStatus ? "Sjekker status..." : "Sjekk Status"}
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            void logoutUser();
+                        }}
+                        disabled={isLoggingOut}
+                        className="w-full rounded-xl border py-3 text-sm font-medium transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        style={{
+                            borderColor: 'var(--color-danger, #dc2626)',
+                            color: 'var(--color-danger, #dc2626)',
+                            backgroundColor: 'transparent',
+                        }}
+                        onMouseEnter={e => {
+                            if (!isLoggingOut) e.currentTarget.style.backgroundColor = 'var(--color-danger-soft, rgba(220, 38, 38, 0.12))';
+                        }}
+                        onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+                    >
+                        Logg ut
+                    </button>
+                </section>
             </div>
+
+            <LogoutLoadingOverlay isVisible={isLoggingOut} />
         </main>
     );
 }

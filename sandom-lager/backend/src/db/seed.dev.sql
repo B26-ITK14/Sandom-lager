@@ -30,6 +30,7 @@ VALUES
 INSERT INTO users (auth0_id, email, name, profile_picture, role)
 VALUES
     ('auth0|admin001',   'admin@sandom.no',   'Siri Admin',     'https://example.com/siri.jpg',   'admin'),
+    ('auth0|69aa009fa1790df60b82f526', 'emil.berglund+sandom@live.no', 'Emil Berglund', 'https://s.gravatar.com/avatar/62ede51feb352c3b6f0f1e695e2e2196?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fem.png', 'admin'),
     ('auth0|manager001', 'manager@sandom.no', 'Morten Manager', 'https://example.com/morten.jpg', 'manager'),
     ('auth0|user001',    'anna@sandom.no',    'Anna Hansen',    'https://example.com/anna.jpg',   'user'),
     ('auth0|user002',    'bjorn@sandom.no',   'Bjørn Olsen',    'https://example.com/bjorn.jpg',  'user'),
@@ -42,6 +43,10 @@ VALUES
 INSERT INTO user_sessions (id, user_id, ip_address, user_agent, created_at, last_seen_at)
 SELECT 'sess-admin-001', id, '192.168.1.10', 'Mozilla/5.0 (Macintosh)', NOW() - INTERVAL '3 days', NOW() - INTERVAL '10 minutes'
 FROM users WHERE email = 'admin@sandom.no';
+
+INSERT INTO user_sessions (id, user_id, ip_address, user_agent, created_at, last_seen_at)
+SELECT 'sess-emil-001', id, '192.168.1.12', 'Mozilla/5.0 (Linux)', NOW() - INTERVAL '1 day', NOW() - INTERVAL '1 hour'
+FROM users WHERE email = 'emil.berglund+sandom@live.no';
 
 INSERT INTO user_sessions (id, user_id, ip_address, user_agent, created_at, last_seen_at)
 SELECT 'sess-manager-001', id, '192.168.1.11', 'Mozilla/5.0 (Windows)', NOW() - INTERVAL '2 days', NOW() - INTERVAL '25 minutes'
@@ -63,6 +68,12 @@ SELECT u.id, l.id, 'approved'
 FROM users u
 CROSS JOIN locations l
 WHERE u.email = 'admin@sandom.no';
+
+INSERT INTO user_locations (user_id, location_id, access_status)
+SELECT u.id, l.id, 'approved'
+FROM users u
+JOIN locations l ON l.name IN ('Sandom Retreatsenter', 'Tomasgården')
+WHERE u.email = 'emil.berglund+sandom@live.no';
 
 INSERT INTO user_locations (user_id, location_id, access_status)
 SELECT u.id, l.id, 'approved'

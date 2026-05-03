@@ -6,8 +6,14 @@
 */
 
 import { User, MapPin, Clock } from "lucide-react";
+import {
+    ACCESS_STATUS,
+    ACCESS_STATUS_LABELS,
+    ACCESS_STATUS_STYLES,
+    type AccessStatus,
+} from "../../constants/accessStatus";
 
-export type ApplicationStatus = "pending" | "approved" | "denied";
+export type ApplicationStatus = AccessStatus;
 
 export interface AccessRequest {
     id: string;
@@ -27,24 +33,6 @@ interface PendingCardProps {
     isLoading?: boolean;
 }
 
-const statusConfig: Record<ApplicationStatus, { label: string; bg: string; color: string }> = {
-    pending: {
-        label: "Venter",
-        bg: "#FEF9C3",
-        color: "#A16207",
-    },
-    approved: {
-        label: "Godkjent",
-        bg: "#DCFCE7",
-        color: "#15803D",
-    },
-    denied: {
-        label: "Avslått",
-        bg: "#FEE2E2",
-        color: "#B91C1C",
-    },
-};
-
 function formatDate(iso: string): string {
     return new Intl.DateTimeFormat("nb-NO", {
         day: "2-digit",
@@ -63,7 +51,8 @@ export default function PendingCard({
     onBlock,
     isLoading = false,
 }: PendingCardProps) {
-    const status = statusConfig[request.status];
+    const statusLabel = request.status === ACCESS_STATUS.PENDING ? "Venter" : ACCESS_STATUS_LABELS[request.status];
+    const statusStyle = ACCESS_STATUS_STYLES[request.status];
 
     return (
         <article
@@ -99,9 +88,9 @@ export default function PendingCard({
                 </div>
                 <span
                     className="shrink-0 rounded-full px-3 py-1 text-xs font-medium"
-                    style={{ backgroundColor: status.bg, color: status.color }}
+                    style={{ backgroundColor: statusStyle.bg, color: statusStyle.text }}
                 >
-                    {status.label}
+                    {statusLabel}
                 </span>
             </div>
 
@@ -118,7 +107,7 @@ export default function PendingCard({
             </div>
 
             {/* Knapper – kun for pending */}
-            {request.status === "pending" && (
+            {request.status === ACCESS_STATUS.PENDING && (
                 <div className="flex gap-2">
                     <button
                         onClick={() => onApprove(request.id)}
@@ -148,7 +137,7 @@ export default function PendingCard({
                 </div>
             )}
             {/* Knapper – approved */}
-            {request.status === "approved" && (
+            {request.status === ACCESS_STATUS.APPROVED && (
                 <div className="flex gap-2">
                     <button
                         onClick={() => onRevoke?.(request.id)}
