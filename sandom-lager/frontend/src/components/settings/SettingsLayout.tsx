@@ -9,11 +9,13 @@ import React from "react";
 import HeaderSection from "../HeaderSection";
 
 interface LayoutProps {
-    title: string;
+    title?: string;
     children?: React.ReactNode;
+    notifications?: boolean;
+    backMenu?: boolean;
 }
 
-export default function SettingsLayout({ children }: LayoutProps) {
+export default function SettingsLayout({ children, notifications = false, backMenu = true }: LayoutProps) {
 
     return (
         <div
@@ -21,7 +23,7 @@ export default function SettingsLayout({ children }: LayoutProps) {
             style={{ backgroundColor: "var(--color-background)" }}
         >
             <header>
-                <HeaderSection notifications={false} backMenu={true} />
+                <HeaderSection notifications={notifications} backMenu={backMenu} />
             </header>
             <div className="flex-1">{children}</div>
         </div>

@@ -5,7 +5,7 @@ const { checkJwt } = require("../middleware/checkJwt");
 const { syncUser } = require("../middleware/syncUser");
 const { requireRole } = require("../middleware/requireRole");
 
-// Use Postman or similar tool to test these endpoints with a valid JWT in the Authorization header
+// Use Postman to test these endpoints with a valid JWT in the Authorization header
 router.get("/test-secure", 
   checkJwt(),
   syncUser,
@@ -29,19 +29,6 @@ router.get("/test-admin",
 });
 
 // Returns the current authenticated user's profile including their role
-router.get("/me",
-  checkJwt(),
-  syncUser,
-  (req, res) => {
-    res.json({
-      id: req.user.id,
-      name: req.user.name,
-      email: req.user.email,
-      role: req.user.role,
-    });
-  }
-);
-
 // Example of a role-protected route, if role is 'user', this route will be inaccessible
 router.get("/test-manager", 
   checkJwt(),
@@ -65,7 +52,5 @@ router.get("/test-user",
     user: req.user
   });
 });
-
-
 
 module.exports = router;

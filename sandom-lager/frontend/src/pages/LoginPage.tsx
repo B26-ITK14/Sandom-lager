@@ -9,20 +9,36 @@ import { LogIn, UserPlus } from "lucide-react";
 import OnBoardingTitle from "../components/onBoarding/OnBoardingTitle";
 import ToggleThemeButton from "../components/ToggleThemeButton";
 import { AUTH0_AUDIENCE } from "../config/auth";
+import { usePageMeta } from "../hooks";
+import { ROUTES } from "../router/routes";
 
 import { useAuth0 } from "@auth0/auth0-react";
 
 export default function LoginPage() {
+  usePageMeta({
+    title: "Login - Sandom Lager",
+    description: "Log in or register to manage your inventory, recipes, and shopping lists securely",
+    keywords: "login, register, authentication, sandom lager",
+    ogTitle: "Login - Sandom Lager",
+    ogDescription: "Secure login for inventory management",
+  });
   const { loginWithRedirect } = useAuth0();
 
   // Handle login
   const handleLogin = () => {
-    loginWithRedirect();
+    loginWithRedirect({
+      appState: {
+        returnTo: ROUTES.POST_AUTH.path,
+      },
+    });
   };
 
   // Handle register (signup)
   const handleRegister = () => {
     loginWithRedirect({
+      appState: {
+        returnTo: ROUTES.POST_AUTH.path,
+      },
       authorizationParams: {
         screen_hint: "signup",
         audience: AUTH0_AUDIENCE,

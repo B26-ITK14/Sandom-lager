@@ -28,8 +28,7 @@ export function useAppLogout(onBeforeRedirect?: () => void) {
                     returnTo: window.location.origin,
                 },
             });
-        } catch (error) {
-            console.error("[logout] Failed to log out", error);
+        } catch {
             setIsLoggingOut(false);
         }
     }, [logout, onBeforeRedirect]);

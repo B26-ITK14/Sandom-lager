@@ -8,15 +8,31 @@ import type { Route } from "../types";
 
 export type RouteNickname =
     | "dashboard"
+    | "login"
+    | "post-auth"
     | "shopping-list"
     | "storage"
     | "recipes"
     | "settings"
     | "settings-account"
     | "settings-applications"
-    | "settings-app-settings";
+    | "settings-app-settings"
+    | "settings-about"
+    | "request-access"
+    | "pending-approval"
+    | "admin";
 
 export const ROUTES: Record<string, Route> = {
+    LOGIN: {
+        nickname: "login",
+        path: "/login",
+        displayName: "Logg inn",
+    },
+    POST_AUTH: {
+        nickname: "post-auth",
+        path: "/auth/continue",
+        displayName: "Autentisering",
+    },
     DASHBOARD: {
         nickname: "dashboard",
         path: "/",
@@ -56,5 +72,25 @@ export const ROUTES: Record<string, Route> = {
         nickname: "settings-app-settings",
         path: "/settings/app-settings",
         displayName: "App innstillinger",
+    },
+    SETTINGS_ABOUT: {
+        nickname: "settings-about",
+        path: "/settings/about",
+        displayName: "Om Sandom Lager",
+    },
+    REQUEST_ACCESS: {
+        nickname: "request-access",
+        path: "/request-access",
+        displayName: "Søk om tilgang",
+    },
+    PENDING_APPROVAL: {
+        nickname: "pending-approval",
+        path: "/pending-approval",
+        displayName: "Venter på godkjenning",
+    },
+    ADMIN: {
+        nickname: "admin",
+        path: "/admin",
+        displayName: "Admin",
     },
 } as const;

@@ -30,11 +30,9 @@ export default function OnBoardingTitle({ description }: OnBoardingTitleProps) {
                 className="text-center text-md mt-2 mx-auto leading-snug"
                 style={{
                     color: 'var(--color-text-secondary)',
-                    maxWidth: '28ch',
                     display: '-webkit-box',
                     WebkitBoxOrient: 'vertical',
                     WebkitLineClamp: 2,
-                    overflow: 'hidden',
                     minHeight: '2.6em',
                 }}
             >

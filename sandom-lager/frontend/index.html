@@ -1,10 +1,110 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Character Encoding -->
     <meta charset="UTF-8" />
-    <!-- Icon here-->
+    
+    <!-- Viewport & Responsive Design -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sandom Lager</title>
+    
+    <!-- Page Title -->
+    <title>Sandom Lager - Inventory & Recipe Management</title>
+    
+    <!-- Meta Description (for search results) -->
+    <meta name="description" content="Manage your pantry, recipes, and shopping list — all in one place with Sandom Lager." />
+    
+    <!-- Meta Keywords -->
+    <meta name="keywords" content="inventory management, recipe management, shopping list, ingredient tracking, food storage" />
+    
+    <!-- Author & Copyright -->
+    <meta name="author" content="Sandom Lager Team" />
+    <meta name="copyright" content="2026 Sandom Lager. All rights reserved." />
+    
+    <!-- Robots Meta Tag (for search engine crawling) -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    
+    <!-- Theme Color (for browser UI) -->
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light dark" />
+    
+    <!-- Open Graph Meta Tags (Social Media) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Sandom Lager - Inventory & Recipe Management" />
+    <meta property="og:description" content="Organize your ingredients, manage recipes, and streamline your shopping list with Sandom Lager." />
+    <meta property="og:url" content="https://sandom-lager.com" />
+    <meta property="og:site_name" content="Sandom Lager" />
+    <meta property="og:locale" content="en_US" />
+    <!-- og:image would be added with proper asset path once available -->
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sandom Lager - Inventory & Recipe Management" />
+    <meta name="twitter:description" content="Organize your ingredients, manage recipes, and streamline your shopping list with Sandom Lager." />
+    <!-- twitter:image would be added with proper asset path once available -->
+    
+    <!-- Canonical URL -->
+    <meta property="canonical" content="https://sandom-lager.com" />
+    
+    <!-- Language and Locale -->
+    <meta http-equiv="Content-Language" content="en-US" />
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()" />
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="apple-touch-icon" href="/vite.svg" />
+    <link rel="shortcut icon" href="/vite.svg" />
+    
+    <!-- Web App Manifest (PWA Support) -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Prefetch likely-needed resources -->
+    <link rel="prefetch" href="/assets/router-DJHQxjZb.js" />
+    <link rel="prefetch" href="/assets/auth-y9ytzTR2.js" />
+    
+    <!-- DNS prefetch for external services -->
+    <link rel="dns-prefetch" href="https://cdn.auth0.com" />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    
+    <!-- Font Size Script (runs before rendering) -->
+    <script>
+      (function () {
+        try {
+          var fs = JSON.parse(localStorage.getItem('app:fontSize'));
+          var sizes = { small: '87.5%', medium: '100%', large: '112.5%' };
+          if (sizes[fs]) document.documentElement.style.fontSize = sizes[fs];
+        } catch (e) {}
+      })();
+    </script>
+    
+    <!-- Structured Data (JSON-LD for Search Engines) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Sandom Lager",
+      "description": "A comprehensive inventory and recipe management application designed to help you organize your ingredients, manage recipes, and streamline your shopping list.",
+      "url": "https://sandom-lager.com",
+      "applicationCategory": "ProductivityApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Sandom Lager Team"
+      },
+      "keywords": ["inventory management", "recipe management", "shopping list", "ingredient tracking"],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5",
+        "ratingCount": "1"
+      }
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

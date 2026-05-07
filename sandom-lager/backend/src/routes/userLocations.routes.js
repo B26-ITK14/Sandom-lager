@@ -1,49 +1,62 @@
 const express = require('express');
 const router = express.Router();
 
+const asyncHandler = require("../utils/asyncHandler");
+
 const { checkJwt } = require("../middleware/checkJwt");
 const { syncUser } = require("../middleware/syncUser");
 const { requireRole } = require("../middleware/requireRole");
 
-const {
-    requestLocationAccess,
-    approveLocationAccess,
-    denyLocationAccess,
-    getMyLocationAccess, 
-} = require("../controllers/userLocations.controller");
+const userLocationsController = require("../controllers/userLocations.controller");
+
+// Apply authentication and user synchronization middleware to all routes in this router
+router.use(checkJwt())
+router.use(syncUser)
 
 // POST - User requests access to location
 router.post(
     "/user-locations/request",
-    checkJwt(),
-    syncUser,
-    requestLocationAccess
+    asyncHandler(userLocationsController.requestLocationAccess)
 );
 
 // PATCH - Admin approves location access request
 router.patch(
     "/user-locations/:id/approve",
-    checkJwt(),
-    syncUser,
     requireRole("admin"),
-    approveLocationAccess
+    asyncHandler(userLocationsController.approveLocationAccess)
 );
 
 // PATCH - Admin denies location access request
 router.patch(
     "/user-locations/:id/deny",
-    checkJwt(),
-    syncUser,
     requireRole("admin"),
-    denyLocationAccess
+    asyncHandler(userLocationsController.denyLocationAccess)
 );
 
 // GET - User views their location access status
 router.get(
     "/user-locations/me",
-    checkJwt(),
-    syncUser,
-    getMyLocationAccess
+    asyncHandler(userLocationsController.getMyLocationAccess)
 );
 
+// GET - Admin gets all applications
+router.get(
+    "/user-locations",
+    requireRole("admin"),
+    asyncHandler(userLocationsController.getAllLocationAccess)
+);
+
+// PATCH - Admin revokes location access
+router.patch(
+    "/user-locations/:id/revoke",
+    requireRole("admin"),
+    asyncHandler(userLocationsController.revokeLocationAccess)
+);
+
+// PATCH - Admin blocks user in Auth0
+router.patch(
+    "/user-locations/:id/block",
+    requireRole("admin"),
+    asyncHandler(userLocationsController.blockUser)
+);
 module.exports = router;

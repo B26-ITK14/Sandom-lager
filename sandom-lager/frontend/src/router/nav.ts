@@ -25,5 +25,6 @@ export const getAllRoutes = (): Route[] => {
 };
 
 export const getAllMainRoutes = (): Route[] => {
-    return Object.values(ROUTES).filter((route) => !route.path.includes("/settings/"));
+    const allowedNicknames = ["dashboard", "shopping-list", "storage", "recipes", "settings"];
+    return Object.values(ROUTES).filter((route) => allowedNicknames.includes(route.nickname));
 };

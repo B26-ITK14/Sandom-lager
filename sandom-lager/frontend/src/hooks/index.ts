@@ -1,2 +1,25 @@
-// User domain hooks
-export * from "./user/index";
+// User hooks
+export { useUsername, useFullName } from "./user/useName.ts";
+export { useUserRole } from "./user/useUserRole.ts";
+
+// Storage hooks
+export { useInventory } from "./storage/useInventory";
+
+// Auth hooks
+export { useAuthenticatedFetch } from "./useAuthenticatedFetch";
+export { useNotifications } from "./useNotifications";
+
+// UI hooks
+export { useEscapeKey } from "./ui/useEscapeKey";
+export { useClickOutside } from "./ui/useClickOutside";
+
+// Meta/SEO hooks
+export { usePageMeta } from "./usePageMeta";
+
+// Version hooks
+export * from "./version/appVersion";
+export * from "./version/appStability";
+export * from "./version/appLastUpdated";
+
+// Recipes domain hooks
+export * from "./recipes/index";

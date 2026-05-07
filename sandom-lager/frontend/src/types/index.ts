@@ -5,6 +5,7 @@
 */
 
 import type { RouteNickname } from "../router/routes";
+import type { AccessStatus } from "../constants/accessStatus";
 
 export type UserRole = "admin" | "manager" | "user" | null;
 
@@ -25,11 +26,19 @@ export interface User {
 
 export interface Recipe {
     id: number;
-    location_id: number;
     title: string;
     category: string;
     instructions: string | null;
+    image_url?: string | null;
+    image_public_id?: string | null;
+    allergens: string[];
+    servings: number;
     created_at: string;
+}
+
+export interface Allergen {
+    id: number;
+    name: string;
 }
 
 export type WeightUnit = "mg" | "g" | "hg" | "kg";
@@ -49,6 +58,16 @@ export const INGREDIENT_UNITS: readonly IngredientUnit[] = [
     ...COUNT_UNITS,
 ];
 
+export const RECIPE_CATEGORIES = [
+    "Frokost",
+    "Lunsj",
+    "Middag",
+    "Mellommåltid",
+    "Kveldsmat",
+] as const;
+
+export type RecipeCategory = typeof RECIPE_CATEGORIES[number];
+
 export interface Ingredient {
     id: number;
     name: string;
@@ -60,20 +79,48 @@ export interface RecipeIngredient {
     recipe_id: number;
     ingredient_id: number;
     quantity: number;
+    ingredient_name: string;
+    unit: IngredientUnit;
 }
 
 export interface ShoppingListItem {
     id: number;
-    location_id: number;
     ingredient_id: number;
+    ingredient: string;
     needed_quantity: number;
-    created_at: string;
+    location: string;
+    unit: IngredientUnit;
+    stock_quantity: number;
+}
+
+export interface ShoppingListHistoryRow {
+    batch_id: number;
+    deleted_at: string;
+    deleted_by_user_id: number | null;
+    deleted_by_name: string | null;
+    ingredient_id: number | null;
+    ingredient: string;
+    unit: IngredientUnit;
+    needed_quantity: number;
+    stock_quantity: number;
 }
 
 export interface InventoryItem {
     id: number;
     location_id: number;
     ingredient_id: number;
+    ingredient: string;
     quantity: number;
     updated_at: string;
+    unit: IngredientUnit;
+    location: string;
+}
+
+export interface UserLocationResponse {
+    id: number;
+    access_status: AccessStatus;
+    created_at: string;
+    user_name: string;
+    email: string;
+    location_name: string;
 }
