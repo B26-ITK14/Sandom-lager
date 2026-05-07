@@ -43,13 +43,8 @@ export default defineConfig({
             }
             return 'vendor';
           }
-          // Split large page components into separate chunks
-          if (id.includes('/pages/')) {
-            return 'pages';
-          }
-          if (id.includes('/components/')) {
-            return 'components';
-          }
+          // Let Rollup handle internal code splitting to prevent circular chunks
+          // (Removed explicit pages and components chunking which caused circular dependencies)
         },
         // Better asset file names for long-term caching
         entryFileNames: 'js/[name].[hash].js',
