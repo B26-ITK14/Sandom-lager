@@ -12,12 +12,18 @@ interface SelectedRecipesContextType {
     selectedIds: Set<number>;
     toggleSelected: (id: number) => void;
     clearSelected: () => void;
+    numberOfPeople: number;
+    numberOfPeopleInput: string;
+    setNumberOfPeople: (n: number) => void;
+    setNumberOfPeopleInput: (s: string) => void;
 }
 
 const SelectedRecipesContext = createContext<SelectedRecipesContextType | undefined>(undefined);
 
 export function SelectedRecipesProvider({ children }: { children: ReactNode }) {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+    const [numberOfPeople, setNumberOfPeople] = useState(8);
+    const [numberOfPeopleInput, setNumberOfPeopleInput] = useState("8");
 
     function toggleSelected(id: number) {
         setSelectedIds((prev) => {
@@ -36,7 +42,7 @@ export function SelectedRecipesProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <SelectedRecipesContext.Provider value={{ selectedIds, toggleSelected, clearSelected }}>
+        <SelectedRecipesContext.Provider value={{ selectedIds, toggleSelected, clearSelected, numberOfPeople, numberOfPeopleInput, setNumberOfPeople, setNumberOfPeopleInput }}>
             {children}
         </SelectedRecipesContext.Provider>
     );
