@@ -1,6 +1,8 @@
 # Sandom Lager
 
-Sandom Lager er en webbasert fullstack-applikasjon utviklet for Sandom Retreatsenter og Tomasgården. Løsningen er laget for å forenkle arbeid med oppskrifter, ingredienser, lagerbeholdning, handlelister og tilgangsstyring på tvers av flere lokasjoner.
+Sandom Lager er en webbasert fullstack-applikasjon utviklet for Sandom Retreatsenter og
+Tomasgården. Løsningen er laget for å forenkle arbeid med oppskrifter, ingredienser,
+lagerbeholdning, handlelister og tilgangsstyring på tvers av flere lokasjoner.
 
 Prosjektet er utviklet som en bacheloroppgave ved Høgskolen i Østfold.
 
@@ -8,37 +10,74 @@ Prosjektet er utviklet som en bacheloroppgave ved Høgskolen i Østfold.
 
 ## Innhold
 
-- [Om prosjektet](#om-prosjektet)
-- [Hovedfunksjonalitet](#hovedfunksjonalitet)
-- [Teknologier](#teknologier)
-- [Prosjektstruktur](#prosjektstruktur)
-- [Roller og tilgang](#roller-og-tilgang)
-- [Forutsetninger](#forutsetninger)
-- [Oppsett med Docker](#oppsett-med-docker)
-- [pgAdmin](#pgadmin)
-- [Fylle databasen med tabeller og testdata](#fylle-databasen-med-tabeller-og-testdata)
-- [Feilsøking ved Docker-problemer](#feilsøking-ved-docker-problemer)
-- [Manuelt oppsett uten Docker](#manuelt-oppsett-uten-docker)
-- [Miljøvariabler](#miljøvariabler)
-- [Database](#database)
-- [Backend API](#backend-api)
-- [Frontend-ruter](#frontend-ruter)
-- [Auth0](#auth0)
-- [Cloudinary og bildehåndtering](#cloudinary-og-bildehåndtering)
-- [Sikkerhet](#sikkerhet)
-- [Testing](#testing)
-- [Drift og vedlikehold](#drift-og-vedlikehold)
-- [Viktig før publisering på GitHub](#viktig-før-publisering-på-github)
-- [Videre arbeid](#videre-arbeid)
-- [Status](#status)
+- [Sandom Lager](#sandom-lager)
+  - [Innhold](#innhold)
+  - [Om prosjektet](#om-prosjektet)
+  - [Hovedfunksjonalitet](#hovedfunksjonalitet)
+  - [Teknologier](#teknologier)
+    - [Frontend](#frontend)
+    - [Backend](#backend)
+    - [Andre verktøy og tjenester](#andre-verktøy-og-tjenester)
+  - [Prosjektstruktur](#prosjektstruktur)
+    - [Backend](#backend-1)
+    - [Frontend](#frontend-1)
+  - [Roller og tilgang](#roller-og-tilgang)
+    - [`user`](#user)
+    - [`manager`](#manager)
+    - [`admin`](#admin)
+    - [Lokasjonstilgang](#lokasjonstilgang)
+  - [Forutsetninger](#forutsetninger)
+  - [Oppsett med Docker](#oppsett-med-docker)
+    - [Viktig om `VITE_API_BASE_URL` i Docker](#viktig-om-vite_api_base_url-i-docker)
+  - [pgAdmin](#pgadmin)
+    - [Koble pgAdmin til databasen](#koble-pgadmin-til-databasen)
+  - [Fylle databasen med tabeller og testdata](#fylle-databasen-med-tabeller-og-testdata)
+    - [Windows](#windows)
+    - [Mac og Linux](#mac-og-linux)
+  - [Feilsøking ved Docker-problemer](#feilsøking-ved-docker-problemer)
+  - [Manuelt oppsett uten Docker](#manuelt-oppsett-uten-docker)
+  - [Backend-oppsett](#backend-oppsett)
+    - [Anbefalt dev-script](#anbefalt-dev-script)
+  - [Frontend-oppsett](#frontend-oppsett)
+  - [Miljøvariabler](#miljøvariabler)
+    - [Backend](#backend-2)
+    - [Frontend](#frontend-2)
+  - [Database](#database)
+    - [Opprette tabeller uten Docker Compose](#opprette-tabeller-uten-docker-compose)
+    - [Legge inn testdata uten Docker Compose](#legge-inn-testdata-uten-docker-compose)
+    - [Viktige tabeller](#viktige-tabeller)
+  - [Backend API](#backend-api)
+    - [System/test](#systemtest)
+    - [Bruker](#bruker)
+    - [Lokasjoner](#lokasjoner)
+    - [Brukertilgang til lokasjoner](#brukertilgang-til-lokasjoner)
+    - [Oppskrifter](#oppskrifter)
+    - [Ingredienser](#ingredienser)
+    - [Oppskriftsingredienser](#oppskriftsingredienser)
+    - [Lager](#lager)
+    - [Handleliste](#handleliste)
+    - [Varslinger](#varslinger)
+    - [Opplasting](#opplasting)
+  - [Frontend-ruter](#frontend-ruter)
+  - [Auth0](#auth0)
+  - [Cloudinary og bildehåndtering](#cloudinary-og-bildehåndtering)
+  - [Sikkerhet](#sikkerhet)
+  - [Testing](#testing)
+  - [Drift og vedlikehold](#drift-og-vedlikehold)
+  - [Videre arbeid](#videre-arbeid)
+  - [Status](#status)
+  - [Lisens og eierskap](#lisens-og-eierskap)
 
 ---
 
 ## Om prosjektet
 
-Sandom Retreatsenter og Tomasgården hadde tidligere et eldre lokalt system basert på DataEase. Systemet var installert på én fysisk maskin og hadde begrensninger knyttet til tilgjengelighet, samtidige brukere, vedlikehold og bruk på tvers av lokasjoner.
+Sandom Retreatsenter og Tomasgården hadde tidligere et eldre lokalt system basert på
+DataEase. Systemet var installert på én fysisk maskin og hadde begrensninger knyttet til
+tilgjengelighet, samtidige brukere, vedlikehold og bruk på tvers av lokasjoner.
 
-Sandom Lager er utviklet for å modernisere denne arbeidsflyten. Systemet samler sentrale kjøkkenrelaterte oppgaver i én webbasert plattform:
+Sandom Lager er utviklet for å modernisere denne arbeidsflyten. Systemet samler
+sentrale kjøkkenrelaterte oppgaver i én webbasert plattform:
 
 - oppskrifter
 - ingredienser
@@ -370,15 +409,6 @@ docker compose up --build
 ```
 
 Hvis problemet fortsatt oppstår, kan Docker-cache ryddes med:
-
-```bash
-docker compose down -v
-docker builder prune -af
-docker image prune -af
-docker compose up --build
-```
-
-Kort copy-paste-variant:
 
 ```bash
 docker compose down -v
