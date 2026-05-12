@@ -16,6 +16,7 @@ import type { ShoppingListItem } from "../types";
 import { ROUTES } from "../router/routes";
 import { BookOpen, ShoppingCart, Package, AlertTriangle } from "lucide-react";
 import { usePageMeta } from "../hooks";
+import { useSelectedRecipes } from "../context/SelectedRecipesContext";
 
 export default function Dashboard() {
     usePageMeta({
@@ -27,6 +28,7 @@ export default function Dashboard() {
     });
     const navigate = useNavigate();
     const { recipes, loading: recipesLoading } = useRecipes();
+    const { selectedIds } = useSelectedRecipes();
     const { inventory, isLoading: inventoryLoading } = useInventory();
     const { getAccessTokenSilently, isAuthenticated } = useAuth0();
     const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
@@ -51,7 +53,7 @@ export default function Dashboard() {
     }, [isAuthenticated, getAccessTokenSilently]);
 
     const totalInventoryItems = inventory.length;
-    const activeRecipes = recipes.length;
+    const activeRecipes = selectedIds.size;
     const shoppingListCount = shoppingList.length;
 
     const statCards = [
@@ -89,7 +91,7 @@ export default function Dashboard() {
         },
     ];
 
-    const featuredRecipes = recipes.slice(0, 3);
+    const featuredRecipes = recipes.filter(r => selectedIds.has(r.id));
 
     return (
         <Layout>
