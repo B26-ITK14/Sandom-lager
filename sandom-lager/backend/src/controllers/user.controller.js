@@ -280,8 +280,8 @@ async function updateProfilePicture(req, res) {
         );
 
         const profilePictureUrl = toProfilePictureUrl(result.rows[0]?.profile_picture);
-        
-        res.json({ 
+
+        res.json({
             profilePicture: profilePictureUrl
         });
     } catch (err) {
@@ -330,6 +330,41 @@ async function getProfilePicture(req, res) {
     }
 }
 
+// PATCH /me/notification-preferences - Updates notification preferences for the current user
+async function updateNotificationPreferences(req, res) {
+    const { notifyInventory, notifyRecipes, notifySystem } = req.body;
+
+    try {
+        const result = await pool.query(
+            `UPDATE users 
+             SET notify_inventory = COALESCE($1, notify_inventory),
+                 notify_recipes = COALESCE($2, notify_recipes),
+                 notify_system = COALESCE($3, notify_system)
+             WHERE id = $4
+             RETURNING notify_inventory, notify_recipes, notify_system`,
+            [
+                notifyInventory !== undefined ? notifyInventory : null,
+                notifyRecipes !== undefined ? notifyRecipes : null,
+                notifySystem !== undefined ? notifySystem : null,
+                req.user.id
+            ]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "Bruker ikke funnet" });
+        }
+
+        res.json({
+            notifyInventory: result.rows[0].notify_inventory,
+            notifyRecipes: result.rows[0].notify_recipes,
+            notifySystem: result.rows[0].notify_system,
+        });
+    } catch (err) {
+        console.error("[updateNotificationPreferences] error:", err.message);
+        res.status(500).json({ message: "Kunne ikke oppdatere varslepreferanser" });
+    }
+}
+
 module.exports = {
     getMe,
     updateName,
@@ -337,4 +372,5 @@ module.exports = {
     updateProfilePicture,
     getProfilePicture,
     updateUsername,
+    updateNotificationPreferences,
 };
