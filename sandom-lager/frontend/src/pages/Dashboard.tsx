@@ -9,12 +9,13 @@ import Layout from "../components/Layout";
 import { useRecipes } from "../hooks/recipes/useRecipes";
 import { useInventory } from "../hooks/storage/useInventory";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetchShoppingList } from "../api/storage";
+import { fetchRecipeIngredients } from "../api/recipes";
 import { AUTH0_AUDIENCE } from "../config/auth";
-import type { ShoppingListItem } from "../types";
+import type { RecipeIngredient, ShoppingListItem } from "../types";
 import { ROUTES } from "../router/routes";
-import { BookOpen, ShoppingCart, Package, AlertTriangle } from "lucide-react";
+import { BookOpen, ShoppingCart, Package, AlertTriangle, Users } from "lucide-react";
 import { usePageMeta } from "../hooks";
 import { useSelectedRecipes } from "../context/SelectedRecipesContext";
 
@@ -28,11 +29,12 @@ export default function Dashboard() {
     });
     const navigate = useNavigate();
     const { recipes, loading: recipesLoading } = useRecipes();
-    const { selectedIds } = useSelectedRecipes();
+    const { selectedIds, numberOfPeople, numberOfPeopleInput, setNumberOfPeople, setNumberOfPeopleInput } = useSelectedRecipes();
     const { inventory, isLoading: inventoryLoading } = useInventory();
     const { getAccessTokenSilently, isAuthenticated } = useAuth0();
     const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
     const [shoppingLoading, setShoppingLoading] = useState(true);
+    const [recipeIngredients, setRecipeIngredients] = useState<Map<number, RecipeIngredient[]>>(new Map());
 
     useEffect(() => {
         if (!isAuthenticated) return;
@@ -51,6 +53,32 @@ export default function Dashboard() {
         }
         loadShoppingList();
     }, [isAuthenticated, getAccessTokenSilently]);
+
+    useEffect(() => {
+        if (!isAuthenticated || selectedIds.size === 0) {
+            setRecipeIngredients(new Map());
+            return;
+        }
+        let cancelled = false;
+        async function loadIngredients() {
+            try {
+                const token = await getAccessTokenSilently({
+                    authorizationParams: { audience: AUTH0_AUDIENCE },
+                });
+                const entries = await Promise.all(
+                    Array.from(selectedIds).map(async (id) => {
+                        const ingredients = await fetchRecipeIngredients(id, token);
+                        return [id, ingredients] as [number, RecipeIngredient[]];
+                    })
+                );
+                if (!cancelled) setRecipeIngredients(new Map(entries));
+            } catch {
+                if (!cancelled) setRecipeIngredients(new Map());
+            }
+        }
+        loadIngredients();
+        return () => { cancelled = true; };
+    }, [isAuthenticated, getAccessTokenSilently, selectedIds]);
 
     const totalInventoryItems = inventory.length;
     const activeRecipes = selectedIds.size;
@@ -93,6 +121,25 @@ export default function Dashboard() {
 
     const featuredRecipes = recipes.filter(r => selectedIds.has(r.id));
 
+    const scaledIngredients = useMemo(() => {
+        const map = new Map<string, { name: string; quantity: number; unit: string }>();
+        for (const recipe of featuredRecipes) {
+            const ingredients = recipeIngredients.get(recipe.id) ?? [];
+            const scale = numberOfPeople / (recipe.servings || 8);
+            for (const ing of ingredients) {
+                const key = `${ing.ingredient_name}__${ing.unit}`;
+                const existing = map.get(key);
+                const scaled = ing.quantity * scale;
+                if (existing) {
+                    existing.quantity += scaled;
+                } else {
+                    map.set(key, { name: ing.ingredient_name, quantity: scaled, unit: ing.unit });
+                }
+            }
+        }
+        return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+    }, [featuredRecipes, recipeIngredients, numberOfPeople]);
+
     return (
         <Layout>
             <main>
@@ -121,6 +168,83 @@ export default function Dashboard() {
                         </button>
                     ))}
                 </section>
+
+                {/* Kalkuler ingredienser */}
+                {featuredRecipes.length > 0 && (
+                    <section
+                        className="rounded-2xl p-5 mt-6"
+                        style={{
+                            backgroundColor: "var(--color-surface)",
+                            border: "1px solid var(--color-border)",
+                        }}
+                    >
+                        <div className="flex items-center justify-between mb-4">
+                            <h2
+                                className="text-base font-semibold"
+                                style={{ color: "var(--color-text-primary)" }}
+                            >
+                                Ingredienser
+                            </h2>
+                            <div className="flex items-center gap-2">
+                                <Users size={14} style={{ color: "var(--color-text-secondary)" }} />
+                                <label
+                                    htmlFor="number-of-people"
+                                    className="text-xs"
+                                    style={{ color: "var(--color-text-secondary)" }}
+                                >
+                                    Antall personer:
+                                </label>
+                                <input
+                                    id="number-of-people"
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    value={numberOfPeopleInput}
+                                    onChange={(e) => {
+                                        setNumberOfPeopleInput(e.target.value);
+                                        const val = parseInt(e.target.value, 10);
+                                        if (!isNaN(val) && val >= 1) setNumberOfPeople(val);
+                                    }}
+                                    onBlur={() => {
+                                        if (numberOfPeopleInput === "" || parseInt(numberOfPeopleInput, 10) < 1) {
+                                            setNumberOfPeopleInput(String(numberOfPeople));
+                                        }
+                                    }}
+                                    className="w-16 rounded-md px-2 py-1 text-sm font-semibold text-center"
+                                    style={{
+                                        border: "1px solid var(--color-border)",
+                                        backgroundColor: "var(--color-background)",
+                                        color: "var(--color-text-primary)",
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        {scaledIngredients.length === 0 ? (
+                            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                                Ingen ingredienser funnet for valgte oppskrifter.
+                            </p>
+                        ) : (
+                            <div className="flex flex-col gap-1">
+                                {scaledIngredients.map((ing) => (
+                                    <div
+                                        key={`${ing.name}__${ing.unit}`}
+                                        className="flex items-center justify-between rounded-xl px-3 py-2"
+                                        style={{ backgroundColor: "var(--color-background)" }}
+                                    >
+                                        <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+                                            {ing.name}
+                                        </span>
+                                        <span className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                                            {Number(ing.quantity.toFixed(2))}{" "}
+                                            {ing.unit}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </section>
+                )}
 
                 {/* Handleliste-snarvei */}
                 <section
