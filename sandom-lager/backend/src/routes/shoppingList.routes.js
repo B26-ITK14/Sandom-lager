@@ -1,3 +1,8 @@
+/*
+    * shoppingList.routes.js
+    * Routes for shopping list endpoints.
+    * Author:
+*/
 const express = require('express');
 const router = express.Router();
 

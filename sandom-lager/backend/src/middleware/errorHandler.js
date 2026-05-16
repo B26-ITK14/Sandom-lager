@@ -1,3 +1,8 @@
+/*
+    * errorHandler.js
+    * Centralized error handling middleware for Express.
+    * Author:
+*/
 // Centralized error handling middleware for Express
 function errorHandler(err, req, res, next) {
     const statusCode = err.statusCode || 500;

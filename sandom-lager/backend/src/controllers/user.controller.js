@@ -1,3 +1,8 @@
+/*
+    * user.controller.js
+    * Controller for user-related operations and profile management.
+    * Author: Emil Berglund
+*/
 const pool = require("../db/pool");
 const { callManagementApi } = require("../lib/auth0Management");
 const {

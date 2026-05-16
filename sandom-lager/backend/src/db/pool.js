@@ -1,3 +1,8 @@
+/*
+  * pool.js
+  * Postgres connection pool helper and DB utilities.
+  * Author: Andreas Skaarberg & Emil Berglund
+*/
 const { Pool } = require("pg");
 
 // PostgreSQL connection (Docker service name = db)

@@ -1,13 +1,8 @@
-/**
- * auth0Management.js
- * Utility to obtain and cache a Management API access token via client credentials,
- * and to call the Auth0 Management API v2.
- *
- * Required environment variables:
- *   AUTH0_DOMAIN          – e.g. dev-xxxx.eu.auth0.com
- *   AUTH0_M2M_CLIENT_ID   – client ID of an M2M application with read:sessions / delete:sessions
- *   AUTH0_M2M_CLIENT_SECRET – its client secret
- */
+/*
+    * auth0Management.js
+    * Utility to obtain and cache an Auth0 Management API token and call the API.
+    * Author:
+*/
 
 let cachedToken = null;
 let tokenExpiresAt = 0;

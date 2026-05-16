@@ -1,3 +1,8 @@
+/*
+	* user.routes.js
+	* Routes for user profile and account management.
+	* Author:
+*/
 const express = require("express");
 const router = express.Router();
 

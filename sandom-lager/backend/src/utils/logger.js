@@ -1,3 +1,8 @@
+/*
+    * logger.js
+    * Logging utility that records actions to the console and database.
+    * Author:
+*/
 const pool = require('../db/pool');
 
 async function logAction(user, action) {
@@ -15,7 +20,7 @@ async function logAction(user, action) {
             [user.id, message]
         );
 
-    } catch(err) {
+    } catch (err) {
         console.error('Logging error:', err);
     }
 }

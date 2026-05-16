@@ -1,3 +1,8 @@
+/*
+    * locations.routes.js
+    * Routes for location-related endpoints.
+    * Author:
+*/
 const express = require("express");
 const router = express.Router();
 const { checkJwt } = require("../middleware/checkJwt");

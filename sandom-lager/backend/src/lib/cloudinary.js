@@ -1,3 +1,8 @@
+/*
+  * cloudinary.js
+  * Cloudinary SDK configuration wrapper for image uploads.
+  * Author:
+*/
 const { v2: cloudinary } = require("cloudinary");
 
 cloudinary.config({

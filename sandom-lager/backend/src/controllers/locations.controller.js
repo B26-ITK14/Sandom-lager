@@ -1,3 +1,8 @@
+/*
+    * locations.controller.js
+    * Controller for location CRUD and access management.
+    * Author: Khalid Osman 
+*/
 const pool = require("../db/pool");
 
 // GET /api/locations - Henter alle lokasjoner

@@ -1,3 +1,8 @@
+/*
+  * index.js
+  * Express server setup and route registration.
+  * Author:
+*/
 const express = require("express");
 require("dotenv").config();
 const pool = require("./db/pool");
@@ -99,7 +104,7 @@ async function logDatabaseDiagnostics() {
     if (missingTables.length > 0) {
       console.error(
         `[startup] Missing expected DB tables: ${missingTables.join(", ")}. ` +
-          "Run backend/src/db/schema.sql (and seed if needed) against the database in DATABASE_URL."
+        "Run backend/src/db/schema.sql (and seed if needed) against the database in DATABASE_URL."
       );
     } else {
       console.log("[startup] Core DB tables detected");

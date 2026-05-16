@@ -1,3 +1,8 @@
+/*
+    * recipes.routes.js
+    * Routes for recipe CRUD and listing endpoints.
+    * Author:
+*/
 const express = require("express");
 const router = express.Router();
 
@@ -16,7 +21,7 @@ router.use(syncUser)
 // All users can access and read recipes. 
 // Get all recipes
 router.get(
-    "/", 
+    "/",
     requireRole("user", "manager", "admin"), // All roles can access
     asyncHandler(recipesController.getAllRecipes)
 );
@@ -30,21 +35,21 @@ router.get(
 
 // Get recipe by ID
 router.get(
-    "/:id", 
+    "/:id",
     requireRole("user", "manager", "admin"),
     asyncHandler(recipesController.getRecipeById)
 );
 
 // Manager and admin can create recipes
 router.post(
-    "/", 
+    "/",
     requireRole("manager", "admin"),
     asyncHandler(recipesController.createRecipe)
 );
 
 // Manager and admin can update recipes
 router.put(
-    "/:id", 
+    "/:id",
     requireRole("manager", "admin"),
     asyncHandler(recipesController.updateRecipe)
 );

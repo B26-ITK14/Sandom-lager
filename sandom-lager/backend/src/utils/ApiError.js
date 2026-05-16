@@ -1,3 +1,8 @@
+/*
+    * ApiError.js
+    * Custom API error class carrying HTTP status codes and messages.
+    * Author:
+*/
 // A custom error class for API errors, allowing us to include an HTTP status code and a message.
 class ApiError extends Error {
     constructor(statusCode, message) {

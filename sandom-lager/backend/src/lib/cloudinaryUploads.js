@@ -1,3 +1,8 @@
+/*
+  * cloudinaryUploads.js
+  * Helpers to upload image buffers to Cloudinary and manage public IDs.
+  * Author:
+*/
 const cloudinary = require("./cloudinary");
 const { CLOUDINARY_FOLDERS } = require("./cloudinaryFolders");
 

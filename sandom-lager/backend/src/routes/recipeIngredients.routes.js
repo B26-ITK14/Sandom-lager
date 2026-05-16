@@ -1,3 +1,8 @@
+/*
+    * recipeIngredients.routes.js
+    * Routes for managing recipe-ingredient relationships.
+    * Author:
+*/
 const express = require("express");
 const router = express.Router();
 
@@ -14,25 +19,25 @@ router.use(checkJwt())
 router.use(syncUser)
 
 // GET - All users allowed
-router.get("/recipes/:id/ingredients", 
+router.get("/recipes/:id/ingredients",
     requireRole("user", "admin", "manager"),
     asyncHandler(recipeIngredientsController.getRecipeIngredients)
 );
 
 // POST - Requires admin or manager role
-router.post("/recipes/:id/ingredients", 
+router.post("/recipes/:id/ingredients",
     requireRole("admin", "manager"),
     asyncHandler(recipeIngredientsController.addRecipeIngredient)
 );
 
 // PUT - Requires admin or manager role
-router.put("/recipe-ingredients/:id", 
+router.put("/recipe-ingredients/:id",
     requireRole("admin", "manager"),
     asyncHandler(recipeIngredientsController.updateRecipeIngredient)
 );
 
 // DELETE - Requires admin role
-router.delete("/recipe-ingredients/:id", 
+router.delete("/recipe-ingredients/:id",
     requireRole("admin"),
     asyncHandler(recipeIngredientsController.deleteRecipeIngredient)
 );

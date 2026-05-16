@@ -1,3 +1,8 @@
+/*
+    * session.controller.js
+    * Controller for session listing and revocation logic.
+    * Author: Emil Berglund
+*/
 const pool = require("../db/pool");
 
 // GET /me/sessions - Returns all tracked sessions for the current user

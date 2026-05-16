@@ -1,3 +1,8 @@
+/*
+ * recipes.controller.js
+ * Controller for recipe CRUD and retrieval operations.
+ * Author: Emil Berglund, Sebastian Thomsen & Andreas Skaarberg
+ */
 const pool = require("../db/pool");
 const { logAction } = require("../utils/logger");
 const ApiError = require("../utils/ApiError");
@@ -5,14 +10,14 @@ const ApiError = require("../utils/ApiError");
 // Helper – henter én oppskrift med allergener
 async function getRecipeWithAllergens(id) {
     const result = await pool.query(
-                `SELECT r.id, r.title, r.category, r.instructions, r.image_url, r.image_public_id, r.servings, r.created_at,
+        `SELECT r.id, r.title, r.category, r.instructions, r.image_url, r.image_public_id, r.servings, r.created_at,
           COALESCE(array_agg(a.name ORDER BY a.name) FILTER (WHERE a.name IS NOT NULL), '{}') AS allergens
          FROM recipes r
          LEFT JOIN recipe_allergens ra ON ra.recipe_id = r.id
          LEFT JOIN allergens a ON a.id = ra.allergen_id
          WHERE r.id = $1
          GROUP BY r.id`,
-        [id]
+        [id],
     );
     return result.rows[0] ?? null;
 }
@@ -20,13 +25,13 @@ async function getRecipeWithAllergens(id) {
 // GET /recipes
 async function getAllRecipes(req, res) {
     const result = await pool.query(
-                `SELECT r.id, r.title, r.category, r.instructions, r.image_url, r.image_public_id, r.servings, r.created_at,
+        `SELECT r.id, r.title, r.category, r.instructions, r.image_url, r.image_public_id, r.servings, r.created_at,
           COALESCE(array_agg(a.name ORDER BY a.name) FILTER (WHERE a.name IS NOT NULL), '{}') AS allergens
          FROM recipes r
          LEFT JOIN recipe_allergens ra ON ra.recipe_id = r.id
          LEFT JOIN allergens a ON a.id = ra.allergen_id
          GROUP BY r.id
-         ORDER BY r.id DESC`
+         ORDER BY r.id DESC`,
     );
     res.json(result.rows);
 }
@@ -41,8 +46,14 @@ async function getRecipeById(req, res) {
 
 // POST /recipes
 async function createRecipe(req, res) {
-
-    const { title, category, instructions, servings, image_url, image_public_id } = req.body;
+    const {
+        title,
+        category,
+        instructions,
+        servings,
+        image_url,
+        image_public_id,
+    } = req.body;
 
     if (!title) {
         throw new ApiError(400, "Missing required field: title");
@@ -53,24 +64,34 @@ async function createRecipe(req, res) {
         (title, category, instructions, image_url, image_public_id, servings)
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *`,
-        [title, category, instructions, image_url ?? null, image_public_id ?? null, servings ?? 8]
+        [
+            title,
+            category,
+            instructions,
+            image_url ?? null,
+            image_public_id ?? null,
+            servings ?? 8,
+        ],
     );
 
     const recipe = result.rows[0];
 
-    await logAction(
-        req.user,
-        `Opprettet oppskriften "${recipe.title}"`
-    );
+    await logAction(req.user, `Opprettet oppskriften "${recipe.title}"`);
 
     res.status(201).json({ ...recipe, allergens: [] });
 }
 
 // PUT /recipes/:id
 async function updateRecipe(req, res) {
-
     const { id } = req.params;
-    const { title, category, instructions, servings, image_url, image_public_id } = req.body;
+    const {
+        title,
+        category,
+        instructions,
+        servings,
+        image_url,
+        image_public_id,
+    } = req.body;
 
     if (!title) {
         throw new ApiError(400, "Missing required field: title");
@@ -81,7 +102,15 @@ async function updateRecipe(req, res) {
          SET title = $1, category = $2, instructions = $3, image_url = $4, image_public_id = $5, servings = $6
          WHERE id = $7
          RETURNING *`,
-        [title, category, instructions, image_url ?? null, image_public_id ?? null, servings ?? 8, id]
+        [
+            title,
+            category,
+            instructions,
+            image_url ?? null,
+            image_public_id ?? null,
+            servings ?? 8,
+            id,
+        ],
     );
 
     if (updateResult.rows.length === 0) {
@@ -90,40 +119,29 @@ async function updateRecipe(req, res) {
 
     const recipe = await getRecipeWithAllergens(id);
 
-    await logAction(
-        req.user,
-        `Oppdaterte oppskriften "${recipe.title}"`
-    );
+    await logAction(req.user, `Oppdaterte oppskriften "${recipe.title}"`);
 
     res.json(recipe);
 }
 
 // DELETE /recipes/:id
 async function deleteRecipe(req, res) {
-    
     const { id } = req.params;
 
     const recipeResult = await pool.query(
         `SELECT title FROM recipes WHERE id = $1`,
-        [id]
+        [id],
     );
 
-    const recipeTitle =
-        recipeResult.rows[0]?.title || `ID ${id}`;
+    const recipeTitle = recipeResult.rows[0]?.title || `ID ${id}`;
 
-    const result = await pool.query(
-        `DELETE FROM recipes WHERE id = $1`,
-        [id]
-    );
+    const result = await pool.query(`DELETE FROM recipes WHERE id = $1`, [id]);
 
     if (result.rowCount === 0) {
         throw new ApiError(404, "Recipe not found");
     }
 
-    await logAction(
-        req.user,
-        `Slettet oppskriften "${recipeTitle}"`
-    );
+    await logAction(req.user, `Slettet oppskriften "${recipeTitle}"`);
 
     res.json({ message: "Recipe deleted" });
 }
@@ -131,7 +149,7 @@ async function deleteRecipe(req, res) {
 // GET /recipes/allergens
 async function getAllAllergens(req, res) {
     const result = await pool.query(
-        "SELECT id, name FROM allergens ORDER BY name"
+        "SELECT id, name FROM allergens ORDER BY name",
     );
     res.json(result.rows);
 }
@@ -150,7 +168,7 @@ async function setRecipeAllergens(req, res) {
     for (const allergenId of allergen_ids) {
         await pool.query(
             "INSERT INTO recipe_allergens (recipe_id, allergen_id) VALUES ($1, $2)",
-            [id, allergenId]
+            [id, allergenId],
         );
     }
 
@@ -167,5 +185,5 @@ module.exports = {
     updateRecipe,
     deleteRecipe,
     getAllAllergens,
-    setRecipeAllergens
+    setRecipeAllergens,
 };

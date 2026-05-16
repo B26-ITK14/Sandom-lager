@@ -1,3 +1,8 @@
+/*
+    * checkJwt.js
+    * Middleware to validate JWT tokens from Auth0 for protected routes.
+    * Author:
+*/
 // https://auth0.com/docs/secure/tokens/json-web-tokens
 // https://www.digitalocean.com/community/tutorials/nodejs-jwt-expressjs
 // https://developer.auth0.com/resources/guides/api/express/basic-authorization
