@@ -172,7 +172,7 @@ export default function Dashboard() {
                 {/* Kalkuler ingredienser */}
                 {featuredRecipes.length > 0 && (
                     <section
-                        className="rounded-2xl p-5 mt-6"
+                        className="rounded-2xl p-5 mt-6 mb-6"
                         style={{
                             backgroundColor: "var(--color-surface)",
                             border: "1px solid var(--color-border)",
