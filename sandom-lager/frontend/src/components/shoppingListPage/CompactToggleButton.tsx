@@ -1,3 +1,10 @@
+/*
+    * CompactToggleButton.tsx
+    * A toggle button for switching between compact and detailed views of the shopping list.
+    * Displays an icon and label indicating the current view mode, and calls the onChange callback with the new mode when clicked.
+    * Author: Emil Berglund
+*/
+
 import { List, ListCollapse } from "lucide-react";
 
 interface Props {

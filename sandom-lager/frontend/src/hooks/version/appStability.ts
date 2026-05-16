@@ -2,6 +2,8 @@
     * appStability.ts
     * Custom React hook for determining the stability status of the application based on its version.
     * This hook analyzes the version string from package-lock.json to classify it as stable, rc, beta, alpha, or development.
+    * It also provides a user-friendly label for the stability status and indicates whether the app is in production or not.
+    * Author: Emil Berglund
  */
 
 import packageLock from "../../../package-lock.json";

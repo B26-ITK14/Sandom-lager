@@ -1,3 +1,10 @@
+/*
+    * AddShoppingItemModal.tsx
+    * A modal dialog for adding a new item to the shopping list. Allows users to either select an existing ingredient from their inventory or enter a new ingredient name, along with quantity and unit. Handles form state, validation, and API interaction to add the item to the shopping list.
+    * Author: Andreas Skaarberg
+*/
+
+
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { addToShoppingList, fetchInventory } from "../../api";
@@ -105,7 +112,7 @@ export default function AddShoppingItemModal({ isOpen, onClose, onItemAdded }: P
                     token
                 );
             }
-            
+
             // Reset form
             setSelectedIngredient(null);
             setNewIngredientName("");

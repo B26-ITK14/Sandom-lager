@@ -1,3 +1,10 @@
+/*
+    * ShoppingListPrintExport.tsx
+    * A component that provides buttons for printing the shopping list and exporting it to an Excel file. The print button triggers the browser's print functionality, while the export button generates an Excel file containing the shopping list items and prompts the user to download it.
+    * The component uses the write-excel-file library to create the Excel file and styles the buttons to match the application's design.
+    * Author: Andreas Skaarberg
+*/
+
 import writeXlsxFile, { type SheetData } from 'write-excel-file/browser';
 import { Printer, FileSpreadsheet } from 'lucide-react';
 import type { ShoppingListItem } from '../../types';
@@ -52,7 +59,7 @@ export default function ShoppingListPrintExport({ items }: Props) {
             <button
                 onClick={() => window.print()}
                 className="flex items-center gap-2 py-2 px-4 rounded-md font-medium transition-all hover:shadow-md cursor-pointer"
-                style={{ 
+                style={{
                     background: "var(--color-secondary-surface)",
                     color: "var(--color-text-primary)",
                     border: "1px solid var(--color-border)",
@@ -67,7 +74,7 @@ export default function ShoppingListPrintExport({ items }: Props) {
             <button
                 onClick={exportToExcel}
                 className="flex items-center gap-2 py-2 px-4 rounded-md font-medium transition-all hover:shadow-md cursor-pointer"
-                style={{ 
+                style={{
                     background: "#10b981",
                     color: "white",
                 }}

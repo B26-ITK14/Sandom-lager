@@ -1,8 +1,9 @@
 /*
-* ProductCard.tsx
-* Displays an inventory item with its name, quantity, and unit.
-* Allows editing the quantity and deleting the item with confirmation.
-* Shows appropriate buttons based on user permissions and action states.
+    * ProductCard.tsx
+    * Displays an inventory item with its name, quantity, and unit.
+    * Allows editing the quantity and deleting the item with confirmation.
+    * Shows appropriate buttons based on user permissions and action states.
+    * Author: Ida Tollaksen
 */
 
 import { useEffect, useState } from "react";
@@ -140,7 +141,7 @@ export default function ProductCard({
                 </section>
 
                 <section className="flex items-center gap-3">
-                    <FavProductBtn 
+                    <FavProductBtn
                         name={name}
                         onClick={() => onToggleFavorite?.(id)}
                         isSaved={isFavorite}

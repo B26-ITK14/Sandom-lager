@@ -1,6 +1,8 @@
 /*
     * ShoppingListPage.tsx
     * Main page for managing the shopping list, including generating from recipes, editing items, and viewing history.
+    * Allows users to increase/decrease quantities, change units, delete items, and add new items to the shopping list. Displays a history of past shopping lists with timestamps.
+    * Author: Andreas Skaarberg
 */
 
 import Layout from "../components/Layout";
@@ -15,7 +17,7 @@ import { useSelectedRecipes } from "../context/SelectedRecipesContext";
 import ShoppingListHeader from "../components/shoppingListPage/ShoppingListHeader";
 import ShoppingListItemRow from "../components/shoppingListPage/ShoppingListItem";
 import ShoppingListHistory from "../components/shoppingListPage/ShoppingListHistory";
-import { EmptyShoppingList }  from "../components/shoppingListPage/EmptyShoppingList";
+import { EmptyShoppingList } from "../components/shoppingListPage/EmptyShoppingList";
 import AddShoppingItemModal from "../components/shoppingListPage/AddShoppingItemModal";
 
 export default function ShoppingListPage() {
@@ -210,7 +212,7 @@ export default function ShoppingListPage() {
                 onClose={() => setIsAddModalOpen(false)}
                 onItemAdded={loadShoppingList}
             />
-            
+
         </Layout>
-    ) 
+    )
 }

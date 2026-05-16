@@ -1,6 +1,11 @@
 /*
     * LanguageCard.tsx
     * Settings card for language and region preferences.
+    * Allows users to select their preferred language for the app interface and provides an optional Google Translate popup for additional languages.
+    * Saves language preference to local storage and applies it immediately by setting the document's lang attribute.
+    * Integrates with Google Translate API to offer on-the-fly translation of the app interface, with a fallback mechanism if the script fails to load.
+    * Includes accessibility features and responsive design for the translation popup.
+    * Is used within the AppSettingsPage.tsx component on the application settings page.
     * Author: Emil Berglund
 */
 

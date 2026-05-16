@@ -1,3 +1,10 @@
+/*
+    * ShoppingListHeader.tsx
+    * The header component for the shopping list page. It contains buttons for adding items, generating the shopping list from selected recipes, toggling between compact and detailed views, and exporting or deleting the shopping list.
+    * The header also displays the number of selected recipes when generating the shopping list.
+    * Author: Emil Berglund
+*/
+
 import { Plus, Zap, List, ListCollapse } from "lucide-react";
 import ShoppingListPrintExport from "./ShoppingListPrintExport";
 import DeleteShoppingListButton from "./DeleteShoppingListButton";

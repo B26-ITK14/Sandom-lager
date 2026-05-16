@@ -26,6 +26,10 @@ export function AuthErrorProvider({ children }: { children: ReactNode }) {
             void logoutUser();
             navigate('/login', { replace: true });
         }
+        else {
+            // For other errors, you could implement additional handling here (e.g., show a notification)
+            console.error(_errorMessage || `Unhandled auth error with status ${status}`);
+        }
     }, [logoutUser, navigate]);
 
     return (

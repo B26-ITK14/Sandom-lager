@@ -1,6 +1,10 @@
 /*
     * NotificationsCard.tsx
     * Settings card for notification preferences.
+    * Allows users to toggle notifications for inventory, recipes, and system alerts.
+    * Saves preferences to local storage and updates server-side settings via API calls.
+    * Provides error handling and feedback for failed updates.
+    * Is used within the AppSettingsPage.tsx component on the application settings page.
     * Author: Emil Berglund
 */
 

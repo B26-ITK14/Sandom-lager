@@ -1,7 +1,8 @@
 /*
- * Dashboard.tsx
- * Hovedside etter innlogging. Viser statistikk, planlegging og aktive oppskrifter.
- * Author: Khalid Osman
+    * Dashboard.tsx
+    * Main dashboard page that provides an overview of the user's inventory, active recipes, and shopping list.
+    * Displays key statistics and quick links to relevant sections of the app for easy navigation.
+    * Author: Khalid Osman
  */
 
 import { useNavigate } from "react-router-dom";
@@ -101,7 +102,7 @@ export default function Dashboard() {
                             key={label}
                             onClick={() => navigate(route)}
                             className="flex-1 min-w-[140px] rounded-2xl p-4 transition-all duration-150 hover:shadow-md active:scale-95 cursor-pointer"
-                            style={{ 
+                            style={{
                                 backgroundColor: bg,
                                 border: `1px solid ${bg}`,
                             }}

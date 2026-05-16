@@ -1,6 +1,9 @@
 /*
     * AccessibilityCard.tsx
     * Settings card for accessibility options like reduced motion and high contrast mode.
+    * Allows users to toggle accessibility features that enhance usability for those with specific needs.
+    * Applies changes immediately and saves preferences to local storage for persistence.
+    * Is used within the AppSettingsPage.tsx component on the application settings page.
     * Author: Emil Berglund
 */
 

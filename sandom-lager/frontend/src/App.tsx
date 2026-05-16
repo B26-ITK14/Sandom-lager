@@ -1,3 +1,8 @@
+/*
+    * App.tsx
+    * The main application component that sets up routing, context providers, and lazy loading for the Sandom Lager frontend. It defines the structure of the application and manages access to different pages based on authentication and user roles.
+*/
+
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -129,43 +134,43 @@ export default function App() {
                       </ProtectedRoute>
                     }
                   />
-                <Route
-                  path={ROUTES.SETTINGS_ACCOUNT.path}
-                  element={
-                    <ProtectedRoute>
-                      <MyAccountPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path={ROUTES.SETTINGS_APPLICATIONS.path}
-                  element={
-                    <ProtectedRoute>
-                      <MyApplicationsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path={ROUTES.SETTINGS_APP_SETTINGS.path}
-                  element={
-                    <ProtectedRoute>
-                      <AppSettingsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path={ROUTES.SETTINGS_ABOUT.path}
-                  element={
-                    <ProtectedRoute>
-                      <AboutSandomLagerPage />
-                    </ProtectedRoute>
-                  }
-                />
+                  <Route
+                    path={ROUTES.SETTINGS_ACCOUNT.path}
+                    element={
+                      <ProtectedRoute>
+                        <MyAccountPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={ROUTES.SETTINGS_APPLICATIONS.path}
+                    element={
+                      <ProtectedRoute>
+                        <MyApplicationsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={ROUTES.SETTINGS_APP_SETTINGS.path}
+                    element={
+                      <ProtectedRoute>
+                        <AppSettingsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path={ROUTES.SETTINGS_ABOUT.path}
+                    element={
+                      <ProtectedRoute>
+                        <AboutSandomLagerPage />
+                      </ProtectedRoute>
+                    }
+                  />
 
-                {/* Catch-all */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </Suspense>
+                  {/* Catch-all */}
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </Suspense>
             </SelectedRecipesProvider>
           </UserProvider>
         </AuthErrorProvider>

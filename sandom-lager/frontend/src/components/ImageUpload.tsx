@@ -1,5 +1,3 @@
-import { apiUrl } from "../api/client";
-
 /*
     * ImageUpload.tsx
     * Component for uploading images to the server and displaying a preview.
@@ -7,8 +5,9 @@ import { apiUrl } from "../api/client";
     * - onUpload: function that receives the URL of the uploaded image
     * Usage:
     * <ImageUpload onUpload={(url) => saveUrlToDatabase(url)} /> />
+    * Author: Emil Berglund
 */
-
+import { apiUrl } from "../api/client";
 import { useState } from "react";
 
 export default function ImageUpload({ onUpload }: { onUpload: (url: string) => void }) {

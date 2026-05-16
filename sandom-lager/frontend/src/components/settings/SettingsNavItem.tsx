@@ -1,6 +1,10 @@
 /*
     * SettingsNavItem.tsx
     * A reusable navigation item component for the settings page.
+    * Renders an icon, title, optional description, and a chevron. Supports click handling for navigation or custom actions.
+    * Displays a warning indicator if the 'warning' prop is set to true.
+    * Uses the 'figureType' prop to determine which icon to display, with a predefined mapping of types to icons.
+    * Is used across various settings pages to create a consistent navigation experience for different settings options.
     * Author: Emil Berglund
 */
 

@@ -2,6 +2,7 @@
     * SelectedRecipesContext.tsx
     * Provides a global set of selected recipe IDs that can be read and modified from any page
     * For example, RecipesPage selects recipes, ShoppingListPage uses them.
+    * Author: Sebastian Thomsen
 */
 
 /* eslint-disable react-refresh/only-export-components */

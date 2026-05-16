@@ -2,6 +2,7 @@
     * index.ts
     * Type definitions for the frontend application, including user roles, route information, and data models for recipes, ingredients, shopping list items, and inventory items.
     * This file serves as a central location for all type definitions used across the frontend codebase, ensuring consistency and type safety.
+    * Author: Emil Berglund
 */
 
 import type { RouteNickname } from "../router/routes";

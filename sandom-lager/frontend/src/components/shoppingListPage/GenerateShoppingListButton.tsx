@@ -1,3 +1,11 @@
+/*
+    * GenerateShoppingListButton.tsx
+    * A button component for generating a shopping list based on selected recipes. Displays the number of selected recipes and shows a loading state while the shopping list is being generated.
+    * The button is disabled when no recipes are selected or while the generation process is ongoing to prevent multiple submissions.
+    * Author: Emil Berglund
+*/
+
+
 import { Zap } from "lucide-react";
 
 interface Props {

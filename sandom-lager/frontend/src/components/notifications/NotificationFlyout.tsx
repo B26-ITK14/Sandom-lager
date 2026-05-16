@@ -1,7 +1,8 @@
 /*
     * NotificationFlyout.tsx
     * A flyout notification panel that slides in from the right, displaying system notifications
-    * such as low stock alerts or access approvals. 
+    * Is used in the header when the user clicks on the notification bell icon.
+    * Author: Emil Berglund
 */
 
 import { useNavigate } from 'react-router-dom';
@@ -59,9 +60,8 @@ export function NotificationFlyout({
             {/* Flyout */}
             <section
                 id="app-notification-flyout"
-                className={`fixed top-0 right-0 h-full w-full max-w-md transition-transform duration-200 ease-out z-50 flex flex-col ${
-                    isOpen ? 'translate-x-0' : 'translate-x-full'
-                }`}
+                className={`fixed top-0 right-0 h-full w-full max-w-md transition-transform duration-200 ease-out z-50 flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'
+                    }`}
                 style={{ backgroundColor: 'var(--color-surface)' }}
             >
                 <div className={isOpen ? 'animate-slide-in-right' : ''}>
@@ -102,8 +102,8 @@ export function NotificationFlyout({
                 </div>
 
                 <div className={isOpen ? 'animate-slide-in-right animate-delay-200' : ''}>
-                    <NotificationFooter 
-                        hasNotifications={notifications.length > 0} 
+                    <NotificationFooter
+                        hasNotifications={notifications.length > 0}
                         onMarkAllAsRead={onMarkAllAsRead}
                     />
                 </div>

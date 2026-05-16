@@ -1,6 +1,7 @@
 /*
     * AccountDetailsCard.tsx
     * Card component for displaying user account details like role, membership date, and status.
+    * Is used within the AccountSettingsPage.tsx component on the account settings page.
     * Author: Emil Berglund
 */
 

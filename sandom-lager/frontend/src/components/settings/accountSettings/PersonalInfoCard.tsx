@@ -1,6 +1,8 @@
 /*
     * PersonalInfoCard.tsx
     * Card component for displaying and editing personal information like name, username, email, and location.
+    * Includes profile picture editing with preview support and validation.
+    * Used within the AccountSettingsPage.tsx component on the account settings page.
     * Author: Emil Berglund
 */
 

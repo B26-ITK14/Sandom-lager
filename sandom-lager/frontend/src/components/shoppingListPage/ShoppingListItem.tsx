@@ -1,3 +1,10 @@
+/*
+    * ShoppingListItem.tsx
+    * A component that displays a single item in the shopping list, allowing users to increase, decrease, or delete the item. It also provides options to edit the unit and quantity of the item.
+    * The component handles loading states and displays appropriate messages when there are no items to show.
+    * Author: Andreas Skaarberg
+*/
+
 import { useState } from "react";
 import { INGREDIENT_UNITS, type IngredientUnit } from "../../types";
 import type { ShoppingListItem } from "../../types";

@@ -2,6 +2,8 @@
     * UserContext.tsx
     * Provides global user information and state, such as name, username, role, profile picture, and location.
     * Fetches user data from the backend on app load and handles authentication errors globally.
+    * Includes functions for optimistic local updates and full refreshes of user data.
+    * Author: Emil Berglund
 */
 
 /* eslint-disable react-refresh/only-export-components */
@@ -75,7 +77,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                     handleAuthError(401, err.detail || err.message);
                     return;
                 }
-                
+
                 if (!cancelled) {
                     setError(err instanceof Error ? err.message : 'Unknown error');
                     setLoading(false);

@@ -1,6 +1,8 @@
-/* useApiAccessToken.ts 
-* Custom React hook for retrieving an API access token from Auth0, with built-in handling for 
-* token retrieval errors that may require user interaction like consent or login
+/* 
+    * useApiAccessToken.ts 
+    * Custom React hook for retrieving an API access token from Auth0, with built-in handling for 
+    * token retrieval errors that may require user interaction like consent or login
+    * Author: Ida Tollaksen
 */
 
 import { useAuth0 } from "@auth0/auth0-react";

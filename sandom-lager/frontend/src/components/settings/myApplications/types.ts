@@ -1,6 +1,9 @@
 /*
     * types.ts
     * Shared types for the My Applications settings domain.
+    * Defines the MyApplication type representing a user's application for location access, and the LocationOption type for available locations when creating a new application.
+    * These types are used across multiple components in the My Applications section, including MyApplicationsPage.tsx, ApplicationsHistorySection.tsx, and NewApplicationSection.tsx.
+    * Author: Emil Berglund
 */
 
 import type { AccessStatus } from "../../../constants/accessStatus";

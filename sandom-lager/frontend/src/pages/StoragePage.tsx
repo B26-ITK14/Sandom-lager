@@ -2,6 +2,8 @@
  * StoragePage.tsx
  * Displays the inventory list from the backend API with search and quantity sorting.
  * Handles Auth0 token retrieval and shows loading, empty, and error states for data fetch.
+ * Allows users with appropriate roles to edit quantities and delete inventory items, with feedback messages for actions.
+ * Author: Ida Tollaksen (main), Emil Berglund (refactoring and styling)
  */
 
 import { useEffect, useMemo, useState } from "react";

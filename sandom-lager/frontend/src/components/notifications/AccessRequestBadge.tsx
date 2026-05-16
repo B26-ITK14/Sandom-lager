@@ -1,7 +1,7 @@
 /*
     * AccessRequestBadge.tsx
-    * Varselbadge som viser antall ventende tilgangssøknader.
-    * Brukes i header for admin-brukere.
+    * Shows a badge with the number of pending access requests.
+    * Is used in the header when the user has pending access requests.
     * Author: Khalid Osman
 */
 

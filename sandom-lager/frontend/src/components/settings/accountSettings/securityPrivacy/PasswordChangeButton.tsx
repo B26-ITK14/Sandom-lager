@@ -1,6 +1,7 @@
 /*
     * PasswordChangeButton.tsx
     * Button + confirmation overlay for sending a password reset email via Auth0.
+    * Only shown for users with a password-based account (not social/federated).
     * Author: Emil Berglund
 */
 
@@ -101,15 +102,15 @@ export default function PasswordChangeButton() {
                         <p className="text-xs" style={{
                             color: pwState === 'sent' ? '#22c55e'
                                 : pwState === 'error' ? '#ef4444'
-                                : 'var(--color-text-secondary)'
+                                    : 'var(--color-text-secondary)'
                         }}>
                             {pwState === 'sent'
                                 ? 'E-post for tilbakestilling er sendt'
                                 : pwState === 'error'
-                                ? pwError
-                                : !isPasswordUser
-                                ? 'Ikke tilgjengelig for sosiale kontoer'
-                                : 'Send tilbakestillingslenke til din e-post'}
+                                    ? pwError
+                                    : !isPasswordUser
+                                        ? 'Ikke tilgjengelig for sosiale kontoer'
+                                        : 'Send tilbakestillingslenke til din e-post'}
                         </p>
                     </div>
                 </div>

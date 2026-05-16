@@ -1,6 +1,8 @@
 /*
     * primitives.tsx
     * Reusable UI components for the app settings page, such as SectionCard, SettingRow, Toggle, and SettingSelect.
+    * These components provide consistent styling and behavior for different settings sections and options.
+    * The SectionCard component is used to create distinct sections for different categories of settings, while SettingRow is used for individual settings within those sections.
     * Author: Emil Berglund
 */
 

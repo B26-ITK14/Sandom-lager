@@ -2,6 +2,7 @@
     * SettingsUserHeader.tsx
     * A user profile header component for the settings page, displaying the user's profile picture, name, and an option to edit the profile. 
     * It also includes a styled divider for visual separation.
+    * Is used at the top of the account settings page to provide a personalized touch and quick access to profile information.
     * Author: Emil Berglund
 */
 
@@ -28,7 +29,7 @@ export default function SettingsUserHeader() {
             {/* Profile section */}
             <section className="flex flex-col items-center gap-4 ">
                 {/* Profile picture */}
-                <figure 
+                <figure
                     className="overflow-hidden rounded-2xl p-1.5"
                     style={{
                         background: 'linear-gradient(var(--color-surface), var(--color-surface)) padding-box, linear-gradient(135deg, var(--color-primary-gradient-from), var(--color-primary-gradient-to)) border-box',

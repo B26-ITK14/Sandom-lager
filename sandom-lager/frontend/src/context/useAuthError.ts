@@ -1,6 +1,7 @@
 /*
     * useAuthError.ts
     * Custom hook for accessing the AuthError context.
+    * This hook provides a convenient way for components to access the authentication error handling logic defined in AuthErrorContext.
     * Author: Emil Berglund
 */
 

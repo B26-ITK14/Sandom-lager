@@ -1,8 +1,9 @@
 /*
     * MyApplicationsPage.tsx
     * Page for managing user's applications to access different locations. Users can view the status of their applications and submit new ones. 
+    * Displays a history of applications with their current status (pending, approved, rejected) and allows users to apply for access to new locations that they haven't already applied for or been approved to.
+    * Utilizes the ApplicationsHistorySection and NewApplicationSection components to organize the page into a clear layout for managing applications.
     * Author: Emil Berglund
-    TODO: Fetch access status from DB
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";

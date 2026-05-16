@@ -1,8 +1,9 @@
 /*
- *  PostAuthRedirectPage.tsx
- *  A page that handles redirection after authentication based on the user's location access status.
- *  It checks if the user has approved, pending, or no access to any location and redirects accordingly.
- *  Shows a loading spinner while checking the access status.
+    * PostAuthRedirectPage.tsx
+    * A page that handles redirection after authentication based on the user's location access status.
+    * It checks if the user has approved, pending, or no access to any location and redirects accordingly.
+    * Shows a loading spinner while checking the access status.
+    * Author: Emil Berglund
  */
 
 import { useAuth0 } from "@auth0/auth0-react";

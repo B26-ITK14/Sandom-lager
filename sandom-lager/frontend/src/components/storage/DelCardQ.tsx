@@ -1,7 +1,9 @@
-/**
- * DelCardQ.tsx
- * A confirmation card component for deleting an inventory item.
- * Displays the item name and asks the user to confirm or cancel the deletion.
+/*
+    * DelCardQ.tsx
+    * A confirmation card component for deleting an inventory item.
+    * Displays the item name and asks the user to confirm or cancel the deletion.
+    * The component is designed to be used in a modal dialog and includes accessibility features such as ARIA labels.
+    * Author: Ida Tollaksen
  */
 
 type DelCardQProps = {

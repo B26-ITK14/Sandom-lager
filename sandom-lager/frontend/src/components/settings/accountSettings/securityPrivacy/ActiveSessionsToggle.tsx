@@ -1,6 +1,7 @@
 /*
     * ActiveSessionsToggle.tsx
     * Collapsible button that reveals the ActiveSessionsPanel when expanded.
+    * Used in the Security & Privacy section of the account settings page.
     * Author: Emil Berglund
 */
 

@@ -1,6 +1,7 @@
 /*
     * OnBoardingTitle.tsx
     * A component for displaying the title and description on onboarding screens, featuring a logo and styled text.
+    * Is used in the initial steps of the onboarding process to welcome users and provide context about Sandom Lager.
     * Author: Emil Berglund
 */
 

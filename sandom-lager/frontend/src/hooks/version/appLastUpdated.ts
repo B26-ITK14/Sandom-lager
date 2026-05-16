@@ -2,6 +2,8 @@
     * appLastUpdated.ts
     * Custom React hook for exposing app last-updated metadata.
     * Reads from VITE_APP_LAST_UPDATED and formats it for display.
+    * If the environment variable is missing or invalid, it provides sensible fallbacks.
+    * Author: Emil Berglund
 */
 
 export interface AppLastUpdatedInfo {

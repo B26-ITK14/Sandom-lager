@@ -1,3 +1,8 @@
+/*
+    * main.tsx
+    * The entry point of the Sandom Lager frontend application. It sets up the Auth0 authentication provider, registers a service worker for offline support, and renders the main App component within the appropriate context providers.
+*/
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles/App.css";
