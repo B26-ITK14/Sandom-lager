@@ -5,7 +5,7 @@
 * Shows appropriate buttons based on user permissions and action states.
 */
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DelCardQ from "./DelCardQ";
 import StorageEditCardBtn from "./StorageEditCardBtn";
 import StorageDelCardBtn from "./StorageDelCardBtn";
@@ -47,12 +47,6 @@ export default function ProductCard({
     const [isEditing, setIsEditing] = useState(false);
     const [quantityInput, setQuantityInput] = useState(String(quantity));
     const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
-
-    useEffect(() => {
-        if (!isEditing) {
-            setQuantityInput(String(quantity));
-        }
-    }, [quantity, isEditing]);
 
     function handleStartEdit() {
         if (!canEdit) {
