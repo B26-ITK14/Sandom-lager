@@ -28,6 +28,20 @@ router.get(
     asyncHandler(recipesController.getAllAllergens)
 );
 
+// Manager and admin can create new allergens
+router.post(
+    "/allergens",
+    requireRole("manager", "admin"),
+    asyncHandler(recipesController.createAllergen)
+);
+
+// Manager and admin can delete allergens (only if not in use)
+router.delete(
+    "/allergens/:id",
+    requireRole("manager", "admin"),
+    asyncHandler(recipesController.deleteAllergen)
+);
+
 // Get recipe by ID
 router.get(
     "/:id", 

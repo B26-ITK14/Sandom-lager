@@ -160,6 +160,45 @@ async function setRecipeAllergens(req, res) {
     res.json(recipe);
 }
 
+// POST /recipes/allergens
+async function createAllergen(req, res) {
+    const { name } = req.body;
+    if (!name || typeof name !== "string" || !name.trim()) {
+        throw new ApiError(400, "name is required");
+    }
+    const trimmed = name.trim();
+    const existing = await pool.query(
+        "SELECT id FROM allergens WHERE LOWER(name) = LOWER($1)",
+        [trimmed]
+    );
+    if (existing.rows.length > 0) {
+        throw new ApiError(409, "Allergenet finnes allerede");
+    }
+    const result = await pool.query(
+        "INSERT INTO allergens (name) VALUES ($1) RETURNING id, name",
+        [trimmed]
+    );
+    res.status(201).json(result.rows[0]);
+}
+
+// DELETE /recipes/allergens/:id
+async function deleteAllergen(req, res) {
+    const { id } = req.params;
+    const inUse = await pool.query(
+        "SELECT 1 FROM recipe_allergens WHERE allergen_id = $1 LIMIT 1",
+        [id]
+    );
+    if (inUse.rows.length > 0) {
+        throw new ApiError(409, "Allergenet er i bruk av én eller flere oppskrifter og kan ikke slettes");
+    }
+    const result = await pool.query(
+        "DELETE FROM allergens WHERE id = $1 RETURNING id",
+        [id]
+    );
+    if (result.rows.length === 0) throw new ApiError(404, "Allergen ikke funnet");
+    res.status(204).send();
+}
+
 module.exports = {
     getAllRecipes,
     getRecipeById,
@@ -167,5 +206,7 @@ module.exports = {
     updateRecipe,
     deleteRecipe,
     getAllAllergens,
-    setRecipeAllergens
+    setRecipeAllergens,
+    createAllergen,
+    deleteAllergen
 };
