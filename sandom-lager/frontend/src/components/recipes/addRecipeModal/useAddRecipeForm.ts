@@ -9,7 +9,9 @@
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { AUTH0_AUDIENCE } from "../../../config/auth";
-import { createIngredient, createRecipe, updateRecipe, addRecipeIngredient, deleteRecipeIngredient, fetchIngredients, fetchAllergens, setRecipeAllergens, uploadRecipeImage } from "../../../api/recipes";
+import { createIngredient, createRecipe, updateRecipe, addRecipeIngredient, deleteRecipeIngredient, 
+    fetchIngredients, fetchAllergens, setRecipeAllergens, uploadRecipeImage, 
+    createAllergen as apiCreateAllergen, deleteAllergen as apiDeleteAllergen } from "../../../api/recipes";
 import type { Allergen, Ingredient, Recipe, RecipeIngredient } from "../../../types";
 import { type IngredientRow } from "./IngredientRows";
 
@@ -213,6 +215,19 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
         await submitRecipe();
     }
 
+    async function handleAddAllergen(name: string): Promise<void> {
+        const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
+        const newAllergen = await apiCreateAllergen(name, token);
+        setAllAllergens((prev) => [...prev, newAllergen].sort((a, b) => a.name.localeCompare(b.name)));
+    }
+
+    async function handleDeleteAllergen(id: number): Promise<void> {
+        const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
+        await apiDeleteAllergen(id, token);
+        setAllAllergens((prev) => prev.filter((a) => a.id !== id));
+        setSelectedAllergenIds((prev) => prev.filter((aid) => aid !== id));
+    }
+
     return {
         title, setTitle,
         category, setCategory,
@@ -226,6 +241,8 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
         rows,
         allAllergens,
         selectedAllergenIds, setSelectedAllergenIds,
+        handleAddAllergen,
+        handleDeleteAllergen,
         existingIngredients,
         submitting,
         error,

@@ -32,6 +32,8 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
         recipeImageUrl, recipeImageFile, recipeImagePreview,
         handleImageChange, handleRemoveImage,
         allAllergens, selectedAllergenIds, setSelectedAllergenIds,
+        handleAddAllergen,
+        handleDeleteAllergen,
         existingIngredients,
         rows, updateRow, handleIngredientNameChange, addRow, removeRow,
         submitting, error,
@@ -102,6 +104,9 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
                         allAllergens={allAllergens}
                         selectedAllergenIds={selectedAllergenIds}
                         onChange={setSelectedAllergenIds}
+                        canManage={true}
+                        onAddAllergen={handleAddAllergen}
+                        onDeleteAllergen={handleDeleteAllergen}
                     />
 
                     {/* Ingredients */}

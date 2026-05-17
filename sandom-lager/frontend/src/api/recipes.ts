@@ -153,6 +153,21 @@ export async function fetchAllergens(accessToken: string): Promise<Allergen[]> {
     });
 }
 
+export async function createAllergen(name: string, accessToken: string): Promise<Allergen> {
+    return apiFetchJson<Allergen>("/api/recipes/allergens", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+    });
+}
+
+export async function deleteAllergen(id: number, accessToken: string): Promise<void> {
+    await apiFetchJson<unknown>(`/api/recipes/allergens/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+}
+
 export async function setRecipeAllergens(
     recipeId: number,
     allergenIds: number[],
