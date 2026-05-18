@@ -1,7 +1,7 @@
 /*
     * PendingCard.tsx
-    * Viser én tilgangssøknad i admin-panelet.
-    * Admin kan godkjenne eller avslå søknaden direkte fra kortet.
+    * A card component for displaying pending access requests, showing user information, request details, and action buttons for approval or denial.
+    * Is used in the AccessRequestsPage to render each pending access request in a user-friendly format.
     * Author: Khalid Osman
 */
 
@@ -126,7 +126,7 @@ export default function PendingCard({
                         onClick={() => onDeny(request.id)}
                         disabled={isLoading}
                         className="flex-1 rounded-xl border px-4 py-2 text-xs font-semibold transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                        style={{                            
+                        style={{
                             borderColor: 'var(--color-danger)',
                             color: 'var(--color-danger)',
                             backgroundColor: 'transparent',

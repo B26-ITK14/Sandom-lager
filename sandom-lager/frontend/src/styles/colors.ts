@@ -1,3 +1,10 @@
+/*
+    * colors.ts
+    * Defines the color tokens for both light and dark modes used throughout the frontend application. Each color mode has a set of specific colors for various UI elements such as text, backgrounds, surfaces, borders, and primary/danger actions.
+    * This centralized color definition allows for consistent theming and easy maintenance of the application's visual design.
+    * Author: Emil Berglund
+*/
+
 export type ColorMode = "light" | "dark";
 
 export type ColorTokens = {

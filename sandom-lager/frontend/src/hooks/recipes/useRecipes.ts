@@ -2,6 +2,8 @@
     * useRecipes.ts
     * Custom hook to fetch all recipes from the backend API.
     * Returns the recipes array, a loading state, any error, and a refresh function.
+    * The refresh function can be called to re-fetch the recipes, which is useful after creating/updating/deleting a recipe to ensure the UI shows the latest data.
+    * Author: Sebastian Thomsen
 */
 
 import { useCallback, useEffect, useState } from 'react';

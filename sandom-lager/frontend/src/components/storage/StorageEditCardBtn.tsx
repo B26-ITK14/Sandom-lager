@@ -1,7 +1,8 @@
-/**
-* StorageEditCardBtn.tsx
-* A button component for editing or saving changes to an inventory item.
-*/
+/*
+    * StorageEditCardBtn.tsx
+    * A button component for editing or saving changes to an inventory item.
+    * Author: Ida Tollaksen
+ */
 
 import { Check, Pencil, X } from "lucide-react";
 

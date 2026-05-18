@@ -1,3 +1,8 @@
+/*
+    * notifications.routes.js
+    * Routes for notifications endpoints and actions.
+    * Author: Ida Tollaksen
+*/
 const express = require("express");
 const router = express.Router();
 

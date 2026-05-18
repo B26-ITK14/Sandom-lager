@@ -1,6 +1,8 @@
 /*
  * sessionUtils.ts
  * Utility functions for parsing and formatting session/device data in ActiveSessionsPanel.
+ * Includes functions to parse user agent strings, determine device icons, and format session timestamps.
+ * Is used by ActiveSessionsPanel.tsx in the Security & Privacy section of the account settings page.
  * Author: Emil Berglund
  */
 

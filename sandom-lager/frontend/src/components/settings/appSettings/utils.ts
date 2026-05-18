@@ -1,6 +1,8 @@
 /*
     * utils.ts
     * Utility functions for reading and saving user preferences in localStorage, as well as type definitions for settings options.
+    * These functions are used across various settings cards to persist user preferences and apply them immediately.
+    * The readPref function retrieves a preference value from localStorage, returning a fallback value if the key is not found or if parsing fails. The savePref function saves a preference value to localStorage after stringifying it.
     * Author: Emil Berglund
 */
 

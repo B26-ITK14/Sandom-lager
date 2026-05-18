@@ -1,3 +1,8 @@
+/*
+    * uploadProfilePicture.js
+    * Middleware to handle profile picture uploads and Cloudinary integration.
+    * Author: Emil Berglund
+*/
 const multer = require('multer');
 const storage = multer.memoryStorage();
 

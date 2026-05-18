@@ -2,6 +2,8 @@
     * useRecipeIngredients.ts
     * Custom hook to fetch all ingredients for a specific recipe.
     * Returns the ingredient list, a loading state, and any error.
+    * This hook abstracts away the logic of fetching recipe ingredients and managing loading/error states, making it easy to use in any component that needs to display or work with a recipe's ingredients.
+    * Author: Sebastian Thomsen
 */
 
 import { useEffect, useState } from 'react';

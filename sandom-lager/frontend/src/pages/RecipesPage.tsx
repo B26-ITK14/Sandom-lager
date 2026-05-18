@@ -1,5 +1,8 @@
 /*
     * RecipesPage.tsx
+    * Main page for browsing, creating, and managing recipes. Displays a list of recipes with filtering options and allows users with appropriate roles to add, edit, or delete recipes.
+    * Includes a search bar and category filter for easy navigation through recipes. Clicking on a recipe opens a detail modal with more information and management options.
+    * Authors: Sebastian Thomsen
 */
 
 import { useMemo, useState } from "react";

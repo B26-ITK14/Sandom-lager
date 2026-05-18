@@ -98,6 +98,31 @@ export async function fetchCurrentUserRole(accessToken: string): Promise<UserRol
     return data.role ?? null;
 }
 
+export async function updateNotificationPreferences(
+    preferences: {
+        notifyInventory?: boolean;
+        notifyRecipes?: boolean;
+        notifySystem?: boolean;
+    },
+    accessToken: string
+): Promise<{ notifyInventory: boolean; notifyRecipes: boolean; notifySystem: boolean }> {
+    const response = await fetch(apiUrl('/api/me/notification-preferences'), {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(preferences),
+    });
+
+    if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error((data as { message?: string }).message ?? `Kunne ikke oppdatere varslepreferanser (${response.status})`);
+    }
+
+    return response.json();
+}
+
 // ----- Sessions -----
 
 export interface SessionDevice {

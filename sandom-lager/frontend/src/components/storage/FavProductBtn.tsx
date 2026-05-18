@@ -1,7 +1,8 @@
 /*
-* FavProductBtn.tsx
-* A button component for marking a product as a favorite in the storage page.
-*/
+    * FavProductBtn.tsx
+    * A button component for marking a product as a favorite in the storage page.
+    * Author: Ida Tollaksen
+ */
 
 import { Star } from "lucide-react";
 

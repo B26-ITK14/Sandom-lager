@@ -1,3 +1,8 @@
+/*
+    * uploadRoutes.js
+    * Routes for file uploads and profile picture endpoints.
+    * Author: Emil Berglund
+*/
 const express = require("express");
 const multer = require("multer");
 const {

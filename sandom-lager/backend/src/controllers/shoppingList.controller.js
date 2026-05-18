@@ -1,4 +1,9 @@
 const pool = require('../db/pool');
+/*
+    * shoppingList.controller.js
+    * Controller for shopping list CRUD and management.
+    * Author: Andreas Skaarberg
+*/
 const ApiError = require('../utils/ApiError');
 
 async function getApprovedLocationId(userId) {

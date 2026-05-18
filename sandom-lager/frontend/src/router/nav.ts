@@ -2,6 +2,7 @@
     * nav.ts
     * Utility functions for handling navigation and route information in the frontend application.
     * This file provides helper functions to retrieve route information based on path or nickname, as well as functions to get display names and lists of routes for use in navigation components.
+    * Author: Emil Berglund
 */
 
 import { ROUTES } from "./routes";

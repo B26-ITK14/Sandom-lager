@@ -1,3 +1,8 @@
+/*
+    * recipeIngredients.controller.js
+    * Controller for linking ingredients to recipes and related operations.
+    * Author: Ida Tollaksen & Andreas Skaarberg
+*/
 const pool = require("../db/pool");
 const ApiError = require("../utils/ApiError");
 
@@ -6,7 +11,7 @@ const ApiError = require("../utils/ApiError");
 // Returnerer liste med ingrediens-navn, mengde og enhet
 async function getRecipeIngredients(req, res) {
 
-    const { id } = req.params;    
+    const { id } = req.params;
 
     const result = await pool.query(
         `SELECT 
@@ -18,7 +23,7 @@ async function getRecipeIngredients(req, res) {
             i.unit 
         FROM recipe_ingredients ri
         JOIN ingredients i ON ri.ingredient_id = i.id 
-        WHERE ri.recipe_id = $1`, [id]    
+        WHERE ri.recipe_id = $1`, [id]
     );
 
     res.json(result.rows)
@@ -57,7 +62,7 @@ async function updateRecipeIngredient(req, res) {
     if (quantity === undefined) {
         throw new ApiError(400, "Missing required field: quantity");
     }
-    
+
     const result = await pool.query(
         `UPDATE recipe_ingredients
          SET quantity = $1
@@ -79,7 +84,7 @@ async function updateRecipeIngredient(req, res) {
 async function deleteRecipeIngredient(req, res) {
 
     const { id } = req.params;
-    
+
     const result = await pool.query(
         `DELETE FROM recipe_ingredients 
          WHERE id = $1
@@ -90,9 +95,9 @@ async function deleteRecipeIngredient(req, res) {
         throw new ApiError(404, "Recipe ingredient not found");
     }
 
-    res.json({ 
-        message: "Ingrediens fjernet", 
-        deleted: result.rows[0] 
+    res.json({
+        message: "Ingrediens fjernet",
+        deleted: result.rows[0]
     });
 }
 

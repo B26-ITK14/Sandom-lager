@@ -2,6 +2,7 @@
     * NotificationFooter.tsx
     * Footer component for the notification flyout.
     * Provides "Mark all as read" functionality.
+    * Is used in the NotificationFlyout component when there are notifications to show.
     * Author: Emil Berglund
 */
 

@@ -1,6 +1,9 @@
 /*
     * accessStatus.ts
     * Global access-status types and presentation metadata used across the app.
+    * Defines the AccessStatus type, a constant object with status values, and mappings for user-friendly labels and styles for each access status.
+    * Used in components like AccessRequestCard to display the status of access requests in a consistent way.
+    * Author: Emil Berglund
 */
 
 export type AccessStatus = "pending" | "approved" | "denied";

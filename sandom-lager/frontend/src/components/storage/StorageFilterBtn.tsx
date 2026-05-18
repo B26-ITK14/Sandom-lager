@@ -1,6 +1,7 @@
-/**
- * StorageFilterBtn.tsx
- * A filter button component for the storage page that allows users to select a filter the inventory.
+/*
+    * StorageFilterBtn.tsx
+    * A filter button component for the storage page that allows users to select a filter the inventory.
+    * Author: Ida Tollaksen
  */
 
 import { SlidersHorizontal } from "lucide-react";

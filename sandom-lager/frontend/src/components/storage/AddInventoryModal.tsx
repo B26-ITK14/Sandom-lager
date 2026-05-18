@@ -1,8 +1,10 @@
-/* AddInventoryModal.tsx 
-* A modal component for adding a new inventory item to the storage.
-* Fetches necessary data (ingredients, locations, existing inventory) on mount to populate the form.
-* Validates input and submits the new inventory item to the backend API.
-* Displays loading states and error messages as needed.
+/* 
+    * AddInventoryModal.tsx 
+    * A modal component for adding a new inventory item to the storage.
+    * Fetches necessary data (ingredients, locations, existing inventory) on mount to populate the form.
+    * Validates input and submits the new inventory item to the backend API.
+    * Displays loading states and error messages as needed.
+    * Author: Ida Tollaksen
 */
 
 import { useEffect, useMemo, useState } from "react";

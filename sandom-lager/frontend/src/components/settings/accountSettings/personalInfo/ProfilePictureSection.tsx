@@ -1,6 +1,7 @@
 /*
     * ProfilePictureSection.tsx
     * Displays the user's profile picture with an optional camera button when in edit mode.
+    * Is used within the PersonalInfoSection.tsx component on the account settings page.
     * Author: Emil Berglund
 */
 

@@ -42,11 +42,11 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
     const [rows, setRows] = useState<IngredientRow[]>(
         initialIngredients && initialIngredients.length > 0
             ? initialIngredients.map((ri) => ({
-                  existingId: ri.ingredient_id,
-                  name: ri.ingredient_name,
-                  unit: ri.unit,
-                  quantity: String(ri.quantity),
-              }))
+                existingId: ri.ingredient_id,
+                name: ri.ingredient_name,
+                unit: ri.unit,
+                quantity: String(ri.quantity),
+            }))
             : [{ ...DEFAULT_ROW }]
     );
 

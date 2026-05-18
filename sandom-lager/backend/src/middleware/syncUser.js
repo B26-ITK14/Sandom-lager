@@ -1,3 +1,8 @@
+/*
+    * syncUser.js
+    * Middleware to synchronize user information from Auth0 to the database and attach user to the request.
+    * Author: Andreas Skaarberg & Emil Berglund
+*/
 // https://auth0.com/docs/secure/tokens/access-tokens/validate-access-tokens
 // https://auth0.com/docs/secure/tokens/json-web-tokens
 // https://developer.auth0.com/resources/guides/api/express/basic-authorization
@@ -11,7 +16,7 @@ async function syncUser(req, res, next) {
         await ensureUserSchema();
 
         const auth0Id = req.auth?.sub;
-        
+
         // The Auth0 ID is crucial for identifying the user in the database
         if (!auth0Id) {
             return res.status(401).json({ message: "Invalid token payload" });

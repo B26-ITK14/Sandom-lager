@@ -1,6 +1,7 @@
 /*
     * Layout.tsx
     * A layout component that provides a consistent structure for the main application pages, including a header section and a content area.
+    * Author: Emil Berglund
 */
 
 import type { ReactNode } from 'react';

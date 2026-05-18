@@ -2,6 +2,7 @@
     * NotificationItem.tsx
     * A single notification item component for the notification flyout.
     * Displays notification content and handles click actions.
+    * Is used in the NotificationList component to render each notification.
     * Author: Emil Berglund
 */
 
@@ -46,23 +47,21 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
     return (
         <li
             onClick={() => onClick(notification)}
-            className={`p-4 hover:opacity-80 cursor-pointer transition-colors ${
-                !notification.isRead ? 'bg-opacity-50' : ''
-            }`}
+            className={`p-4 hover:opacity-80 cursor-pointer transition-colors ${!notification.isRead ? 'bg-opacity-50' : ''
+                }`}
             style={{
                 backgroundColor: !notification.isRead ? 'var(--color-primary-light)' : 'transparent',
             }}
         >
             <div className="flex gap-3">
-                    <div className="flex-shrink-0 mt-1">
+                <div className="flex-shrink-0 mt-1">
                     {getNotificationIcon(notification)}
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-1">
                         <h3
-                            className={`text-sm font-semibold ${
-                                !notification.isRead ? 'font-bold' : ''
-                            }`}
+                            className={`text-sm font-semibold ${!notification.isRead ? 'font-bold' : ''
+                                }`}
                             style={{ color: 'var(--color-text-primary)' }}
                         >
                             {notification.title}

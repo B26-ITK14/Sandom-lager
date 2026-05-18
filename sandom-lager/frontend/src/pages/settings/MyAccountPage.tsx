@@ -1,6 +1,8 @@
 /*
     * MyAccountPage.tsx
     * Account settings page for managing personal information, security, preferences, and account options.
+    * Includes sections for personal info (name, username, email, profile picture), account details (role, member since, blocked status), and security/privacy settings (password changes, active sessions).
+    * Utilizes the PersonalInfoCard, AccountDetailsCard, and SecurityPrivacyCard components to organize settings into clear sections.
     * Author: Emil Berglund
 */
 

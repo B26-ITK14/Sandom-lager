@@ -88,6 +88,7 @@ html.high-contrast svg {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -103,6 +104,7 @@ html.high-contrast svg {
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -119,6 +121,7 @@ html.high-contrast svg {
     opacity: 0;
     transform: translateX(20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -137,4 +140,79 @@ html.high-contrast svg {
 .animate-delay-200 {
   animation-delay: 0.2s;
   opacity: 0;
+}
+
+/* Google Translate popup styling */
+.translate-popup-panel .goog-te-gadget {
+  font-family: inherit;
+  color: var(--color-text-primary);
+  width: 100%;
+}
+
+.translate-popup-panel .goog-te-gadget-simple {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.8rem 1rem !important;
+  border-radius: 1rem !important;
+  border: 1px solid color-mix(in srgb, var(--color-border) 78%, transparent) !important;
+  background: color-mix(in srgb, var(--color-background) 90%, var(--color-surface)) !important;
+  color: var(--color-text-primary) !important;
+  box-shadow: none !important;
+}
+
+.translate-popup-panel .goog-te-gadget-icon {
+  display: none;
+}
+
+.translate-popup-panel .goog-te-gadget-simple span {
+  color: inherit !important;
+}
+
+.translate-popup-panel .goog-te-gadget-simple span[style] {
+  color: inherit !important;
+  opacity: 1 !important;
+}
+
+.translate-popup-panel select.goog-te-combo {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 0.95rem;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font: inherit;
+}
+
+.translate-popup-panel .goog-te-gadget .goog-te-combo {
+  margin: 0;
+}
+
+.translate-widget-shell {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-background) 84%, transparent), transparent);
+  border-color: color-mix(in srgb, var(--color-border) 72%, transparent);
+}
+
+.translate-element-host {
+  min-height: 3.25rem;
+}
+
+.translate-popup-panel .goog-te-gadget,
+.translate-popup-panel .goog-te-gadget * {
+  opacity: 1 !important;
+}
+
+@media (max-width: 640px) {
+  .translate-popup-panel {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .translate-popup-panel select.goog-te-combo {
+    min-height: 3rem;
+  }
 }

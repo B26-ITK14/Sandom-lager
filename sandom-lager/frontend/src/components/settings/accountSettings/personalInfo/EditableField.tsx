@@ -1,6 +1,7 @@
 /*
     * EditableField.tsx
     * Generic field component that renders a text input in edit mode and a plain value in view mode.
+    * Used by PersonalInfoSection.tsx in the account settings page.
     * Author: Emil Berglund
 */
 

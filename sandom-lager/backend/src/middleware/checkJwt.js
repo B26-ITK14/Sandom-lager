@@ -1,3 +1,9 @@
+/*
+    * checkJwt.js
+    * Middleware to validate JWT tokens from Auth0 for protected routes.
+    * Checks the Authorization header for a Bearer token, validates it against Auth0's JWKS endpoint, and ensures the correct audience and issuer.
+    * Author: Andreas Skaarberg
+*/
 // https://auth0.com/docs/secure/tokens/json-web-tokens
 // https://www.digitalocean.com/community/tutorials/nodejs-jwt-expressjs
 // https://developer.auth0.com/resources/guides/api/express/basic-authorization

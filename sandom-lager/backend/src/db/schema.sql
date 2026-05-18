@@ -25,6 +25,9 @@ CREATE TABLE IF NOT EXISTS users (
     profile_picture TEXT,
     role TEXT NOT NULL DEFAULT 'user'
     CHECK (role IN ('user', 'admin', 'manager')),
+    notify_inventory BOOLEAN DEFAULT TRUE,
+    notify_recipes BOOLEAN DEFAULT TRUE,
+    notify_system BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
