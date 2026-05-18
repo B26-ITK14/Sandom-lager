@@ -4,6 +4,7 @@
     * Author: Emil Berglund
 */
 const pool = require("../db/pool");
+const ApiError = require("../utils/ApiError");
 const { callManagementApi } = require("../lib/auth0Management");
 const {
     uploadProfilePictureBuffer,
@@ -41,50 +42,43 @@ function toProfilePictureUrl(value) {
 
 // GET /me - Returns the current authenticated user's profile
 async function getMe(req, res) {
-    try {
-        const result = await pool.query(
-            `SELECT
-                u.id,
-                u.name,
-                u.email,
-                u.username,
-                u.role,
-                u.profile_picture,
-                loc.location_name
-            FROM users u
-            LEFT JOIN LATERAL (
-                SELECT l.name AS location_name
-                FROM user_locations ul
-                JOIN locations l ON l.id = ul.location_id
-                WHERE ul.user_id = u.id
-                  AND ul.access_status = 'approved'
-                ORDER BY ul.id DESC
-                LIMIT 1
-            ) loc ON true
-            WHERE u.id = $1`,
-            [req.user.id]
-        );
+    const result = await pool.query(
+        `SELECT
+            u.id,
+            u.name,
+            u.email,
+            u.username,
+            u.role,
+            u.profile_picture,
+            loc.location_name
+        FROM users u
+        LEFT JOIN LATERAL (
+            SELECT l.name AS location_name
+            FROM user_locations ul
+            JOIN locations l ON l.id = ul.location_id
+            WHERE ul.user_id = u.id
+              AND ul.access_status = 'approved'
+            ORDER BY ul.id DESC
+            LIMIT 1
+        ) loc ON true
+        WHERE u.id = $1`,
+        [req.user.id]
+    );
 
-        const user = result.rows[0];
-        if (!user) {
-            return res.status(404).json({ message: "Bruker ikke funnet" });
-        }
+    const user = result.rows[0];
+    if (!user) throw new ApiError(404, "Bruker ikke funnet");
 
-        const profilePictureUrl = toProfilePictureUrl(user.profile_picture);
+    const profilePictureUrl = toProfilePictureUrl(user.profile_picture);
 
-        res.json({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            username: user.username || null,
-            role: user.role,
-            profilePicture: profilePictureUrl,
-            location: user.location_name || null,
-        });
-    } catch (err) {
-        console.error("[getMe] error:", err.message);
-        res.status(500).json({ message: "Kunne ikke hente brukerprofil" });
-    }
+    res.json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        username: user.username || null,
+        role: user.role,
+        profilePicture: profilePictureUrl,
+        location: user.location_name || null,
+    });
 }
 
 // PATCH /me/username - Updates the user's username in DB and Auth0
@@ -94,24 +88,24 @@ async function updateUsername(req, res) {
 
     if (!username || typeof username !== "string") {
         console.warn('[updateUsername] Validation failed: username missing or invalid type');
-        return res.status(400).json({ message: "Brukernavn er påkrevd" });
+        throw new ApiError(400, "Brukernavn er påkrevd");
     }
 
     const trimmed = username.trim();
     if (trimmed.length < 3 || trimmed.length > 30) {
         console.warn(`[updateUsername] Validation failed: invalid length (${trimmed.length})`);
-        return res.status(400).json({ message: "Brukernavn må være mellom 3 og 30 tegn" });
+        throw new ApiError(400, "Brukernavn må være mellom 3 og 30 tegn");
     }
 
     if (!/^[A-Za-z0-9._-]+$/.test(trimmed)) {
         console.warn('[updateUsername] Validation failed: invalid characters');
-        return res.status(400).json({ message: "Brukernavn kan kun inneholde bokstaver, tall, punktum, bindestrek og understrek" });
+        throw new ApiError(400, "Brukernavn kan kun inneholde bokstaver, tall, punktum, bindestrek og understrek");
     }
 
     const auth0Id = req.auth?.sub;
     if (!auth0Id?.startsWith("auth0|")) {
         console.warn(`[updateUsername] Rejected: sub "${auth0Id}" is not a username/password account`);
-        return res.status(400).json({ message: "Brukernavn kan kun endres for brukernavn/passord-kontoer" });
+        throw new ApiError(400, "Brukernavn kan kun endres for brukernavn/passord-kontoer");
     }
 
     try {
@@ -122,7 +116,7 @@ async function updateUsername(req, res) {
 
         if (takenResult.rows.length > 0) {
             console.warn(`[updateUsername] Username already taken: ${trimmed}`);
-            return res.status(409).json({ message: "Brukernavnet er allerede tatt. Velg et annet brukernavn." });
+            throw new ApiError(409, "Brukernavnet er allerede tatt. Velg et annet brukernavn.");
         }
 
         await callManagementApi(`/users/${encodeURIComponent(auth0Id)}`, {
@@ -139,16 +133,16 @@ async function updateUsername(req, res) {
 
         res.json({ username: updateResult.rows[0]?.username || null });
     } catch (err) {
+        if (err instanceof ApiError) throw err;
         if (err && err.code === "23505") {
             console.warn(`[updateUsername] Unique constraint violation for username: ${trimmed}`);
-            return res.status(409).json({ message: "Brukernavnet er allerede tatt. Velg et annet brukernavn." });
+            throw new ApiError(409, "Brukernavnet er allerede tatt. Velg et annet brukernavn.");
         }
         if (err instanceof Error && err.message.includes("Management API error")) {
             console.error("[updateUsername] Auth0 sync failed:", err.message);
-            return res.status(502).json({ message: "Kunne ikke oppdatere brukernavn i Auth0" });
+            throw new ApiError(502, "Kunne ikke oppdatere brukernavn i Auth0");
         }
-        console.error("[updateUsername] error:", err.message);
-        res.status(500).json({ message: "Kunne ikke oppdatere brukernavn" });
+        throw err;
     }
 }
 
@@ -159,31 +153,26 @@ async function updateName(req, res) {
 
     if (!name || typeof name !== "string" || !name.trim()) {
         console.warn('[updateName] Validation failed: name is empty or invalid');
-        return res.status(400).json({ message: "Navn er påkrevd" });
+        throw new ApiError(400, "Navn er påkrevd");
     }
 
     const trimmed = name.trim();
 
+    await pool.query("UPDATE users SET name = $1 WHERE id = $2", [trimmed, req.user.id]);
+    console.log(`[updateName] DB updated for user id: ${req.user.id}`);
+
     try {
-        await pool.query("UPDATE users SET name = $1 WHERE id = $2", [trimmed, req.user.id]);
-        console.log(`[updateName] DB updated for user id: ${req.user.id}`);
-
-        try {
-            await callManagementApi(`/users/${encodeURIComponent(req.auth.sub)}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: trimmed }),
-            });
-            console.log(`[updateName] Auth0 Management API synced for sub: ${req.auth.sub}`);
-        } catch (mgmtErr) {
-            console.warn(`[updateName] Auth0 Management API sync skipped (non-fatal):`, mgmtErr.message);
-        }
-
-        res.json({ name: trimmed });
-    } catch (err) {
-        console.error("[updateName] error:", err.message);
-        res.status(500).json({ message: "Kunne ikke oppdatere navn" });
+        await callManagementApi(`/users/${encodeURIComponent(req.auth.sub)}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: trimmed }),
+        });
+        console.log(`[updateName] Auth0 Management API synced for sub: ${req.auth.sub}`);
+    } catch (mgmtErr) {
+        console.warn(`[updateName] Auth0 Management API sync skipped (non-fatal):`, mgmtErr.message);
     }
+
+    res.json({ name: trimmed });
 }
 
 // PATCH /me/email - Changes the email via Auth0 Management API (auth0| accounts only)
@@ -193,54 +182,49 @@ async function updateEmail(req, res) {
 
     if (!email || typeof email !== "string") {
         console.warn('[updateEmail] Validation failed: email missing or invalid type');
-        return res.status(400).json({ message: "E-post er påkrevd" });
+        throw new ApiError(400, "E-post er påkrevd");
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         console.warn(`[updateEmail] Validation failed: bad email format "${email}"`);
-        return res.status(400).json({ message: "Ugyldig e-postformat" });
+        throw new ApiError(400, "Ugyldig e-postformat");
     }
 
     const auth0Id = req.auth.sub;
     if (!auth0Id.startsWith("auth0|")) {
         console.warn(`[updateEmail] Rejected: sub "${auth0Id}" is not a username/password account`);
-        return res.status(400).json({ message: "E-post kan kun endres for brukernavn/passord-kontoer" });
+        throw new ApiError(400, "E-post kan kun endres for brukernavn/passord-kontoer");
     }
     console.log(`[updateEmail] Calling Management API for sub: ${auth0Id}`);
 
-    try {
-        await callManagementApi(`/users/${encodeURIComponent(auth0Id)}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                email,
-                email_verified: false,
-                connection: "Username-Password-Authentication",
-            }),
-        });
+    await callManagementApi(`/users/${encodeURIComponent(auth0Id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            email,
+            email_verified: false,
+            connection: "Username-Password-Authentication",
+        }),
+    });
 
-        await callManagementApi("/jobs/verification-email", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user_id: auth0Id }),
-        });
+    await callManagementApi("/jobs/verification-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: auth0Id }),
+    });
 
-        await pool.query("UPDATE users SET email = $1 WHERE id = $2", [email, req.user.id]);
-        console.log(`[updateEmail] DB + Auth0 updated for user id: ${req.user.id} → ${email}`);
+    await pool.query("UPDATE users SET email = $1 WHERE id = $2", [email, req.user.id]);
+    console.log(`[updateEmail] DB + Auth0 updated for user id: ${req.user.id} → ${email}`);
 
-        res.json({ message: "E-post oppdatert. Sjekk innboksen din for å bekrefte den nye adressen." });
-    } catch (err) {
-        console.error("[updateEmail] error:", err.message);
-        res.status(500).json({ message: "Kunne ikke oppdatere e-post" });
-    }
+    res.json({ message: "E-post oppdatert. Sjekk innboksen din for å bekrefte den nye adressen." });
 }
 
 // PATCH /me/profile-picture - Stores the uploaded profile picture for the current user
 async function updateProfilePicture(req, res) {
     if (!req.file) {
         console.warn('[updateProfilePicture] Validation failed: no file uploaded');
-        return res.status(400).json({ message: "Profilbildet er påkrevd" });
+        throw new ApiError(400, "Profilbildet er påkrevd");
     }
 
     try {
@@ -290,17 +274,18 @@ async function updateProfilePicture(req, res) {
             profilePicture: profilePictureUrl
         });
     } catch (err) {
+        if (err instanceof ApiError) throw err;
         const message = err?.message || "Ukjent feil";
 
         if (/Invalid cloud_name/i.test(message)) {
-            return res.status(502).json({ message: "Cloudinary-oppsett er ugyldig: sjekk CLOUDINARY_CLOUD_NAME" });
+            throw new ApiError(502, "Cloudinary-oppsett er ugyldig: sjekk CLOUDINARY_CLOUD_NAME");
         }
 
         if (/api key|api secret|Invalid Signature|unauthorized|authentication/i.test(message)) {
-            return res.status(502).json({ message: "Cloudinary-autentisering feilet: sjekk API-nokler" });
+            throw new ApiError(502, "Cloudinary-autentisering feilet: sjekk API-nokler");
         }
 
-        res.status(500).json({ message: "Kunne ikke oppdatere profilbildet" });
+        throw new ApiError(500, "Kunne ikke oppdatere profilbildet");
     }
 }
 
@@ -310,64 +295,51 @@ async function getProfilePicture(req, res) {
 
     // Validate filename to prevent directory traversal
     if (!filename || /[/\\]/.test(filename)) {
-        return res.status(400).json({ message: "Ugyldig bildenavn" });
+        throw new ApiError(400, "Ugyldig bildenavn");
     }
 
     const filePath = path.join(uploadsDir, filename);
 
     // Ensure the file is within the uploads directory
     if (!filePath.startsWith(uploadsDir)) {
-        return res.status(403).json({ message: "Tilgang nektet" });
+        throw new ApiError(403, "Tilgang nektet");
     }
 
     // Check if file exists
     if (!fs.existsSync(filePath)) {
-        return res.status(404).json({ message: "Bildet ikke funnet" });
+        throw new ApiError(404, "Bildet ikke funnet");
     }
 
-    try {
-        // Set cache headers
-        res.set('Cache-Control', 'public, max-age=604800'); // 1 week
-        res.sendFile(filePath);
-    } catch (err) {
-        console.error("[getProfilePicture] error:", err.message);
-        res.status(500).json({ message: "Kunne ikke hente bildet" });
-    }
+    res.set('Cache-Control', 'public, max-age=604800'); // 1 week
+    res.sendFile(filePath);
 }
 
 // PATCH /me/notification-preferences - Updates notification preferences for the current user
 async function updateNotificationPreferences(req, res) {
     const { notifyInventory, notifyRecipes, notifySystem } = req.body;
 
-    try {
-        const result = await pool.query(
-            `UPDATE users 
-             SET notify_inventory = COALESCE($1, notify_inventory),
-                 notify_recipes = COALESCE($2, notify_recipes),
-                 notify_system = COALESCE($3, notify_system)
-             WHERE id = $4
-             RETURNING notify_inventory, notify_recipes, notify_system`,
-            [
-                notifyInventory !== undefined ? notifyInventory : null,
-                notifyRecipes !== undefined ? notifyRecipes : null,
-                notifySystem !== undefined ? notifySystem : null,
-                req.user.id
-            ]
-        );
+    const result = await pool.query(
+        `UPDATE users 
+         SET notify_inventory = COALESCE($1, notify_inventory),
+             notify_recipes = COALESCE($2, notify_recipes),
+             notify_system = COALESCE($3, notify_system)
+         WHERE id = $4
+         RETURNING notify_inventory, notify_recipes, notify_system`,
+        [
+            notifyInventory !== undefined ? notifyInventory : null,
+            notifyRecipes !== undefined ? notifyRecipes : null,
+            notifySystem !== undefined ? notifySystem : null,
+            req.user.id
+        ]
+    );
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ message: "Bruker ikke funnet" });
-        }
+    if (result.rows.length === 0) throw new ApiError(404, "Bruker ikke funnet");
 
-        res.json({
-            notifyInventory: result.rows[0].notify_inventory,
-            notifyRecipes: result.rows[0].notify_recipes,
-            notifySystem: result.rows[0].notify_system,
-        });
-    } catch (err) {
-        console.error("[updateNotificationPreferences] error:", err.message);
-        res.status(500).json({ message: "Kunne ikke oppdatere varslepreferanser" });
-    }
+    res.json({
+        notifyInventory: result.rows[0].notify_inventory,
+        notifyRecipes: result.rows[0].notify_recipes,
+        notifySystem: result.rows[0].notify_system,
+    });
 }
 
 module.exports = {

@@ -8,6 +8,7 @@ const router = express.Router();
 
 const { checkJwt } = require("../middleware/checkJwt");
 const { syncUser } = require("../middleware/syncUser");
+const asyncHandler = require("../utils/asyncHandler");
 const uploadProfilePicture = require("../middleware/uploadProfilePicture");
 const userController = require("../controllers/user.controller");
 const sessionController = require("../controllers/session.controller");
@@ -34,15 +35,15 @@ function uploadProfilePictureWithLogging(req, res, next) {
 	});
 }
 
-router.get("/me", checkJwt(), syncUser, userController.getMe);
-router.patch("/me/name", checkJwt(), syncUser, userController.updateName);
-router.patch("/me/username", checkJwt(), syncUser, userController.updateUsername);
-router.patch("/me/profile-picture", checkJwt(), syncUser, uploadProfilePictureWithLogging, userController.updateProfilePicture);
-router.patch("/me/notification-preferences", checkJwt(), syncUser, userController.updateNotificationPreferences);
-router.get("/profile-pictures/:filename", userController.getProfilePicture);
-router.get("/me/sessions", checkJwt(), syncUser, sessionController.getSessions);
-router.delete("/me/sessions/others", checkJwt(), syncUser, sessionController.revokeOtherSessions);
-router.delete("/me/sessions/:sessionId", checkJwt(), syncUser, sessionController.revokeSession);
-router.patch("/me/email", checkJwt(), syncUser, userController.updateEmail);
+router.get("/me", checkJwt(), syncUser, asyncHandler(userController.getMe));
+router.patch("/me/name", checkJwt(), syncUser, asyncHandler(userController.updateName));
+router.patch("/me/username", checkJwt(), syncUser, asyncHandler(userController.updateUsername));
+router.patch("/me/profile-picture", checkJwt(), syncUser, uploadProfilePictureWithLogging, asyncHandler(userController.updateProfilePicture));
+router.patch("/me/notification-preferences", checkJwt(), syncUser, asyncHandler(userController.updateNotificationPreferences));
+router.get("/profile-pictures/:filename", asyncHandler(userController.getProfilePicture));
+router.get("/me/sessions", checkJwt(), syncUser, asyncHandler(sessionController.getSessions));
+router.delete("/me/sessions/others", checkJwt(), syncUser, asyncHandler(sessionController.revokeOtherSessions));
+router.delete("/me/sessions/:sessionId", checkJwt(), syncUser, asyncHandler(sessionController.revokeSession));
+router.patch("/me/email", checkJwt(), syncUser, asyncHandler(userController.updateEmail));
 
 module.exports = router;
