@@ -28,7 +28,6 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
         title, setTitle,
         category, setCategory,
         instructions, setInstructions,
-        servings, setServings,
         recipeImageUrl, recipeImageFile, recipeImagePreview,
         handleImageChange, handleRemoveImage,
         allAllergens, selectedAllergenIds, setSelectedAllergenIds,
@@ -91,8 +90,6 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
                         canManageCategories={true}
                         onAddCategory={handleAddCategory}
                         onDeleteCategory={handleDeleteCategory}
-                        servings={servings}
-                        onServingsChange={setServings}
                         instructions={instructions}
                         onInstructionsChange={setInstructions}
                     />
@@ -117,6 +114,9 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
                     />
 
                     {/* Ingredients */}
+                    <p className="text-xs px-3 py-2 rounded-lg" style={{ backgroundColor: "var(--color-secondary-surface)", color: "var(--color-text-secondary)", border: "1px solid var(--color-border)" }}>
+                        Oppskrifter beregnes alltid for <strong>8 personer</strong>.
+                    </p>
                     <IngredientRows
                         rows={rows}
                         existingIngredients={existingIngredients}

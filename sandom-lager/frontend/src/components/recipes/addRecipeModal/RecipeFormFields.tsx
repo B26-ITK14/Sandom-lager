@@ -25,8 +25,6 @@ interface RecipeFormFieldsProps {
     canManageCategories?: boolean;
     onAddCategory?: (name: string) => Promise<void>;
     onDeleteCategory?: (id: number) => Promise<void>;
-    servings: string;
-    onServingsChange: (value: string) => void;
     instructions: string;
     onInstructionsChange: (value: string) => void;
     style?: React.CSSProperties;
@@ -41,8 +39,6 @@ export default function RecipeFormFields({
     canManageCategories = false,
     onAddCategory,
     onDeleteCategory,
-    servings,
-    onServingsChange,
     instructions,
     onInstructionsChange,
     style,
@@ -209,21 +205,7 @@ export default function RecipeFormFields({
                 )}
             </div>
 
-            {/* Servings */}
-            <div className="flex flex-col gap-1">
-                <label htmlFor="recipe-servings" className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
-                    Antall porsjoner
-                </label>
-                <input
-                    id="recipe-servings"
-                    type="number"
-                    min={1}
-                    value={servings}
-                    onChange={(e) => onServingsChange(e.target.value)}
-                    className="rounded-lg px-3 py-2 text-sm outline-none w-28"
-                    style={inputStyle}
-                />
-            </div>
+            
 
             {/* Instructions */}
             <div className="flex flex-col gap-1">
