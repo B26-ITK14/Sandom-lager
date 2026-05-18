@@ -1,7 +1,7 @@
 /*
   * test.routes.js
   * Misc test endpoints used during development.
-  * Author:
+  * Author: Andreas Skaarberg
 */
 const express = require("express");
 const router = express.Router();

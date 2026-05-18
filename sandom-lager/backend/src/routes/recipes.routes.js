@@ -1,7 +1,7 @@
 /*
     * recipes.routes.js
     * Routes for recipe CRUD and listing endpoints.
-    * Author:
+    * Author: Andreas Skaarberg & Sebastian Thomsen
 */
 const express = require("express");
 const router = express.Router();

@@ -1,7 +1,7 @@
 /*
     * ingredients.routes.js
     * Routes for ingredient CRUD and search endpoints.
-    * Author:
+    * Author: Andreas Skaarberg
 */
 const express = require("express");
 const router = express.Router();

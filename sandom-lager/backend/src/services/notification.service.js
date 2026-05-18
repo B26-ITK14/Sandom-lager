@@ -1,7 +1,7 @@
 /*
     * notification.service.js
     * Service for creating notifications (user-initiated and system-generated).
-    * Author:
+    * Author: Ida Tollaksen
 */
 
 const pool = require("../db/pool");

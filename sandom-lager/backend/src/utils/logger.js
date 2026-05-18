@@ -1,7 +1,8 @@
 /*
     * logger.js
     * Logging utility that records actions to the console and database.
-    * Author:
+    * Is used throughout the backend to log user actions and system events for auditing and debugging purposes.
+    * Author: Ida Tollaksen
 */
 const pool = require('../db/pool');
 

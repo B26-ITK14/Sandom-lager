@@ -1,7 +1,8 @@
 /*
     * auth0Management.js
     * Utility to obtain and cache an Auth0 Management API token and call the API.
-    * Author:
+    * Provides a single function callManagementApi(path, options) to make authenticated requests.
+    * Author: Emil Berglund
 */
 
 let cachedToken = null;

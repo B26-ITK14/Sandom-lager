@@ -1,7 +1,7 @@
 /*
     * userLocations.routes.js
     * Routes for managing user access to locations.
-    * Author:
+    * Author: Andreas Skaarberg & Khalid Osman
 */
 const express = require('express');
 const router = express.Router();

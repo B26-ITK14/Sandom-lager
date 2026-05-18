@@ -1,9 +1,9 @@
 /*
     * requireRole.js
     * Middleware to check user roles for authorization.
-    * Author:
+    * Checks if the authenticated user has one of the allowed roles to access a route.
+    * Author: Andreas Skaarberg
 */
-// Middleware to check if the user has one of the allowed roles
 
 function requireRole(...allowedRoles) {
     return (req, res, next) => {

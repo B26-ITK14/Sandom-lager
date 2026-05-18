@@ -1,7 +1,7 @@
 /*
   * index.js
   * Express server setup and route registration.
-  * Author:
+  * Author: Andreas Skaarberg & Emil Berglund
 */
 const express = require("express");
 require("dotenv").config();

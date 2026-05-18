@@ -1,7 +1,7 @@
 /*
     * locations.routes.js
     * Routes for location-related endpoints.
-    * Author:
+    * Author: Khalid Osman
 */
 const express = require("express");
 const router = express.Router();

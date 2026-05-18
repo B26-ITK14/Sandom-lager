@@ -1,7 +1,7 @@
 /*
 	* user.routes.js
 	* Routes for user profile and account management.
-	* Author:
+	* Author: Emil Berglund
 */
 const express = require("express");
 const router = express.Router();
