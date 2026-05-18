@@ -42,6 +42,11 @@ export interface Allergen {
     name: string;
 }
 
+export interface Category {
+    id: number;
+    name: string;
+}
+
 export type WeightUnit = "mg" | "g" | "hg" | "kg";
 export type VolumeUnit = "ml" | "cl" | "dl" | "l";
 export type SpoonUnit = "krm" | "tsk" | "ss";
@@ -58,16 +63,6 @@ export const INGREDIENT_UNITS: readonly IngredientUnit[] = [
     ...SPOON_UNITS,
     ...COUNT_UNITS,
 ];
-
-export const RECIPE_CATEGORIES = [
-    "Frokost",
-    "Lunsj",
-    "Middag",
-    "Mellommåltid",
-    "Kveldsmat",
-] as const;
-
-export type RecipeCategory = typeof RECIPE_CATEGORIES[number];
 
 export interface Ingredient {
     id: number;

@@ -29,7 +29,7 @@ export default function ShoppingListPage() {
         ogDescription: "Manage your shopping lists",
     });
     const { getAccessTokenSilently } = useAuth0();
-    const { selectedIds, clearSelected } = useSelectedRecipes();
+    const { selectedIds, clearSelected, numberOfPeople } = useSelectedRecipes();
 
     const [items, setItems] = useState<ShoppingListItem[]>([]);
     const [historyRows, setHistoryRows] = useState<ShoppingListHistoryRow[]>([]);
@@ -151,7 +151,7 @@ export default function ShoppingListPage() {
 
         try {
             const token = await getAccessTokenSilently();
-            await generateShoppingListFromRecipes(Array.from(selectedIds), token);
+            await generateShoppingListFromRecipes(Array.from(selectedIds), numberOfPeople, token);
             clearSelected();
             await loadShoppingList();
         } catch {

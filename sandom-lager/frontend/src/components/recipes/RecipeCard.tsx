@@ -57,8 +57,8 @@ export default function RecipeCard({ recipe, selected, onToggle, onOpenDetail, s
                 aria-label={selected ? "Fjern oppskrift fra valg" : "Velg oppskrift"}
                 className="absolute top-2 left-2 z-20 w-6 h-6 rounded-full flex items-center justify-center transition-colors cursor-pointer"
                 style={{
-                    backgroundColor: selected ? "var(--color-primary)" : "rgba(255,255,255,0.25)",
-                    border: selected ? "none" : "2px solid rgba(255,255,255,0.6)",
+                    backgroundColor: selected ? "var(--color-primary)" : "rgba(255, 255, 255, 0.88)",
+                    border: selected ? "none" : "2.5px solid var(--color-primary)",
                 }}
             >
                 {selected && (

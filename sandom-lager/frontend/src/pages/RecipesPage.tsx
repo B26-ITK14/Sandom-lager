@@ -33,7 +33,6 @@ export default function RecipesPage() {
     const { role } = useUserRole();
     const [search, setSearch] = useState("");
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
-    const [filterOpen, setFilterOpen] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
     const [detailRecipe, setDetailRecipe] = useState<Recipe | null>(null);
     const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
@@ -86,8 +85,6 @@ export default function RecipesPage() {
                 activeCategory={activeCategory}
                 onCategoryChange={setActiveCategory}
                 categories={categories}
-                filterOpen={filterOpen}
-                onFilterToggle={() => setFilterOpen((prev) => !prev)}
                 canManageRecipes={canManageRecipes}
                 onAddRecipe={() => setShowAddModal(true)}
             />

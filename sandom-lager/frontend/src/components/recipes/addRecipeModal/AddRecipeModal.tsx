@@ -28,10 +28,14 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
         title, setTitle,
         category, setCategory,
         instructions, setInstructions,
-        servings, setServings,
         recipeImageUrl, recipeImageFile, recipeImagePreview,
         handleImageChange, handleRemoveImage,
         allAllergens, selectedAllergenIds, setSelectedAllergenIds,
+        handleAddAllergen,
+        handleDeleteAllergen,
+        allCategories,
+        handleAddCategory,
+        handleDeleteCategory,
         existingIngredients,
         rows, updateRow, handleIngredientNameChange, addRow, removeRow,
         submitting, error,
@@ -82,8 +86,10 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
                         onTitleChange={setTitle}
                         category={category}
                         onCategoryChange={setCategory}
-                        servings={servings}
-                        onServingsChange={setServings}
+                        allCategories={allCategories}
+                        canManageCategories={true}
+                        onAddCategory={handleAddCategory}
+                        onDeleteCategory={handleDeleteCategory}
                         instructions={instructions}
                         onInstructionsChange={setInstructions}
                     />
@@ -102,9 +108,15 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
                         allAllergens={allAllergens}
                         selectedAllergenIds={selectedAllergenIds}
                         onChange={setSelectedAllergenIds}
+                        canManage={true}
+                        onAddAllergen={handleAddAllergen}
+                        onDeleteAllergen={handleDeleteAllergen}
                     />
 
                     {/* Ingredients */}
+                    <p className="text-xs px-3 py-2 rounded-lg" style={{ backgroundColor: "var(--color-secondary-surface)", color: "var(--color-text-secondary)", border: "1px solid var(--color-border)" }}>
+                        Oppskrifter beregnes alltid for <strong>8 personer</strong>.
+                    </p>
                     <IngredientRows
                         rows={rows}
                         existingIngredients={existingIngredients}

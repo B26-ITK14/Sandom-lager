@@ -103,6 +103,7 @@ export async function clearShoppingList(
 
 export async function generateShoppingListFromRecipes(
     recipeIds: number[],
+    people: number,
     accessToken: string
 ): Promise<{ message: string; recipeCount: number; itemCount: number }> {
     return apiFetchJson<{ message: string; recipeCount: number; itemCount: number }>("/api/shopping-list/generate", {
@@ -111,7 +112,7 @@ export async function generateShoppingListFromRecipes(
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ recipe_ids: recipeIds }),
+        body: JSON.stringify({ recipe_ids: recipeIds, people }),
     });
 }
 

@@ -13,8 +13,6 @@ interface RecipeFilterBarProps {
     activeCategory: string | null;
     onCategoryChange: (category: string | null) => void;
     categories: string[];
-    filterOpen: boolean;
-    onFilterToggle: () => void;
     canManageRecipes: boolean;
     onAddRecipe: () => void;
 }
@@ -25,8 +23,6 @@ export default function RecipeFilterBar({
     activeCategory,
     onCategoryChange,
     categories,
-    filterOpen,
-    onFilterToggle,
     canManageRecipes,
     onAddRecipe,
 }: RecipeFilterBarProps) {
@@ -39,27 +35,6 @@ export default function RecipeFilterBar({
                     onChange={onSearchChange}
                     placeholder="Søk etter oppskrifter"
                 />
-
-                <button
-                    type="button"
-                    onClick={onFilterToggle}
-                    aria-expanded={filterOpen}
-                    aria-label="Filtrer oppskrifter"
-                    className="flex items-center justify-center w-11 h-11 rounded-full shrink-0 transition-colors cursor-pointer"
-                    style={{
-                        backgroundColor: filterOpen || activeCategory !== null
-                            ? "var(--color-primary)"
-                            : "var(--color-surface)",
-                        color: filterOpen || activeCategory !== null
-                            ? "var(--color-on-primary)"
-                            : "var(--color-text-primary)",
-                        border: "1px solid var(--color-border)",
-                    }}
-                >
-                    <svg fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" className="w-[18px] h-[18px]" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M7 12h10M11 18h2" />
-                    </svg>
-                </button>
 
                 {canManageRecipes && (
                     <button
@@ -80,7 +55,7 @@ export default function RecipeFilterBar({
                 )}
             </search>
 
-            {filterOpen && categories.length > 0 && (
+            {categories.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4" role="group" aria-label="Kategorier">
                     <button
                         type="button"

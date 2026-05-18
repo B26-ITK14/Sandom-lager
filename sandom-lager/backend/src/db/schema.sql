@@ -119,6 +119,20 @@ VALUES ('Gluten'),
        ('Bløtdyr')
 ON CONFLICT DO NOTHING;
 
+-- CATEGORIES --
+CREATE TABLE IF NOT EXISTS categories (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+INSERT INTO categories (name)
+VALUES ('Frokost'),
+       ('Lunsj'),
+       ('Middag'),
+       ('Mellommåltid'),
+       ('Kveldsmat')
+ON CONFLICT DO NOTHING;
+
 -- RECIPE ALLERGENS --
 CREATE TABLE IF NOT EXISTS recipe_allergens (
     id SERIAL PRIMARY KEY,
