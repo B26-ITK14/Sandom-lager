@@ -34,6 +34,9 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
         allAllergens, selectedAllergenIds, setSelectedAllergenIds,
         handleAddAllergen,
         handleDeleteAllergen,
+        allCategories,
+        handleAddCategory,
+        handleDeleteCategory,
         existingIngredients,
         rows, updateRow, handleIngredientNameChange, addRow, removeRow,
         submitting, error,
@@ -84,6 +87,10 @@ export default function AddRecipeModal({ onClose, onCreated, initialRecipe, init
                         onTitleChange={setTitle}
                         category={category}
                         onCategoryChange={setCategory}
+                        allCategories={allCategories}
+                        canManageCategories={true}
+                        onAddCategory={handleAddCategory}
+                        onDeleteCategory={handleDeleteCategory}
                         servings={servings}
                         onServingsChange={setServings}
                         instructions={instructions}

@@ -11,8 +11,9 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { AUTH0_AUDIENCE } from "../../../config/auth";
 import { createIngredient, createRecipe, updateRecipe, addRecipeIngredient, deleteRecipeIngredient, 
     fetchIngredients, fetchAllergens, setRecipeAllergens, uploadRecipeImage, 
-    createAllergen as apiCreateAllergen, deleteAllergen as apiDeleteAllergen } from "../../../api/recipes";
-import type { Allergen, Ingredient, Recipe, RecipeIngredient } from "../../../types";
+    createAllergen as apiCreateAllergen, deleteAllergen as apiDeleteAllergen,
+    fetchCategories, createCategory as apiCreateCategory, deleteCategory as apiDeleteCategory } from "../../../api/recipes";
+import type { Allergen, Category, Ingredient, Recipe, RecipeIngredient } from "../../../types";
 import { type IngredientRow } from "./IngredientRows";
 
 const DEFAULT_ROW: IngredientRow = { existingId: null, name: "", unit: "g", quantity: "" };
@@ -53,6 +54,9 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
     const [allAllergens, setAllAllergens] = useState<Allergen[]>([]);
     const [selectedAllergenIds, setSelectedAllergenIds] = useState<number[]>([]);
 
+    // Categories
+    const [allCategories, setAllCategories] = useState<Category[]>([]);
+
     // Available ingredients from the database (for autocomplete)
     const [existingIngredients, setExistingIngredients] = useState<Ingredient[]>([]);
 
@@ -77,13 +81,15 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
         async function load() {
             try {
                 const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
-                const [ingredientsData, allergensData] = await Promise.all([
+                const [ingredientsData, allergensData, categoriesData] = await Promise.all([
                     fetchIngredients(token),
                     fetchAllergens(token),
+                    fetchCategories(token),
                 ]);
                 if (!cancelled) {
                     setExistingIngredients(ingredientsData);
                     setAllAllergens(allergensData);
+                    setAllCategories(categoriesData);
                     if (initialRecipe) {
                         const matched = initialRecipe.allergens
                             .map((name) => allergensData.find((a) => a.name === name)?.id)
@@ -228,6 +234,18 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
         setSelectedAllergenIds((prev) => prev.filter((aid) => aid !== id));
     }
 
+    async function handleAddCategory(name: string): Promise<void> {
+        const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
+        const newCat = await apiCreateCategory(name, token);
+        setAllCategories((prev) => [...prev, newCat].sort((a, b) => a.name.localeCompare(b.name)));
+    }
+
+    async function handleDeleteCategory(id: number): Promise<void> {
+        const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
+        await apiDeleteCategory(id, token);
+        setAllCategories((prev) => prev.filter((c) => c.id !== id));
+    }
+
     return {
         title, setTitle,
         category, setCategory,
@@ -243,6 +261,9 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
         selectedAllergenIds, setSelectedAllergenIds,
         handleAddAllergen,
         handleDeleteAllergen,
+        allCategories,
+        handleAddCategory,
+        handleDeleteCategory,
         existingIngredients,
         submitting,
         error,
