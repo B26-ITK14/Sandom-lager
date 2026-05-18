@@ -1,5 +1,8 @@
 /*
     * RecipesPage.tsx
+    * Main page for browsing, creating, and managing recipes. Displays a list of recipes with filtering options and allows users with appropriate roles to add, edit, or delete recipes.
+    * Includes a search bar and category filter for easy navigation through recipes. Clicking on a recipe opens a detail modal with more information and management options.
+    * Authors: Sebastian Thomsen
 */
 
 import { useMemo, useState } from "react";
@@ -30,7 +33,6 @@ export default function RecipesPage() {
     const { role } = useUserRole();
     const [search, setSearch] = useState("");
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
-    const [filterOpen, setFilterOpen] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
     const [detailRecipe, setDetailRecipe] = useState<Recipe | null>(null);
     const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
@@ -83,8 +85,6 @@ export default function RecipesPage() {
                 activeCategory={activeCategory}
                 onCategoryChange={setActiveCategory}
                 categories={categories}
-                filterOpen={filterOpen}
-                onFilterToggle={() => setFilterOpen((prev) => !prev)}
                 canManageRecipes={canManageRecipes}
                 onAddRecipe={() => setShowAddModal(true)}
             />

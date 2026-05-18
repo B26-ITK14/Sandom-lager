@@ -1,3 +1,8 @@
+/*
+    * notifications.controller.js
+    * Controller for creating and managing user notifications.
+    * Author: Ida Tollaksen
+*/
 const pool = require("../db/pool");
 const ApiError = require("../utils/ApiError");
 const { createAdminAccessRequestNotifications } = require("../services/notification.service");

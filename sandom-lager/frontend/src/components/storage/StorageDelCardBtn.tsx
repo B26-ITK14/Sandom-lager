@@ -1,6 +1,7 @@
 /*
- * StorageDelCardBtn.tsx
-* A delete button component for inventory items in the storage page.
+    * StorageDelCardBtn.tsx
+    * A delete button component for inventory items in the storage page.
+    * Author: Ida Tollaksen
  */
 
 import { Trash2 } from "lucide-react";

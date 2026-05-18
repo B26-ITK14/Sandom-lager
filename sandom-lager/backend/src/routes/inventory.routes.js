@@ -1,3 +1,8 @@
+/*
+    * inventory.routes.js
+    * Routes for inventory item management endpoints.
+    * Author: Andreas Skaarberg
+*/
 const express = require("express");
 const router = express.Router();
 
@@ -15,7 +20,7 @@ router.use(syncUser)
 
 // GET - All users can read inventory
 router.get(
-    "/inventory", 
+    "/inventory",
     requireRole("user", "manager", "admin"), // All roles can access
     asyncHandler(inventoryController.getInventory)
 );

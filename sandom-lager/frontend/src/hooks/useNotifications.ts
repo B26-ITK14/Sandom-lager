@@ -1,7 +1,8 @@
 /*
-* useNotifications.ts
-* Custom hook for managing notifications. Handles fetching notifications from the API, marking them as read, and tracking unread counts.
-* Implements polling to keep notifications up-to-date while the user is active. Provides error handling and loading states for a smooth user experience.
+    * useNotifications.ts
+    * Custom hook for managing notifications. Handles fetching notifications from the API, marking them as read, and tracking unread counts.
+    * Implements polling to keep notifications up-to-date while the user is active. Provides error handling and loading states for a smooth user experience.
+    * Author: Ida Tollaksen
 */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';

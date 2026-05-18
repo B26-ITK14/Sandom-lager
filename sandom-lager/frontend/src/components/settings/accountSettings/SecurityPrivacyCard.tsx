@@ -1,6 +1,8 @@
 /*
     * SecurityPrivacyCard.tsx
     * Card component for managing security and privacy settings like password changes and active sessions.
+    * Includes the PasswordChangeButton and ActiveSessionsToggle components.
+    * Is used within the AccountSettingsPage.tsx component on the account settings page.
     * Author: Emil Berglund
 */
 

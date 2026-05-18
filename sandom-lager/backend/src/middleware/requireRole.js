@@ -1,21 +1,26 @@
-// Middleware to check if the user has one of the allowed roles
+/*
+    * requireRole.js
+    * Middleware to check user roles for authorization.
+    * Checks if the authenticated user has one of the allowed roles to access a route.
+    * Author: Andreas Skaarberg
+*/
 
 function requireRole(...allowedRoles) {
     return (req, res, next) => {
-       try {
-        const userRole = req.user?.role;
-        if (!userRole) {
-            return res.status(403).json({ message: "User role not found" });
+        try {
+            const userRole = req.user?.role;
+            if (!userRole) {
+                return res.status(403).json({ message: "User role not found" });
+            }
+
+            if (!allowedRoles.includes(userRole)) {
+                return res.status(403).json({ message: "Access denied: insufficient permissions" });
+            }
+            next();
+        } catch (err) {
+            console.error("Error in requireRole middleware:", err);
+            res.status(500).json({ message: "Internal server error in role checking" });
         }
-        
-       if (!allowedRoles.includes(userRole)) {
-            return res.status(403).json({ message: "Access denied: insufficient permissions" });
-        }
-        next();
-       } catch (err) {
-        console.error("Error in requireRole middleware:", err);
-        res.status(500).json({ message: "Internal server error in role checking"});
-       }
     };
 }
 

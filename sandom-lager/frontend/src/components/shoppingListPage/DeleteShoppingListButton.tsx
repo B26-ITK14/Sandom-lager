@@ -1,3 +1,12 @@
+/*
+    * DeleteShoppingListButton.tsx
+    * A button component for deleting the entire shopping list. When clicked, it opens a confirmation dialog to prevent accidental deletions.
+    * Only users with the "admin" or "manager" role can delete the shopping list. If the user does not have permission, the dialog will inform them of this.
+    * The component handles the deletion process by calling the clearShoppingList API function and provides feedback on success or failure.
+    * Author: Andreas Skaarberg
+*/
+
+
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { useAuth0 } from "@auth0/auth0-react";

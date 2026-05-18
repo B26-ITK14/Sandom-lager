@@ -1,6 +1,9 @@
 /*
     * NewApplicationSection.tsx
     * Presentational section for creating a new location access application.
+    * Allows users to select a location from a dropdown and submit a new application, with feedback on errors or success.
+    * Is used within the MyApplicationsPage.tsx component in the My Applications section of the account settings page.
+    * Author: Emil Berglund
 */
 
 import { ChevronDown } from "lucide-react";

@@ -3,6 +3,8 @@
     * Centralized configuration for environment variables used in the frontend application.
     * Provides a type-safe way to access required environment variables and ensures that missing variables are caught at startup.
     * In development mode, Auth0 env vars are optional and default to demo values for local Docker testing.
+    * In production, all required env vars must be set at build time via Vite/Cloudflare Pages environment variables.
+    * Author: Emil Berglund
 */
 
 // Check if we're in development mode

@@ -1,6 +1,7 @@
 /*
     * ActiveSessionsPanel.tsx
     * Component for displaying and managing active user sessions, including device info and session revocation.
+    * Used in the Security & Privacy section of the account settings page.
     * Author: Emil Berglund
 */
 

@@ -1,6 +1,9 @@
 /*
     * ApplicationsHistorySection.tsx
     * Presentational section for rendering the user's previous applications.
+    * Displays application location, submission date, and current status with appropriate styling.
+    * Is used within the MyApplicationsPage.tsx component in the My Applications section of the account settings page.
+    * Author: Emil Berglund
 */
 
 import { formatRequestedAt, statusLabel, statusStyle } from "./utils";

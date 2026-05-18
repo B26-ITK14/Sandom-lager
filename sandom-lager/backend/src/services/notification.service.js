@@ -1,8 +1,8 @@
-/**
- * notification.service.js
- * Service for creating notifications in the system. This includes both user-initiated notifications (e.g. admin approving location access) 
- * and system-generated notifications (e.g. low stock alerts).
- */
+/*
+    * notification.service.js
+    * Service for creating notifications (user-initiated and system-generated).
+    * Author: Ida Tollaksen
+*/
 
 const pool = require("../db/pool");
 
@@ -45,21 +45,21 @@ async function createLowStockNotifications({ locationId, ingredientName, quantit
                              AND message LIKE $2
              ORDER BY created_at DESC
              LIMIT 1`,
-                        [row.user_id, `%Følgende varer har lav beholdning${locationSuffix}%`]
+            [row.user_id, `%Følgende varer har lav beholdning${locationSuffix}%`]
         );
 
         if (existingUnreadResult.rows.length > 0) {
             const existingNotification = existingUnreadResult.rows[0];
-                        const existingIngredients = existingNotification.message
-                                .split(": ")
-                                .pop()
-                                ?.replace(/\.$/, "")
-                                .split(", ")
-                                .map((item) => item.trim())
-                                .filter(Boolean) ?? [];
+            const existingIngredients = existingNotification.message
+                .split(": ")
+                .pop()
+                ?.replace(/\.$/, "")
+                .split(", ")
+                .map((item) => item.trim())
+                .filter(Boolean) ?? [];
 
-                        const mergedIngredients = Array.from(new Set([...existingIngredients, ingredientName]));
-                        const mergedMessage = `Følgende varer har lav beholdning${locationSuffix}: ${mergedIngredients.join(", ")}.`;
+            const mergedIngredients = Array.from(new Set([...existingIngredients, ingredientName]));
+            const mergedMessage = `Følgende varer har lav beholdning${locationSuffix}: ${mergedIngredients.join(", ")}.`;
 
             const result = await pool.query(
                 `UPDATE notifications

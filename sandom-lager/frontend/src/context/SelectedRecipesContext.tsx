@@ -2,6 +2,7 @@
     * SelectedRecipesContext.tsx
     * Provides a global set of selected recipe IDs that can be read and modified from any page
     * For example, RecipesPage selects recipes, ShoppingListPage uses them.
+    * Author: Sebastian Thomsen
 */
 
 /* eslint-disable react-refresh/only-export-components */
@@ -12,12 +13,18 @@ interface SelectedRecipesContextType {
     selectedIds: Set<number>;
     toggleSelected: (id: number) => void;
     clearSelected: () => void;
+    numberOfPeople: number;
+    numberOfPeopleInput: string;
+    setNumberOfPeople: (n: number) => void;
+    setNumberOfPeopleInput: (s: string) => void;
 }
 
 const SelectedRecipesContext = createContext<SelectedRecipesContextType | undefined>(undefined);
 
 export function SelectedRecipesProvider({ children }: { children: ReactNode }) {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+    const [numberOfPeople, setNumberOfPeople] = useState(8);
+    const [numberOfPeopleInput, setNumberOfPeopleInput] = useState("8");
 
     function toggleSelected(id: number) {
         setSelectedIds((prev) => {
@@ -36,7 +43,7 @@ export function SelectedRecipesProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <SelectedRecipesContext.Provider value={{ selectedIds, toggleSelected, clearSelected }}>
+        <SelectedRecipesContext.Provider value={{ selectedIds, toggleSelected, clearSelected, numberOfPeople, numberOfPeopleInput, setNumberOfPeople, setNumberOfPeopleInput }}>
             {children}
         </SelectedRecipesContext.Provider>
     );

@@ -1,6 +1,8 @@
 /*
     * utils.ts
     * Presentation utilities for My Applications status and date formatting.
+    * These functions are used by ApplicationsHistorySection.tsx to display user applications with appropriate labels, styles, and formatted dates.
+    * Author: Emil Berglund
 */
 
 import {

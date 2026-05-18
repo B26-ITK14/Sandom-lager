@@ -1,4 +1,9 @@
 const pool = require('../db/pool');
+/*
+    * shoppingList.controller.js
+    * Controller for shopping list CRUD and management.
+    * Author: Andreas Skaarberg
+*/
 const ApiError = require('../utils/ApiError');
 
 async function getApprovedLocationId(userId) {
@@ -331,7 +336,7 @@ async function clearShoppingList(req, res) {
 // POST /api/shopping-list/generate - Generate shopping list from selected recipe IDs
 async function generateShoppingList(req, res) {
     const userId = req.user.id;
-    const { recipe_ids } = req.body;
+    const { recipe_ids, people } = req.body;
 
     if (!Array.isArray(recipe_ids) || recipe_ids.length === 0) {
         throw new ApiError(400, "recipe_ids must be a non-empty array");
@@ -345,6 +350,9 @@ async function generateShoppingList(req, res) {
         throw new ApiError(400, "recipe_ids contains no valid IDs");
     }
 
+    const parsedPeople = Number(people);
+    const scalePeople = Number.isFinite(parsedPeople) && parsedPeople > 0 ? parsedPeople : null;
+
     const locationId = await getApprovedLocationId(userId);
     const client = await pool.connect();
 
@@ -354,11 +362,18 @@ async function generateShoppingList(req, res) {
         const aggregateResult = await client.query(
             `SELECT
                 ri.ingredient_id,
-                SUM(ri.quantity) AS needed_quantity
+                SUM(
+                    CASE
+                        WHEN $2::numeric IS NOT NULL
+                        THEN ri.quantity * ($2::numeric / NULLIF(r.servings, 0))
+                        ELSE ri.quantity
+                    END
+                ) AS needed_quantity
              FROM recipe_ingredients ri
+             JOIN recipes r ON r.id = ri.recipe_id
              WHERE ri.recipe_id = ANY($1::int[])
              GROUP BY ri.ingredient_id`,
-            [parsedRecipeIds]
+            [parsedRecipeIds, scalePeople]
         );
 
         for (const row of aggregateResult.rows) {

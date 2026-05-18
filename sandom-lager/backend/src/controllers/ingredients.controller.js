@@ -1,3 +1,8 @@
+/*
+    * ingredients.controller.js
+    * Controller for ingredient CRUD and search operations.
+    * Author: Andreas Skaarberg
+*/
 const pool = require("../db/pool");
 const ApiError = require("../utils/ApiError");
 
@@ -30,7 +35,7 @@ async function createIngredient(req, res) {
     if (!name || !unit) {
         throw new ApiError(400, "Missing required fields: name and unit");
     }
-        
+
     const result = await pool.query(
         "INSERT INTO ingredients (name, unit) VALUES ($1, $2) RETURNING *",
         [name, unit]
@@ -41,10 +46,10 @@ async function createIngredient(req, res) {
 
 // PUT api/ingredients/:id - Update an existing ingredient
 async function updateIngredient(req, res) {
-    
+
     const { id } = req.params;
     const { name, unit } = req.body;
-        
+
     const result = await pool.query(
         "UPDATE ingredients SET name = $1, unit = $2 WHERE id = $3 RETURNING *",
         [name, unit, id]

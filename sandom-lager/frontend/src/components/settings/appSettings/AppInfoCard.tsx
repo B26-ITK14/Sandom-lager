@@ -1,6 +1,7 @@
 /*
     * AppInfoCard.tsx
     * Simple card displaying app information like name, version, and status.
+    * Is used within the AppSettingsPage.tsx component on the application settings page.
     * Author: Emil Berglund
 */
 

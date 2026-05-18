@@ -1,3 +1,8 @@
+/*
+    * inventory.controller.js
+    * Controller for inventory item operations and management.
+    * Author: Andreas Skaarberg
+*/
 const pool = require("../db/pool");
 const ApiError = require("../utils/ApiError");
 const { logAction } = require("../utils/logger");
@@ -45,56 +50,56 @@ async function getInventory(req, res) {
 
 // POST api/inventory
 async function createInventory(req, res) {
-    
+
     const { ingredient_id, location_id, quantity } = req.body;
 
     if (!ingredient_id || !location_id || quantity === undefined) {
         throw new ApiError(400, "Missing required fields: ingredient_id, location_id, quantity");
     }
 
-        const result = await pool.query(
-            `INSERT INTO inventory (ingredient_id, location_id, quantity) 
+    const result = await pool.query(
+        `INSERT INTO inventory (ingredient_id, location_id, quantity) 
              VALUES ($1, $2, $3) 
              RETURNING *`,
-            [ingredient_id, location_id, quantity]
-        );
+        [ingredient_id, location_id, quantity]
+    );
 
-        const ingredientResult = await pool.query(
-            `SELECT name FROM ingredients WHERE id = $1`,
-            [ingredient_id]
-        );
+    const ingredientResult = await pool.query(
+        `SELECT name FROM ingredients WHERE id = $1`,
+        [ingredient_id]
+    );
 
-        const ingredientName =
-            ingredientResult.rows[0]?.name || ingredient_id;
+    const ingredientName =
+        ingredientResult.rows[0]?.name || ingredient_id;
 
-        const locationResult = await pool.query(
-            `SELECT name FROM locations WHERE id = $1`,
-            [location_id]
-        );
+    const locationResult = await pool.query(
+        `SELECT name FROM locations WHERE id = $1`,
+        [location_id]
+    );
 
-        const locationName = locationResult.rows[0]?.name || null;
+    const locationName = locationResult.rows[0]?.name || null;
 
-        await logAction(
-            req.user,
-            `La til inventar: ${ingredientName} (${quantity})`
-        );
+    await logAction(
+        req.user,
+        `La til inventar: ${ingredientName} (${quantity})`
+    );
 
-        if (Number(quantity) <= LOW_STOCK_THRESHOLD) {
-            await createLowStockNotifications({
-                locationId: Number(location_id),
-                ingredientName,
-                quantity: Number(quantity),
-                locationName,
-            });
-        }
+    if (Number(quantity) <= LOW_STOCK_THRESHOLD) {
+        await createLowStockNotifications({
+            locationId: Number(location_id),
+            ingredientName,
+            quantity: Number(quantity),
+            locationName,
+        });
+    }
 
-        res.status(201).json(result.rows[0]);
+    res.status(201).json(result.rows[0]);
 
 }
 
 // PUT api/inventory/:id
 async function updateInventory(req, res) {
-    
+
     const { id } = req.params;
     const { quantity } = req.body;
 

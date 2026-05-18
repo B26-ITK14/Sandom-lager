@@ -2,6 +2,7 @@
     * EmailField.tsx
     * Email field with edit support for password-based accounts and a pending-verification notice.
     * Social/federated accounts see a read-only message instead.
+    * Used by PersonalInfoSection.tsx in the account settings page.
     * Author: Emil Berglund
 */
 

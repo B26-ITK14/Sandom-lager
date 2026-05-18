@@ -2,6 +2,7 @@
     * index.ts
     * Type definitions for the frontend application, including user roles, route information, and data models for recipes, ingredients, shopping list items, and inventory items.
     * This file serves as a central location for all type definitions used across the frontend codebase, ensuring consistency and type safety.
+    * Author: Emil Berglund
 */
 
 import type { RouteNickname } from "../router/routes";
@@ -41,6 +42,11 @@ export interface Allergen {
     name: string;
 }
 
+export interface Category {
+    id: number;
+    name: string;
+}
+
 export type WeightUnit = "mg" | "g" | "hg" | "kg";
 export type VolumeUnit = "ml" | "cl" | "dl" | "l";
 export type SpoonUnit = "krm" | "tsk" | "ss";
@@ -57,16 +63,6 @@ export const INGREDIENT_UNITS: readonly IngredientUnit[] = [
     ...SPOON_UNITS,
     ...COUNT_UNITS,
 ];
-
-export const RECIPE_CATEGORIES = [
-    "Frokost",
-    "Lunsj",
-    "Middag",
-    "Mellommåltid",
-    "Kveldsmat",
-] as const;
-
-export type RecipeCategory = typeof RECIPE_CATEGORIES[number];
 
 export interface Ingredient {
     id: number;

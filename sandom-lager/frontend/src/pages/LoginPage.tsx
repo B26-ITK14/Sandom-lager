@@ -92,7 +92,7 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <p 
+          <p
             className="mt-6 text-xs text-center"
             style={{ color: "var(--color-text-secondary)" }}
           >

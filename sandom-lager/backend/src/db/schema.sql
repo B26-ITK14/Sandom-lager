@@ -25,6 +25,9 @@ CREATE TABLE IF NOT EXISTS users (
     profile_picture TEXT,
     role TEXT NOT NULL DEFAULT 'user'
     CHECK (role IN ('user', 'admin', 'manager')),
+    notify_inventory BOOLEAN DEFAULT TRUE,
+    notify_recipes BOOLEAN DEFAULT TRUE,
+    notify_system BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -114,6 +117,20 @@ VALUES ('Gluten'),
        ('Sulfitter'),
        ('Lupin'),
        ('Bløtdyr')
+ON CONFLICT DO NOTHING;
+
+-- CATEGORIES --
+CREATE TABLE IF NOT EXISTS categories (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+INSERT INTO categories (name)
+VALUES ('Frokost'),
+       ('Lunsj'),
+       ('Middag'),
+       ('Mellommåltid'),
+       ('Kveldsmat')
 ON CONFLICT DO NOTHING;
 
 -- RECIPE ALLERGENS --

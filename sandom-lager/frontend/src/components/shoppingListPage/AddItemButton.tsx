@@ -1,3 +1,9 @@
+/*
+    * AddItemButton.tsx
+    * A button component for adding items to the shopping list.
+    * Author: Emil Berglund
+ */
+
 import { Plus } from "lucide-react";
 
 interface Props {

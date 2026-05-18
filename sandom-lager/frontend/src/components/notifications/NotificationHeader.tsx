@@ -2,6 +2,7 @@
     * NotificationHeader.tsx
     * Header component for the notification flyout.
     * Displays title, unread count, and close button.
+    * Is used in the NotificationFlyout component as the header section.
     * Author: Emil Berglund
 */
 

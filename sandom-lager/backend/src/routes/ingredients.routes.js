@@ -1,3 +1,8 @@
+/*
+    * ingredients.routes.js
+    * Routes for ingredient CRUD and search endpoints.
+    * Author: Andreas Skaarberg
+*/
 const express = require("express");
 const router = express.Router();
 
@@ -16,7 +21,7 @@ router.use(syncUser)
 // GET - All users can read ingredients
 router.get(
     "/ingredients",
-    requireRole("user", "manager", "admin"), 
+    requireRole("user", "manager", "admin"),
     asyncHandler(ingredientsController.getIngredients)
 );
 

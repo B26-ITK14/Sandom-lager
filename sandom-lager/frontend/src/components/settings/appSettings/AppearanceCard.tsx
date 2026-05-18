@@ -1,6 +1,9 @@
 /*
     * AppearanceCard.tsx
     * Settings card for appearance options like theme and font size.
+    * Allows users to customize the look and feel of the application with immediate visual feedback.
+    * Saves preferences to local storage for persistence across sessions.
+    * Is used within the AppSettingsPage.tsx component on the application settings page.
     * Author: Emil Berglund
  */
 

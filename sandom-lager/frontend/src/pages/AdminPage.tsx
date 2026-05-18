@@ -1,12 +1,11 @@
-import { apiUrl } from "../api/client";
-
 /*
     * AdminPage.tsx
-    * Admin-panel for håndtering av brukertilgangssøknader.
-    * Admin kan godkjenne eller avslå søknader per lokasjon.
+    * Admin panel for managing user access requests to locations. Admins can view pending, approved, and denied requests, and take actions like approving, denying, revoking, or blocking users.
+    * Displays statistics on the number of pending, approved, and denied requests, and allows filtering the request list by status.
+    * Utilizes the PendingCard component to display individual requests with action buttons for admins to manage access.
     * Author: Khalid Osman
 */
-
+import { apiUrl } from "../api/client";
 import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useUserRole, usePageMeta } from "../hooks";

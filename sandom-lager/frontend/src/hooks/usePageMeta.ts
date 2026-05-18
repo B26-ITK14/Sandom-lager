@@ -1,3 +1,10 @@
+/*
+    * usePageMeta.ts
+    * Hook to set dynamic meta tags for individual pages
+    * Useful for SEO and social media sharing
+    * Author: Emil Berglund
+*/
+
 import { useEffect } from 'react';
 
 interface PageMetaConfig {

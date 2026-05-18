@@ -1,3 +1,10 @@
+/*
+    * SearchInput.tsx
+    * A reusable search input component that includes a search icon and handles user input for searching functionality across the application.
+    * The component is designed to be flexible, allowing for customization of the placeholder text and handling of input changes through props.
+    * Author: Sebastian Thomsen
+*/
+
 interface SearchInputProps {
     id: string;
     value: string;

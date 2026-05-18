@@ -1,7 +1,7 @@
 /*
     * LocationSelector.tsx
-    * Dropdown-komponent for å velge lokasjon (Sandom / Tomasgården)
-    * Brukes i RequestAccessPage under onboarding-flyten.
+    * Dropdown component for selecting a location during onboarding.
+    * Is used in the OnboardingLocationStep component to allow users to select their location from a list.
     * Author: Khalid Osman
 */
 

@@ -21,7 +21,7 @@ export default function SettingsPage() {
         ogDescription: "Manage your account settings",
     });
     const { logoutUser, isLoggingOut } = useAppLogout();
-    const { role } = useUserRole();   
+    const { role } = useUserRole();
 
     const handleLogout = () => {
         void logoutUser();

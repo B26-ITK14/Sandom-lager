@@ -1,8 +1,9 @@
 /* 
-    useInventory.ts
-    Custom React hook for fetching and managing inventory data from the backend API, with integrated Auth0 authentication handling.
-    This hook abstracts away the complexities of token retrieval and error management, 
-    providing a simple interface for components to access inventory data along with loading and error states.
+    * useInventory.ts
+    * Custom React hook for fetching and managing inventory data from the backend API, with integrated Auth0 authentication handling.
+    * This hook abstracts away the complexities of token retrieval and error management, 
+    * providing a simple interface for components to access inventory data along with loading and error states.
+    * Author: Ida Tollaksen
  */
 
 import { useAuth0 } from "@auth0/auth0-react";

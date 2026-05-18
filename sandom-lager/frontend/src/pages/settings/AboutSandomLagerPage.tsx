@@ -1,6 +1,7 @@
 /*
     * AboutSandomLagerPage.tsx
     * About page with basic information about Sandom Lager.
+    * Includes app version and last updated info using custom hooks.
     * Author: Emil Berglund
 */
 

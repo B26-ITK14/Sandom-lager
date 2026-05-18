@@ -1,8 +1,8 @@
 /*
- * SettingsLayout.tsx
- * A page layout for settings sub-pages. Provides a header with a back button
- * and a scrollable content area. Used as the wrapper for individual settings pages.
- * Author: Emil Berglund
+    * SettingsLayout.tsx
+    * A page layout for settings sub-pages. Provides a header with a back button
+    * and a scrollable content area. Used as the wrapper for individual settings pages.
+    * Author: Emil Berglund
  */
 
 import React from "react";

@@ -1,6 +1,7 @@
 /*
     * personalInfoUtils.ts
     * Utility functions for handling personal information updates, such as validating and processing profile picture changes, and handling save/cancel actions for the PersonalInfoCard component.
+    * Used by PersonalInfoCard.tsx in the account settings page.
     * Author: Emil Berglund
 */
 

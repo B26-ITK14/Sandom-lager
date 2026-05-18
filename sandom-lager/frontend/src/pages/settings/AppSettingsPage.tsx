@@ -1,6 +1,8 @@
 /*
     * AppSettingsPage.tsx
     * Main settings page for app-related preferences like appearance, language, notifications, and accessibility.
+    * Organizes various settings cards (AppearanceCard, LanguageCard, NotificationsCard, AccessibilityCard, AppInfoCard) within a common layout.
+    * Each card component handles a specific category of settings, allowing users to customize their app experience.
     * Author: Emil Berglund
 */
 

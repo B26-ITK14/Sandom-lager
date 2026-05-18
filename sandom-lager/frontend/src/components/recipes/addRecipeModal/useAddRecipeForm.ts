@@ -9,8 +9,11 @@
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { AUTH0_AUDIENCE } from "../../../config/auth";
-import { createIngredient, createRecipe, updateRecipe, addRecipeIngredient, deleteRecipeIngredient, fetchIngredients, fetchAllergens, setRecipeAllergens, uploadRecipeImage } from "../../../api/recipes";
-import type { Allergen, Ingredient, Recipe, RecipeIngredient } from "../../../types";
+import { createIngredient, createRecipe, updateRecipe, addRecipeIngredient, deleteRecipeIngredient, 
+    fetchIngredients, fetchAllergens, setRecipeAllergens, uploadRecipeImage, 
+    createAllergen as apiCreateAllergen, deleteAllergen as apiDeleteAllergen,
+    fetchCategories, createCategory as apiCreateCategory, deleteCategory as apiDeleteCategory } from "../../../api/recipes";
+import type { Allergen, Category, Ingredient, Recipe, RecipeIngredient } from "../../../types";
 import { type IngredientRow } from "./IngredientRows";
 
 const DEFAULT_ROW: IngredientRow = { existingId: null, name: "", unit: "g", quantity: "" };
@@ -28,7 +31,7 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
     const [title, setTitle] = useState(initialRecipe?.title ?? "");
     const [category, setCategory] = useState<string>(initialRecipe?.category ?? "");
     const [instructions, setInstructions] = useState(initialRecipe?.instructions ?? "");
-    const [servings, setServings] = useState(String(initialRecipe?.servings ?? 8));
+
     const [recipeImageUrl, setRecipeImageUrl] = useState<string | null>(initialRecipe?.image_url ?? null);
     const [recipeImagePublicId, setRecipeImagePublicId] = useState<string | null>(initialRecipe?.image_public_id ?? null);
     const [recipeImageFile, setRecipeImageFile] = useState<File | null>(null);
@@ -39,17 +42,20 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
     const [rows, setRows] = useState<IngredientRow[]>(
         initialIngredients && initialIngredients.length > 0
             ? initialIngredients.map((ri) => ({
-                  existingId: ri.ingredient_id,
-                  name: ri.ingredient_name,
-                  unit: ri.unit,
-                  quantity: String(ri.quantity),
-              }))
+                existingId: ri.ingredient_id,
+                name: ri.ingredient_name,
+                unit: ri.unit,
+                quantity: String(ri.quantity),
+            }))
             : [{ ...DEFAULT_ROW }]
     );
 
     // Allergens
     const [allAllergens, setAllAllergens] = useState<Allergen[]>([]);
     const [selectedAllergenIds, setSelectedAllergenIds] = useState<number[]>([]);
+
+    // Categories
+    const [allCategories, setAllCategories] = useState<Category[]>([]);
 
     // Available ingredients from the database (for autocomplete)
     const [existingIngredients, setExistingIngredients] = useState<Ingredient[]>([]);
@@ -75,13 +81,15 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
         async function load() {
             try {
                 const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
-                const [ingredientsData, allergensData] = await Promise.all([
+                const [ingredientsData, allergensData, categoriesData] = await Promise.all([
                     fetchIngredients(token),
                     fetchAllergens(token),
+                    fetchCategories(token),
                 ]);
                 if (!cancelled) {
                     setExistingIngredients(ingredientsData);
                     setAllAllergens(allergensData);
+                    setAllCategories(categoriesData);
                     if (initialRecipe) {
                         const matched = initialRecipe.allergens
                             .map((name) => allergensData.find((a) => a.name === name)?.id)
@@ -163,7 +171,7 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
                 title: title.trim(),
                 category: category.trim(),
                 instructions: instructions.trim() || undefined,
-                servings: parseInt(servings, 10) || 8,
+                servings: 8,
                 image_url: uploadedImageUrl,
                 image_public_id: uploadedImagePublicId,
             };
@@ -213,11 +221,35 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
         await submitRecipe();
     }
 
+    async function handleAddAllergen(name: string): Promise<void> {
+        const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
+        const newAllergen = await apiCreateAllergen(name, token);
+        setAllAllergens((prev) => [...prev, newAllergen].sort((a, b) => a.name.localeCompare(b.name)));
+    }
+
+    async function handleDeleteAllergen(id: number): Promise<void> {
+        const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
+        await apiDeleteAllergen(id, token);
+        setAllAllergens((prev) => prev.filter((a) => a.id !== id));
+        setSelectedAllergenIds((prev) => prev.filter((aid) => aid !== id));
+    }
+
+    async function handleAddCategory(name: string): Promise<void> {
+        const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
+        const newCat = await apiCreateCategory(name, token);
+        setAllCategories((prev) => [...prev, newCat].sort((a, b) => a.name.localeCompare(b.name)));
+    }
+
+    async function handleDeleteCategory(id: number): Promise<void> {
+        const token = await getAccessTokenSilently({ authorizationParams: { audience: AUTH0_AUDIENCE } });
+        await apiDeleteCategory(id, token);
+        setAllCategories((prev) => prev.filter((c) => c.id !== id));
+    }
+
     return {
         title, setTitle,
         category, setCategory,
         instructions, setInstructions,
-        servings, setServings,
         recipeImageUrl,
         recipeImageFile,
         recipeImagePreview,
@@ -226,6 +258,11 @@ export function useAddRecipeForm({ initialRecipe, initialIngredients, onCreated 
         rows,
         allAllergens,
         selectedAllergenIds, setSelectedAllergenIds,
+        handleAddAllergen,
+        handleDeleteAllergen,
+        allCategories,
+        handleAddCategory,
+        handleDeleteCategory,
         existingIngredients,
         submitting,
         error,

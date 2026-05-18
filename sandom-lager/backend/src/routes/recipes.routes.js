@@ -1,3 +1,8 @@
+/*
+    * recipes.routes.js
+    * Routes for recipe CRUD and listing endpoints.
+    * Author: Andreas Skaarberg & Sebastian Thomsen
+*/
 const express = require("express");
 const router = express.Router();
 
@@ -16,7 +21,7 @@ router.use(syncUser)
 // All users can access and read recipes. 
 // Get all recipes
 router.get(
-    "/", 
+    "/",
     requireRole("user", "manager", "admin"), // All roles can access
     asyncHandler(recipesController.getAllRecipes)
 );
@@ -28,23 +33,58 @@ router.get(
     asyncHandler(recipesController.getAllAllergens)
 );
 
+// Manager and admin can create new allergens
+router.post(
+    "/allergens",
+    requireRole("manager", "admin"),
+    asyncHandler(recipesController.createAllergen)
+);
+
+// Manager and admin can delete allergens (only if not in use)
+router.delete(
+    "/allergens/:id",
+    requireRole("manager", "admin"),
+    asyncHandler(recipesController.deleteAllergen)
+);
+
+// Get all categories (for recipe forms)
+router.get(
+    "/categories",
+    requireRole("user", "manager", "admin"),
+    asyncHandler(recipesController.getAllCategories)
+);
+
+// Manager and admin can create new categories
+router.post(
+    "/categories",
+    requireRole("manager", "admin"),
+    asyncHandler(recipesController.createCategory)
+);
+
+// Manager and admin can delete categories (only if not in use)
+router.delete(
+    "/categories/:id",
+    requireRole("manager", "admin"),
+    asyncHandler(recipesController.deleteCategory)
+);
+
 // Get recipe by ID
 router.get(
-    "/:id", 
+    "/:id",
     requireRole("user", "manager", "admin"),
     asyncHandler(recipesController.getRecipeById)
 );
 
 // Manager and admin can create recipes
 router.post(
-    "/", 
+    "/",
     requireRole("manager", "admin"),
     asyncHandler(recipesController.createRecipe)
 );
 
 // Manager and admin can update recipes
 router.put(
-    "/:id", 
+    "/:id",
     requireRole("manager", "admin"),
     asyncHandler(recipesController.updateRecipe)
 );

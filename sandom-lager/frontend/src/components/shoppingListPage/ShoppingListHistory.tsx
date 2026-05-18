@@ -1,3 +1,10 @@
+/*
+    * ShoppingListHistory.tsx
+    * A component that displays the history of deleted shopping lists, grouped by batch. Each batch shows the deletion date, the user who deleted it, and the items that were in the shopping list at the time of deletion.
+    * The component handles loading states and displays appropriate messages when there are no deleted shopping lists to show.
+    * Author: Andreas Skaarberg
+*/
+
 import type { ShoppingListHistoryRow } from "../../types";
 
 interface Props {

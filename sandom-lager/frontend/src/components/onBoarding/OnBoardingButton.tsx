@@ -1,6 +1,7 @@
 /*
     * OnBoardingButton.tsx
-    * A versatile button component for onboarding screens, supporting both link and native button functionalities with multiple styling variants.   
+    * A versatile button component for onboarding screens, supporting both link and native button functionalities with multiple styling variants.
+    * Is used across various onboarding steps to provide consistent call-to-action buttons for users.   
     * Author: Emil Berglund
 */
 

@@ -1,10 +1,15 @@
+/*
+    * userLocations.controller.js
+    * Controller for managing user access to locations and permissions.
+    * Author: Andreas Skaarberg, Ida Tollaksen & Khalid Osman
+*/
 const pool = require("../db/pool");
 const ApiError = require("../utils/ApiError");
 const { createNotification } = require("../services/notification.service");
 
 // POST api/user-locations/request - User requests access to a location
 async function requestLocationAccess(req, res) {
-  
+
     const userId = req.user.id;
     const { location_id } = req.body;
 
@@ -18,13 +23,13 @@ async function requestLocationAccess(req, res) {
         [userId, location_id]
     );
 
-    res.status(201).json(result.rows[0]);   
+    res.status(201).json(result.rows[0]);
 
 }
 
 // PATCH api/user-locations/:id/approve - Admin approves location access request
 async function approveLocationAccess(req, res) {
-    
+
     const { id } = req.params;
 
     const result = await pool.query(
@@ -56,7 +61,7 @@ async function approveLocationAccess(req, res) {
 
 // PATCH api/user-locations/:id/deny - Admin denies location access request
 async function denyLocationAccess(req, res) {
-   
+
     const { id } = req.params;
 
     const result = await pool.query(
@@ -88,7 +93,7 @@ async function denyLocationAccess(req, res) {
 
 // GET api/user-locations/me - User views their location access status
 async function getMyLocationAccess(req, res) {
-    
+
     const userId = req.user.id;
 
     const result = await pool.query(
