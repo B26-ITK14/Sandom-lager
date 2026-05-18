@@ -1,7 +1,7 @@
 /*
     * syncUser.js
     * Middleware to synchronize user information from Auth0 to the database and attach user to the request.
-    * Author:
+    * Author: Andreas Skaarberg & Emil Berglund
 */
 // https://auth0.com/docs/secure/tokens/access-tokens/validate-access-tokens
 // https://auth0.com/docs/secure/tokens/json-web-tokens

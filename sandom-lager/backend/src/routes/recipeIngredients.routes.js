@@ -1,7 +1,7 @@
 /*
     * recipeIngredients.routes.js
     * Routes for managing recipe-ingredient relationships.
-    * Author:
+    * Author: Andreas Skaarberg
 */
 const express = require("express");
 const router = express.Router();

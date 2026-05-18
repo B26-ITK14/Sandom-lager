@@ -1,7 +1,8 @@
 /*
   * cloudinaryUploads.js
   * Helpers to upload image buffers to Cloudinary and manage public IDs.
-  * Author:
+  * Provides functions to upload profile pictures and recipe images, as well as delete images by public ID.
+  * Author: Emil Berglund
 */
 const cloudinary = require("./cloudinary");
 const { CLOUDINARY_FOLDERS } = require("./cloudinaryFolders");

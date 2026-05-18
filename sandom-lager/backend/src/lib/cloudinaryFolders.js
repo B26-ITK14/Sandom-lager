@@ -1,7 +1,8 @@
 /*
     * cloudinaryFolders.js
     * Centralized constants for Cloudinary folder names.
-    * Author:
+    * Used to ensure consistent folder usage across the codebase for image uploads.
+    * Author: Emil Berglund
 */
 const CLOUDINARY_FOLDERS = {
   PROFILE_PICTURES: "profile-pictures",

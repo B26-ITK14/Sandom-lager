@@ -1,7 +1,7 @@
 /*
     * inventory.routes.js
     * Routes for inventory item management endpoints.
-    * Author:
+    * Author: Andreas Skaarberg
 */
 const express = require("express");
 const router = express.Router();

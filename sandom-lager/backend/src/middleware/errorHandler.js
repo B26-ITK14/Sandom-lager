@@ -1,7 +1,7 @@
 /*
     * errorHandler.js
     * Centralized error handling middleware for Express.
-    * Author:
+    * Author: Andreas Skaarberg
 */
 // Centralized error handling middleware for Express
 function errorHandler(err, req, res, next) {
