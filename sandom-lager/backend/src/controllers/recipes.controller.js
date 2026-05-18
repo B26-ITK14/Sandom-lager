@@ -199,6 +199,50 @@ async function deleteAllergen(req, res) {
     res.status(204).send();
 }
 
+// GET /recipes/categories
+async function getAllCategories(req, res) {
+    const result = await pool.query("SELECT id, name FROM categories ORDER BY name");
+    res.json(result.rows);
+}
+
+// POST /recipes/categories
+async function createCategory(req, res) {
+    const { name } = req.body;
+    if (!name || typeof name !== "string" || !name.trim()) {
+        throw new ApiError(400, "navn er påkrevd");
+    }
+    const trimmed = name.trim();
+    const existing = await pool.query(
+        "SELECT id FROM categories WHERE LOWER(name) = LOWER($1)",
+        [trimmed]
+    );
+    if (existing.rows.length > 0) {
+        throw new ApiError(409, "Kategorien finnes allerede");
+    }
+    const result = await pool.query(
+        "INSERT INTO categories (name) VALUES ($1) RETURNING id, name",
+        [trimmed]
+    );
+    res.status(201).json(result.rows[0]);
+}
+
+// DELETE /recipes/categories/:id
+async function deleteCategory(req, res) {
+    const { id } = req.params;
+    const cat = await pool.query("SELECT name FROM categories WHERE id = $1", [id]);
+    if (cat.rows.length === 0) throw new ApiError(404, "Kategori ikke funnet");
+
+    const inUse = await pool.query(
+        "SELECT 1 FROM recipes WHERE category = $1 LIMIT 1",
+        [cat.rows[0].name]
+    );
+    if (inUse.rows.length > 0) {
+        throw new ApiError(409, "Kategorien er i bruk av én eller flere oppskrifter og kan ikke slettes");
+    }
+    await pool.query("DELETE FROM categories WHERE id = $1", [id]);
+    res.status(204).send();
+}
+
 module.exports = {
     getAllRecipes,
     getRecipeById,
@@ -208,5 +252,8 @@ module.exports = {
     getAllAllergens,
     setRecipeAllergens,
     createAllergen,
-    deleteAllergen
+    deleteAllergen,
+    getAllCategories,
+    createCategory,
+    deleteCategory
 };
