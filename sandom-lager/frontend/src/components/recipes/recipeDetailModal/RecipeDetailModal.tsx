@@ -67,7 +67,7 @@ export default function RecipeDetailModal({ recipe, onClose, canManage, onEdit, 
                                 {recipe.category}
                             </span>
                             <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                                {recipe.servings} porsjoner
+                                {recipe.servings} personer
                             </span>
                         </div>
                     </div>
