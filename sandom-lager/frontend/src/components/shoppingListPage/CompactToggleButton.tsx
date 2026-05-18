@@ -15,17 +15,18 @@ interface Props {
 export default function CompactToggleButton({ isCompact, onChange }: Props) {
     return (
         <button
+            type="button"
             onClick={() => onChange(!isCompact)}
-            className="flex items-center gap-2 py-2 px-4 rounded-md font-medium transition-all border hover:shadow-md cursor-pointer"
+            aria-label={isCompact ? "Bytt til detaljert visning" : "Bytt til kompakt visning"}
+            className="flex items-center justify-center w-11 h-11 rounded-full shrink-0 transition-colors cursor-pointer"
             style={{
-                background: "var(--color-secondary-surface)",
-                borderColor: "var(--color-border)",
-                color: "var(--color-text-primary)",
+                backgroundColor: isCompact ? "var(--color-primary)" : "var(--color-surface)",
+                color: isCompact ? "var(--color-on-primary)" : "var(--color-text-primary)",
+                border: "1px solid var(--color-border)",
             }}
             title={isCompact ? "Bytt til detaljert visning" : "Bytt til kompakt visning"}
         >
             {isCompact ? <List size={20} /> : <ListCollapse size={20} />}
-            <span>{isCompact ? "Detaljert" : "Kompakt"}</span>
         </button>
     );
 }
