@@ -5,7 +5,7 @@
 */
 
 import { apiFetchJson, apiUrl } from "./client";
-import type { Allergen, Ingredient, Recipe, RecipeIngredient } from "../types";
+import type { Allergen, Category, Ingredient, Recipe, RecipeIngredient } from "../types";
 
 export type RecipesListResponse = Recipe[];
 
@@ -163,6 +163,29 @@ export async function createAllergen(name: string, accessToken: string): Promise
 
 export async function deleteAllergen(id: number, accessToken: string): Promise<void> {
     await apiFetchJson<unknown>(`/api/recipes/allergens/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+}
+
+// Categories
+
+export async function fetchCategories(accessToken: string): Promise<Category[]> {
+    return apiFetchJson<Category[]>("/api/recipes/categories", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+}
+
+export async function createCategory(name: string, accessToken: string): Promise<Category> {
+    return apiFetchJson<Category>("/api/recipes/categories", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+    });
+}
+
+export async function deleteCategory(id: number, accessToken: string): Promise<void> {
+    await apiFetchJson<unknown>(`/api/recipes/categories/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${accessToken}` },
     });
