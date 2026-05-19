@@ -88,7 +88,7 @@ services:
       API_TARGET: http://backend:5000
       VITE_HMR_HOST: localhost
       VITE_HMR_PORT: 5173
-      VITE_APP_LAST_UPDATED: 2026-05-19
+      VITE_APP_LAST_UPDATED: "2026-05-19"
     depends_on:
       - backend
     develop:
