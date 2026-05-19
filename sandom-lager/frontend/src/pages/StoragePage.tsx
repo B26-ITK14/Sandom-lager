@@ -74,7 +74,8 @@ export default function StoragePage() {
 
                 setFavoriteProductIds(finalFavs);
             } catch (err) {
-                // not authenticated or token failed — keep empty favorites
+                // Failing to load favorites shows no error to the user, but logs it for debugging
+                console.error("Failed to load favorite products:", err);
             }
         }
 
@@ -135,7 +136,6 @@ export default function StoragePage() {
                     await removeFavorite(productId, token);
                 }
             } catch (err) {
-                // rollback on error and show notice
                 setFavoriteProductIds((prev) => (wasFavorite ? [...prev, productId] : prev.filter((id) => id !== productId)));
                 showNotice(err instanceof Error ? err.message : "Kunne ikke oppdatere favoritter.");
             }

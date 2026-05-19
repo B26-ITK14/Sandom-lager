@@ -10,13 +10,14 @@ const ApiError = require("../utils/ApiError");
 // Helper – henter én oppskrift med allergener
 async function getRecipeWithAllergens(id) {
     const result = await pool.query(
-        `SELECT r.id, r.title, r.category, r.instructions, r.image_url, r.image_public_id, r.servings, r.created_at,
+        `SELECT r.id, r.title, c.name AS category, r.instructions, r.image_url, r.image_public_id, r.servings, r.created_at,
           COALESCE(array_agg(a.name ORDER BY a.name) FILTER (WHERE a.name IS NOT NULL), '{}') AS allergens
          FROM recipes r
+         LEFT JOIN categories c ON c.id = r.category_id
          LEFT JOIN recipe_allergens ra ON ra.recipe_id = r.id
          LEFT JOIN allergens a ON a.id = ra.allergen_id
          WHERE r.id = $1
-         GROUP BY r.id`,
+         GROUP BY r.id, c.name`,
         [id],
     );
     return result.rows[0] ?? null;
@@ -25,12 +26,13 @@ async function getRecipeWithAllergens(id) {
 // GET /recipes
 async function getAllRecipes(req, res) {
     const result = await pool.query(
-        `SELECT r.id, r.title, r.category, r.instructions, r.image_url, r.image_public_id, r.servings, r.created_at,
+        `SELECT r.id, r.title, c.name AS category, r.instructions, r.image_url, r.image_public_id, r.servings, r.created_at,
           COALESCE(array_agg(a.name ORDER BY a.name) FILTER (WHERE a.name IS NOT NULL), '{}') AS allergens
          FROM recipes r
+         LEFT JOIN categories c ON c.id = r.category_id
          LEFT JOIN recipe_allergens ra ON ra.recipe_id = r.id
          LEFT JOIN allergens a ON a.id = ra.allergen_id
-         GROUP BY r.id
+         GROUP BY r.id, c.name
          ORDER BY r.id DESC`,
     );
     res.json(result.rows);
@@ -59,14 +61,21 @@ async function createRecipe(req, res) {
         throw new ApiError(400, "Missing required field: title");
     }
 
+    const catResult = await pool.query(
+        "SELECT id FROM categories WHERE LOWER(name) = LOWER($1)",
+        [category]
+    );
+    if (!catResult.rows[0]) throw new ApiError(400, `Ugyldig kategori: ${category}`);
+    const categoryId = catResult.rows[0].id;
+
     const result = await pool.query(
         `INSERT INTO recipes 
-        (title, category, instructions, image_url, image_public_id, servings)
+        (title, category_id, instructions, image_url, image_public_id, servings)
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *`,
         [
             title,
-            category,
+            categoryId,
             instructions,
             image_url ?? null,
             image_public_id ?? null,
@@ -97,14 +106,21 @@ async function updateRecipe(req, res) {
         throw new ApiError(400, "Missing required field: title");
     }
 
+    const catResult = await pool.query(
+        "SELECT id FROM categories WHERE LOWER(name) = LOWER($1)",
+        [category]
+    );
+    if (!catResult.rows[0]) throw new ApiError(400, `Ugyldig kategori: ${category}`);
+    const categoryId = catResult.rows[0].id;
+
     const updateResult = await pool.query(
         `UPDATE recipes
-         SET title = $1, category = $2, instructions = $3, image_url = $4, image_public_id = $5, servings = $6
+         SET title = $1, category_id = $2, instructions = $3, image_url = $4, image_public_id = $5, servings = $6
          WHERE id = $7
          RETURNING *`,
         [
             title,
-            category,
+            categoryId,
             instructions,
             image_url ?? null,
             image_public_id ?? null,
@@ -251,8 +267,8 @@ async function deleteCategory(req, res) {
     if (cat.rows.length === 0) throw new ApiError(404, "Kategori ikke funnet");
 
     const inUse = await pool.query(
-        "SELECT 1 FROM recipes WHERE category = $1 LIMIT 1",
-        [cat.rows[0].name]
+        "SELECT 1 FROM recipes WHERE category_id = $1 LIMIT 1",
+        [id]
     );
     if (inUse.rows.length > 0) {
         throw new ApiError(409, "Kategorien er i bruk av én eller flere oppskrifter og kan ikke slettes");

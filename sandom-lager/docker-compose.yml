@@ -23,7 +23,6 @@ services:
       retries: 20
       start_period: 10s
 
-
   # -----------------------------
   # pgAdmin GUI
   # -----------------------------
@@ -39,7 +38,7 @@ services:
     depends_on:
       - db
     volumes:
-    - pgadmin_data:/var/lib/pgadmin
+      - pgadmin_data:/var/lib/pgadmin
 
   # -----------------------------
   # Backend API (Express)
@@ -89,6 +88,7 @@ services:
       API_TARGET: http://backend:5000
       VITE_HMR_HOST: localhost
       VITE_HMR_PORT: 5173
+      VITE_APP_LAST_UPDATED: "2026-05-19"
     depends_on:
       - backend
     develop:

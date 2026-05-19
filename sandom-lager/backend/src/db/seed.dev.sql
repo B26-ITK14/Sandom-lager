@@ -8,6 +8,7 @@ TRUNCATE TABLE
     recipe_ingredients,
     recipes,
     allergens,
+    categories,
     ingredients,
     user_locations,
     user_sessions,
@@ -165,72 +166,83 @@ VALUES
     ('Bløtdyr');
 
 -- =====================================
+-- CATEGORIES
+-- =====================================
+INSERT INTO categories (name)
+VALUES
+    ('Frokost'),
+    ('Lunsj'),
+    ('Middag'),
+    ('Mellommåltid'),
+    ('Kveldsmat');
+
+-- =====================================
 -- RECIPES
 -- =====================================
-INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+INSERT INTO recipes (title, category_id, instructions, image_url, image_public_id, created_at)
 VALUES (
     'Pannekaker',
-    'Frokost',
+    (SELECT id FROM categories WHERE name = 'Frokost'),
     'Bland mel, melk og egg. Stek i panne med smør.',
     'https://res.cloudinary.com/sandomlager/image/upload/v1778592904/recipe-images/recipe-1-1778592901805.jpg',
     'recipe-images/recipe-1-1778592901805',
     NOW() - INTERVAL '20 days'
 );
 
-INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+INSERT INTO recipes (title, category_id, instructions, image_url, image_public_id, created_at)
 VALUES (
     'Kyllinggryte',
-    'Middag',
+    (SELECT id FROM categories WHERE name = 'Middag'),
     'Stek kylling, løk og hvitløk. Tilsett tomater og paprika.',
     'https://res.cloudinary.com/sandomlager/image/upload/v1778592892/recipe-images/recipe-2-1778592890749.jpg',
     'recipe-images/recipe-2-1778592890749',
     NOW() - INTERVAL '15 days'
 );
 
-INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+INSERT INTO recipes (title, category_id, instructions, image_url, image_public_id, created_at)
 VALUES (
     'Ovnsbakt laks', 
-    'Middag', 
+    (SELECT id FROM categories WHERE name = 'Middag'),
     'Bak laks i ovn. Server med poteter og gulrøtter.', 
     'https://res.cloudinary.com/sandomlager/image/upload/v1778592880/recipe-images/recipe-3-1778592877154.webp', 
     'recipe-images/recipe-3-1778592877154', 
     NOW() - INTERVAL '10 days'
 );
 
-INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+INSERT INTO recipes (title, category_id, instructions, image_url, image_public_id, created_at)
 VALUES (
     'Pasta med ostesaus', 
-    'Middag', 
+    (SELECT id FROM categories WHERE name = 'Middag'),
     'Kok pasta. Lag saus med smør, melk og ost.', 
     'https://res.cloudinary.com/sandomlager/image/upload/v1778592867/recipe-images/recipe-4-1778592865733.webp', 
     'recipe-images/recipe-4-1778592865733', 
     NOW() - INTERVAL '8 days'
 );
 
-INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+INSERT INTO recipes (title, category_id, instructions, image_url, image_public_id, created_at)
 VALUES (
     'Overnight oats', 
-    'Frokost', 
+    (SELECT id FROM categories WHERE name = 'Frokost'),
     'Bland havregryn, yoghurt og melk. La stå over natten.', 
     'https://res.cloudinary.com/sandomlager/image/upload/v1778592853/recipe-images/recipe-5-1778592852513.jpg', 
     'recipe-images/recipe-5-1778592852513', 
     NOW() - INTERVAL '5 days'
 );
 
-INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+INSERT INTO recipes (title, category_id, instructions, image_url, image_public_id, created_at)
 VALUES (
     'Kikertcurry',
-    'Middag',
+    (SELECT id FROM categories WHERE name = 'Middag'),
     'Stek løk og hvitløk, tilsett kikerter og kokosmelk.',
     'https://res.cloudinary.com/sandomlager/image/upload/v1778592841/recipe-images/recipe-6-1778592838438.webp',
     'recipe-images/recipe-6-1778592838438',
     NOW() - INTERVAL '3 days'
 );
 
-INSERT INTO recipes (title, category, instructions, image_url, image_public_id, created_at)
+INSERT INTO recipes (title, category_id, instructions, image_url, image_public_id, created_at)
 VALUES (
     'Asiatisk nudelsalat',
-    'Lunsj',
+    (SELECT id FROM categories WHERE name = 'Lunsj'),
     'Bland nudler, grønnsaker, soyasaus, peanøtter og sesam.',
     'https://res.cloudinary.com/sandomlager/image/upload/v1778592226/recipe-images/recipe-7-1778592223792.webp',
     'recipe-images/recipe-7-1778592223792',

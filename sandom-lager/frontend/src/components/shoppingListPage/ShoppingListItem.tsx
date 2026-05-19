@@ -164,6 +164,7 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
                             disabled={isLoading}
                             className="underline-offset-2 hover:underline cursor-pointer disabled:cursor-not-allowed"
                             style={{ color: "var(--color-text-primary)" }}
+                            title="Endre mengde"
                             onClick={openQuantityEditor}>
                             {formatQuantity(item.needed_quantity)}
                         </button>
@@ -191,6 +192,7 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
                             disabled={isLoading}
                             className="underline-offset-2 hover:underline cursor-pointer disabled:cursor-not-allowed"
                             style={{ color: "var(--color-text-primary)" }}
+                            title="Endre enhet"
                             onClick={() => setIsUnitEditing(true)}>
                             {item.unit}
                         </button>
@@ -210,6 +212,7 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
                         background: "var(--color-warning, #f59e0b)",
                         color: "#ffffff",
                     }}
+                    title="Reduser mengde"
                     aria-label={`Reduser mengde for ${item.ingredient}`}>
                     −
                 </button>
@@ -222,7 +225,9 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
                         background: "var(--color-success, #10b981)",
                         color: "#ffffff",
                     }}
+                    title="Øk mengde"
                     aria-label={`Øk mengde for ${item.ingredient}`}>
+
                     +
                 </button>
 
@@ -234,6 +239,7 @@ export default function ShoppingListItem({ item, compact, onIncrease, onDecrease
                         background: "var(--color-danger, #dc2626)",
                         color: "#ffffff",
                     }}
+                    title="Slett vare"
                     aria-label={`Slett ${item.ingredient} fra handlelisten`}>
                     ×
                 </button>
