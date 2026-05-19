@@ -12,9 +12,10 @@ import type { Notification } from './types';
 interface NotificationListProps {
     notifications: Notification[];
     onNotificationClick: (notification: Notification) => void;
+    onDeleteNotification: (notificationId: number) => Promise<void>;
 }
 
-export function NotificationList({ notifications, onNotificationClick }: NotificationListProps) {
+export function NotificationList({ notifications, onNotificationClick, onDeleteNotification }: NotificationListProps) {
     if (notifications.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center h-full p-6">
@@ -33,6 +34,7 @@ export function NotificationList({ notifications, onNotificationClick }: Notific
                     key={notification.id}
                     notification={notification}
                     onClick={onNotificationClick}
+                    onDelete={onDeleteNotification}
                 />
             ))}
         </ul>

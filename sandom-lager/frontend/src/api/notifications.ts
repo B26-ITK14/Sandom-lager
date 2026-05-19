@@ -37,7 +37,7 @@ function formatRelativeTime(createdAtIso: string): string {
     return `${days} dager siden`;
 }
 
-export async function fetchNotifications(accessToken: string, unreadOnly?: boolean) : Promise<Notification[]> {
+export async function fetchNotifications(accessToken: string, unreadOnly?: boolean): Promise<Notification[]> {
     const path = unreadOnly ? "/api/notifications?unreadOnly=true" : "/api/notifications";
 
     const data = await apiFetchJson<NotificationDto[]>(path, {
@@ -57,7 +57,7 @@ export async function fetchNotifications(accessToken: string, unreadOnly?: boole
     }));
 }
 
-export async function markNotificationRead( id: number, accessToken: string): Promise<void> {
+export async function markNotificationRead(id: number, accessToken: string): Promise<void> {
     await apiFetchJson<{ id: number; is_read: boolean }>(`/api/notifications/${id}/read`, {
         headers: { Authorization: `Bearer ${accessToken}` },
         method: "PATCH",
@@ -68,6 +68,13 @@ export async function markAllNotificationsRead(accessToken: string): Promise<voi
     await apiFetchJson<{ message: string; updatedCount: number }>("/api/notifications/read-all", {
         headers: { Authorization: `Bearer ${accessToken}` },
         method: "PATCH",
+    });
+}
+
+export async function deleteNotification(id: number, accessToken: string): Promise<void> {
+    await apiFetchJson<{ message: string; id: number }>(`/api/notifications/${id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        method: "DELETE",
     });
 }
 

@@ -29,6 +29,12 @@ router.patch(
     asyncHandler(notificationsController.markNotificationRead)
 );
 
+router.delete(
+    "/notifications/:id",
+    requireRole("user", "manager", "admin"),
+    asyncHandler(notificationsController.deleteNotification)
+);
+
 router.patch(
     "/notifications/read-all",
     requireRole("user", "manager", "admin"),

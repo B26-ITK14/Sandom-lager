@@ -29,6 +29,7 @@ export default function HeaderSection({ notifications, backMenu }: HeaderSection
         refresh,
         markOneAsRead,
         markAllAsRead,
+        deleteOne,
     } = useNotifications();
     const location = useLocation();
     const navigate = useNavigate();
@@ -121,6 +122,7 @@ export default function HeaderSection({ notifications, backMenu }: HeaderSection
                 onRefresh={() => refresh({ force: true })}
                 onNotificationClick={markOneAsRead}
                 onMarkAllAsRead={markAllAsRead}
+                onDeleteNotification={deleteOne}
             />
         </>
     );
