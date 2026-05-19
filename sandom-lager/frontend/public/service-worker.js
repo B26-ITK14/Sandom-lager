@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 // Cache version for updates
-const CACHE_NAME = 'sandom-lager-v1';
+const CACHE_NAME = 'sandom-lager-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -66,7 +66,27 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first strategy for assets
+  // Network-first for HTML – must always be fresh so Vite's hashed JS/CSS is correct
+  const url = new URL(request.url);
+  const isHtml = request.headers.get('accept')?.includes('text/html') ||
+                 url.pathname === '/' ||
+                 url.pathname.endsWith('.html');
+  if (isHtml) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.status === 200) {
+            const cloned = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, cloned));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // Cache-first strategy for hashed assets (JS, CSS, images)
   event.respondWith(
     caches.match(request).then((response) => {
       if (response) {
