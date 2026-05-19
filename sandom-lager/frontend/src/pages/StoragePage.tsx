@@ -14,7 +14,7 @@ import SearchInput from "../components/SearchInput";
 import ProductCard from "../components/storage/productCard";
 import StorageFilterButton from "../components/storage/StorageFilterBtn";
 import AddInventoryModal from "../components/storage/AddInventoryModal";
-import { deleteInventoryItem, updateInventoryQuantity } from "../api/storage";
+import { deleteInventoryItem, updateInventoryQuantity, fetchFavorites, addFavorite, removeFavorite } from "../api/storage";
 import { useUser } from "../context/UserContext";
 import { useApiAccessToken } from "../hooks/useApiAccessToken";
 import { useInventory } from "../hooks/storage/useInventory";
@@ -48,24 +48,7 @@ export default function StoragePage() {
     const [deletingProductId, setDeletingProductId] = useState<number | null>(null);
     const [notice, setNotice] = useState<string | null>(null);
     const [showAddModal, setShowAddModal] = useState(false);
-    const [favoriteProductIds, setFavoriteProductIds] = useState<number[]>(() => {
-        try {
-            const parsed = JSON.parse(localStorage.getItem("favoriteProducts") || "[]") as unknown;
-            if (!Array.isArray(parsed)) {
-                return [];
-            }
-
-            return parsed
-                .map((value) => Number(value))
-                .filter((value) => Number.isInteger(value) && value > 0);
-        } catch {
-            return [];
-        }
-    });
-
-    useEffect(() => {
-        localStorage.setItem("favoriteProducts", JSON.stringify(favoriteProductIds));
-    }, [favoriteProductIds]);
+    const [favoriteProductIds, setFavoriteProductIds] = useState<number[]>([]);
 
     const products = useMemo(() => mapInventoryToProducts(inventory), [inventory]);
 
@@ -74,6 +57,33 @@ export default function StoragePage() {
             previous.filter((favoriteId) => products.some((product) => product.id === favoriteId))
         );
     }, [products]);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        async function loadFavorites() {
+            try {
+                const token = await getApiAccessToken();
+                const favs = await fetchFavorites(token);
+
+                if (cancelled) return;
+
+                const finalFavs = (Array.isArray(favs) ? favs : [])
+                    .map((v) => Number(v))
+                    .filter((v) => Number.isInteger(v) && products.some((p) => p.id === v));
+
+                setFavoriteProductIds(finalFavs);
+            } catch (err) {
+                // not authenticated or token failed — keep empty favorites
+            }
+        }
+
+        void loadFavorites();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [getApiAccessToken, products]);
 
     const filteredProducts = useMemo(() => {
         const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -111,13 +121,25 @@ export default function StoragePage() {
     }
 
     function toggleFavorite(productId: number) {
-        setFavoriteProductIds((previous) => {
-            if (previous.includes(productId)) {
-                return previous.filter((id) => id !== productId);
-            }
+        const wasFavorite = favoriteProductIds.includes(productId);
 
-            return [...previous, productId];
-        });
+        setFavoriteProductIds((prev) => (wasFavorite ? prev.filter((id) => id !== productId) : [...prev, productId]));
+
+        (async () => {
+            try {
+                const token = await getApiAccessToken();
+
+                if (!wasFavorite) {
+                    await addFavorite(productId, token);
+                } else {
+                    await removeFavorite(productId, token);
+                }
+            } catch (err) {
+                // rollback on error and show notice
+                setFavoriteProductIds((prev) => (wasFavorite ? [...prev, productId] : prev.filter((id) => id !== productId)));
+                showNotice(err instanceof Error ? err.message : "Kunne ikke oppdatere favoritter.");
+            }
+        })();
     }
 
     async function handleSaveProductQuantity(product: Product, nextQuantity: number): Promise<boolean> {
