@@ -151,6 +151,14 @@ CREATE TABLE IF NOT EXISTS inventory (
     UNIQUE(location_id, ingredient_id)
 );
 
+CREATE TABLE IF NOT EXISTS user_favorites (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    inventory_id INT REFERENCES inventory(id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE(user_id, inventory_id)
+);
+
 -- SHOPPING LIST --
 CREATE TABLE IF NOT EXISTS shopping_list (
     id SERIAL PRIMARY KEY,
@@ -173,6 +181,7 @@ CREATE TABLE IF NOT EXISTS shopping_list_history_batches (
     id SERIAL PRIMARY KEY,
     location_id INT REFERENCES locations(id) ON DELETE CASCADE,
     deleted_by_user_id INT REFERENCES users(id) ON DELETE SET NULL,
+    action_type TEXT NOT NULL DEFAULT 'deleted',
     deleted_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

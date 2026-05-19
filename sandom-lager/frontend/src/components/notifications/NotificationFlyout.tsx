@@ -22,6 +22,7 @@ interface NotificationFlyoutProps {
     onRefresh: () => void;
     onNotificationClick: (notificationId: number) => Promise<void>;
     onMarkAllAsRead: () => Promise<void>;
+    onDeleteNotification: (notificationId: number) => Promise<void>;
 }
 
 export function NotificationFlyout({
@@ -34,6 +35,7 @@ export function NotificationFlyout({
     onRefresh,
     onNotificationClick,
     onMarkAllAsRead,
+    onDeleteNotification,
 }: NotificationFlyoutProps) {
     const navigate = useNavigate();
 
@@ -97,6 +99,7 @@ export function NotificationFlyout({
                         <NotificationList
                             notifications={notifications}
                             onNotificationClick={handleNotificationClick}
+                            onDeleteNotification={onDeleteNotification}
                         />
                     )}
                 </div>

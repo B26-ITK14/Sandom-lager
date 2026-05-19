@@ -80,6 +80,29 @@ async function markAllNotificationsRead(req, res) {
     });
 }
 
+// DELETE /api/notifications/:id
+async function deleteNotification(req, res) {
+    const userId = req.user.id;
+    const notificationId = Number(req.params.id);
+
+    if (!Number.isFinite(notificationId)) {
+        throw new ApiError(400, "Invalid notification id");
+    }
+
+    const result = await pool.query(
+        `DELETE FROM notifications
+         WHERE id = $1 AND user_id = $2
+         RETURNING id`,
+        [notificationId, userId]
+    );
+
+    if (result.rows.length === 0) {
+        throw new ApiError(404, "Notification not found");
+    }
+
+    res.json({ message: "Notification deleted", id: result.rows[0].id });
+}
+
 // POST /api/notifications/access-request
 async function notifyAdminsOfAccessRequest(req, res) {
     const requesterId = req.user.id;
@@ -118,6 +141,7 @@ module.exports = {
     getNotifications,
     markNotificationRead,
     markAllNotificationsRead,
+    deleteNotification,
     notifyAdminsOfAccessRequest,
 };
 

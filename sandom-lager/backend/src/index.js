@@ -22,6 +22,7 @@ const userRoutes = require("./routes/user.routes");
 const locationsRoutes = require("./routes/locations.routes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const notificationsRoutes = require("./routes/notifications.routes");
+const favoritesRoutes = require("./routes/favorites.routes");
 
 const PORT = process.env.PORT || 3001;
 
@@ -165,6 +166,7 @@ app.use("/api", shoppingListRoutes);
 app.use("/api", locationsRoutes);
 app.use("/api", uploadRoutes);
 app.use("/api", notificationsRoutes);
+app.use("/api", favoritesRoutes);
 
 // 404 handler for unknown routes
 app.use((req, res, next) => {

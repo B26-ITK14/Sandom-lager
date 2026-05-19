@@ -86,6 +86,7 @@ export default function ShoppingListPage() {
                     i.id === id ? { ...i, needed_quantity: nextQuantity } : i
                 )
             );
+            await loadShoppingListHistory();
         } catch {
             // Ignore update failures here.
         }
@@ -108,6 +109,7 @@ export default function ShoppingListPage() {
                     i.id === id ? { ...i, needed_quantity: nextQuantity } : i
                 )
             );
+            await loadShoppingListHistory();
         } catch {
             // Ignore update failures here.
         }
@@ -128,6 +130,7 @@ export default function ShoppingListPage() {
             const token = await getAccessTokenSilently();
             await updateShoppingListItem(id, { needed_quantity: nextQuantity }, token);
             setItems((prev) => prev.map((item) => (item.id === id ? { ...item, needed_quantity: nextQuantity } : item)));
+            await loadShoppingListHistory();
         } catch {
             // Ignore update failures here.
         }
@@ -138,6 +141,7 @@ export default function ShoppingListPage() {
             const token = await getAccessTokenSilently();
             await removeFromShoppingList(id, token);
             setItems(prev => prev.filter(i => i.id !== id));
+            await loadShoppingListHistory();
         } catch {
             // Ignore delete failures here.
         }
