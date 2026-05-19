@@ -70,11 +70,25 @@ CREATE TABLE IF NOT EXISTS ingredients (
     unit TEXT NOT NULL -- 'kg', 'liter'
 );
 
+-- CATEGORIES --
+CREATE TABLE IF NOT EXISTS categories (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+INSERT INTO categories (name)
+VALUES ('Frokost'),
+       ('Lunsj'),
+       ('Middag'),
+       ('Mellommåltid'),
+       ('Kveldsmat')
+ON CONFLICT DO NOTHING;
+
 -- RECIPES --
 CREATE TABLE IF NOT EXISTS recipes (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
-    category TEXT NOT NULL,
+    category_id INT NOT NULL REFERENCES categories(id),
     instructions TEXT,
     image_url TEXT,
     image_public_id TEXT,
@@ -117,20 +131,6 @@ VALUES ('Gluten'),
        ('Sulfitter'),
        ('Lupin'),
        ('Bløtdyr')
-ON CONFLICT DO NOTHING;
-
--- CATEGORIES --
-CREATE TABLE IF NOT EXISTS categories (
-    id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE
-);
-
-INSERT INTO categories (name)
-VALUES ('Frokost'),
-       ('Lunsj'),
-       ('Middag'),
-       ('Mellommåltid'),
-       ('Kveldsmat')
 ON CONFLICT DO NOTHING;
 
 -- RECIPE ALLERGENS --
