@@ -9,12 +9,21 @@ import { apiUrl } from "../api/client";
 import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useUserRole, usePageMeta } from "../hooks";
-import { CheckCircle, XCircle, Clock } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users } from "lucide-react";
 import PendingCard, { type AccessRequest } from "../components/onBoarding/PendingCard";
 import type { UserLocationResponse } from "../types";
 import SettingsLayout from "../components/settings/SettingsLayout";
 
 type FilterTab = "all" | "pending" | "approved" | "denied";
+type AdminTab = "access" | "roles";
+
+interface AdminUser {
+    id: number;
+    name: string;
+    email: string;
+    role: "user" | "manager" | "admin";
+    created_at: string;
+}
 
 const TAB_LABELS: Record<FilterTab, string> = {
     all: "Alle",
@@ -40,7 +49,9 @@ export default function AdminPage() {
     const { role, loading: roleLoading } = useUserRole();
     const { getAccessTokenSilently } = useAuth0();
     const [requests, setRequests] = useState<AccessRequest[]>([]);
+    const [users, setUsers] = useState<AdminUser[]>([]);
     const [activeTab, setActiveTab] = useState<FilterTab>("pending");
+    const [adminTab, setAdminTab] = useState<AdminTab>("access");
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const [pageLoading, setPageLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -48,15 +59,25 @@ export default function AdminPage() {
     useEffect(() => {
         if (roleLoading || role !== "admin") return;
 
-        async function fetchRequests() {
+        async function fetchData() {
             try {
                 const token = await getAccessTokenSilently();
-                const res = await fetch(apiUrl("/api/user-locations"), {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (!res.ok) throw new Error("Feil ved henting av søknader");
-                const data: UserLocationResponse[] = await res.json();
-                const mapped: AccessRequest[] = data.map((r: UserLocationResponse) => ({ // ← ENDRET: any → UserLocationResponse
+                const [requestsRes, usersRes] = await Promise.all([
+                    fetch(apiUrl("/api/user-locations"), {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }),
+                    fetch(apiUrl("/api/admin/users"), {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }),
+                ]);
+
+                if (!requestsRes.ok) throw new Error("Feil ved henting av søknader");
+                if (!usersRes.ok) throw new Error("Feil ved henting av brukere");
+
+                const requestsData: UserLocationResponse[] = await requestsRes.json();
+                const usersData: AdminUser[] = await usersRes.json();
+
+                const mapped: AccessRequest[] = requestsData.map((r: UserLocationResponse) => ({
                     id: String(r.id),
                     userName: r.user_name,
                     email: r.email,
@@ -64,15 +85,17 @@ export default function AdminPage() {
                     requestedAt: r.created_at,
                     status: r.access_status,
                 }));
+
                 setRequests(mapped);
-            } catch {
-                setError("Kunne ikke laste søknader.");
+                setUsers(usersData);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : "Kunne ikke laste data.");
             } finally {
                 setPageLoading(false);
             }
         }
 
-        fetchRequests();
+        fetchData();
     }, [roleLoading, role, getAccessTokenSilently]);
 
     if (roleLoading) {
@@ -164,6 +187,29 @@ export default function AdminPage() {
         }
     }
 
+    async function handleRoleChange(userId: number, newRole: "user" | "manager" | "admin") {
+        setLoadingId(String(userId));
+        try {
+            const token = await getAccessTokenSilently();
+            const res = await fetch(apiUrl(`/api/admin/users/${userId}/role`), {
+                method: "PATCH",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ role: newRole }),
+            });
+            if (!res.ok) throw new Error("Rolle oppdatering feilet");
+            const updatedUser: AdminUser = await res.json();
+            setUsers((prev) => prev.map((u) => u.id === userId ? updatedUser : u));
+            setError(null);
+        } catch {
+            setError("Kunne ikke oppdatere rolle.");
+        } finally {
+            setLoadingId(null);
+        }
+    }
+
     return (
         <SettingsLayout notifications={true} backMenu={true}>
             {error && (
@@ -174,66 +220,143 @@ export default function AdminPage() {
             )}
 
             <div className="mx-auto">
-                {/* Stat Cards */}
-                <div className="mb-6 grid grid-cols-3 gap-3">
-                    {statCards.map(({ tab, label, icon: Icon, color }) => (
-                        <div key={tab} className="rounded-2xl p-4 text-center"
-                            style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-                            <div className="flex items-center justify-center gap-1.5 mb-1">
-                                <Icon size={14} style={{ color }} />
-                                <span className="text-xs font-medium uppercase tracking-wide" style={{ color }}>
-                                    {label}
-                                </span>
-                            </div>
-                            <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                                {requests.filter((r) => r.status === tab).length}
-                            </p>
+                {/* Admin Tabs */}
+                <div className="mb-6 flex gap-3">
+                    <button
+                        onClick={() => setAdminTab("access")}
+                        className="px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-150 cursor-pointer flex items-center gap-2"
+                        style={adminTab === "access"
+                            ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-on-primary)' }
+                            : { backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }
+                        }>
+                        <Clock size={16} />
+                        Tilgangsforespørsler
+                    </button>
+                    <button
+                        onClick={() => setAdminTab("roles")}
+                        className="px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-150 cursor-pointer flex items-center gap-2"
+                        style={adminTab === "roles"
+                            ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-on-primary)' }
+                            : { backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }
+                        }>
+                        <Users size={16} />
+                        Rolleadministrasjon
+                    </button>
+                </div>
+
+                {adminTab === "access" && (
+                    <>
+                        {/* Stat Cards */}
+                        <div className="mb-6 grid grid-cols-3 gap-3">
+                            {statCards.map(({ tab, label, icon: Icon, color }) => (
+                                <div key={tab} className="rounded-2xl p-4 text-center"
+                                    style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                                    <div className="flex items-center justify-center gap-1.5 mb-1">
+                                        <Icon size={14} style={{ color }} />
+                                        <span className="text-xs font-medium uppercase tracking-wide" style={{ color }}>
+                                            {label}
+                                        </span>
+                                    </div>
+                                    <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                                        {requests.filter((r) => r.status === tab).length}
+                                    </p>
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
 
-                {/* Filter Tabs */}
-                <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
-                    {(["pending", "approved", "denied", "all"] as FilterTab[]).map((tab) => (
-                        <button key={tab} onClick={() => setActiveTab(tab)}
-                            className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-150 cursor-pointer"
-                            style={activeTab === tab
-                                ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-on-primary)' }
-                                : { backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }
-                            }>
-                            {TAB_LABELS[tab]}
-                            {tab === "pending" && pendingCount > 0 && (
-                                <span className="ml-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold"
-                                    style={{ backgroundColor: 'var(--color-danger)', color: 'var(--color-on-danger)' }}>
-                                    {pendingCount}
-                                </span>
-                            )}
-                        </button>
-                    ))}
-                </div>
+                        {/* Filter Tabs */}
+                        <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
+                            {(["pending", "approved", "denied", "all"] as FilterTab[]).map((tab) => (
+                                <button key={tab} onClick={() => setActiveTab(tab)}
+                                    className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-150 cursor-pointer"
+                                    style={activeTab === tab
+                                        ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-on-primary)' }
+                                        : { backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }
+                                    }>
+                                    {TAB_LABELS[tab]}
+                                    {tab === "pending" && pendingCount > 0 && (
+                                        <span className="ml-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold"
+                                            style={{ backgroundColor: 'var(--color-danger)', color: 'var(--color-on-danger)' }}>
+                                            {pendingCount}
+                                        </span>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
 
-                {pageLoading ? (
-                    <p className="text-center text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                        Laster søknader...
-                    </p>
-                ) : filtered.length === 0 ? (
-                    <div className="rounded-2xl p-10 text-center text-sm"
-                        style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>
-                        Ingen søknader i denne kategorien.
-                    </div>
-                ) : (
-                    <div className="space-y-3">
-                        {filtered.map((request) => (
-                            <PendingCard
-                                key={request.id}
-                                request={request}
-                                onApprove={handleApprove}
-                                onDeny={handleDeny}
-                                onRevoke={handleRevoke}
-                                onBlock={handleBlock}
-                                isLoading={loadingId === request.id} />
-                        ))}
-                    </div>
+                        {pageLoading ? (
+                            <p className="text-center text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                                Laster søknader...
+                            </p>
+                        ) : filtered.length === 0 ? (
+                            <div className="rounded-2xl p-10 text-center text-sm"
+                                style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>
+                                Ingen søknader i denne kategorien.
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {filtered.map((request) => (
+                                    <PendingCard
+                                        key={request.id}
+                                        request={request}
+                                        onApprove={handleApprove}
+                                        onDeny={handleDeny}
+                                        onRevoke={handleRevoke}
+                                        onBlock={handleBlock}
+                                        isLoading={loadingId === request.id} />
+                                ))}
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {adminTab === "roles" && (
+                    <>
+                        {pageLoading ? (
+                            <p className="text-center text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                                Laster brukere...
+                            </p>
+                        ) : users.length === 0 ? (
+                            <div className="rounded-2xl p-10 text-center text-sm"
+                                style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>
+                                Ingen brukere funnet.
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {users.map((user) => (
+                                    <div key={user.id} className="rounded-2xl p-4"
+                                        style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-semibold text-sm" style={{ color: 'var(--color-text-primary)' }}>
+                                                    {user.name}
+                                                </p>
+                                                <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                                                    {user.email}
+                                                </p>
+                                            </div>
+                                            <div className="flex gap-2 w-full sm:w-auto">
+                                                <select
+                                                    value={user.role}
+                                                    onChange={(e) => handleRoleChange(user.id, e.target.value as "user" | "manager" | "admin")}
+                                                    disabled={loadingId === String(user.id)}
+                                                    className="flex-1 sm:flex-none px-3 py-2 rounded-lg text-sm font-medium cursor-pointer"
+                                                    style={{
+                                                        backgroundColor: 'var(--color-primary-light)',
+                                                        color: 'var(--color-text-primary)',
+                                                        border: '1px solid var(--color-border)',
+                                                    }}>
+                                                    <option value="user">Bruker</option>
+                                                    <option value="manager">Manager</option>
+                                                    <option value="admin">Admin</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </SettingsLayout>

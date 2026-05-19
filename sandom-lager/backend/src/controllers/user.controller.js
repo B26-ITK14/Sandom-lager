@@ -342,6 +342,50 @@ async function updateNotificationPreferences(req, res) {
     });
 }
 
+// GET /admin/users - Get all users (admin only)
+async function getAllUsers(req, res) {
+    if (req.user.role !== 'admin') {
+        throw new ApiError(403, "Tilgang nektet");
+    }
+
+    const result = await pool.query(
+        `SELECT id, name, email, role, created_at
+         FROM users
+         ORDER BY created_at DESC`
+    );
+
+    res.json(result.rows);
+}
+
+// PATCH /admin/users/:id/role - Update user role (admin only)
+async function updateUserRole(req, res) {
+    const { role } = req.body;
+    const userId = Number(req.params.id);
+
+    if (req.user.role !== 'admin') {
+        throw new ApiError(403, "Tilgang nektet");
+    }
+
+    if (!role || !['user', 'manager', 'admin'].includes(role)) {
+        throw new ApiError(400, "Ugyldig rolle");
+    }
+
+    if (!Number.isFinite(userId)) {
+        throw new ApiError(400, "Ugyldig bruker-ID");
+    }
+
+    const result = await pool.query(
+        `UPDATE users SET role = $1 WHERE id = $2 RETURNING id, name, email, role`,
+        [role, userId]
+    );
+
+    if (result.rows.length === 0) {
+        throw new ApiError(404, "Bruker ikke funnet");
+    }
+
+    res.json(result.rows[0]);
+}
+
 module.exports = {
     getMe,
     updateName,
@@ -350,4 +394,6 @@ module.exports = {
     getProfilePicture,
     updateUsername,
     updateNotificationPreferences,
+    getAllUsers,
+    updateUserRole,
 };

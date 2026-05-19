@@ -46,4 +46,8 @@ router.delete("/me/sessions/others", checkJwt(), syncUser, asyncHandler(sessionC
 router.delete("/me/sessions/:sessionId", checkJwt(), syncUser, asyncHandler(sessionController.revokeSession));
 router.patch("/me/email", checkJwt(), syncUser, asyncHandler(userController.updateEmail));
 
+// Admin routes
+router.get("/admin/users", checkJwt(), syncUser, asyncHandler(userController.getAllUsers));
+router.patch("/admin/users/:id/role", checkJwt(), syncUser, asyncHandler(userController.updateUserRole));
+
 module.exports = router;
