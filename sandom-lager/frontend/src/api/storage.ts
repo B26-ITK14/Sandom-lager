@@ -2,6 +2,7 @@
     * storage.ts
     * API functions for interacting with the storage-related endpoints of the backend API, such as fetching inventory and shopping list data.
     * This file serves as a single source of truth for all storage-related API calls, ensuring consistent handling of authentication and error management across the frontend application.
+    * Author: Ida Tollaksen
 */
 
 import { apiFetchJson } from "./client";
@@ -171,5 +172,28 @@ export async function deleteInventoryItem(
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
         },
+    });
+}
+
+// Favorites API
+// The functions bellow interact with the favorites endpoints of the backend API
+// Allowing the frontend to fetch, add, and remove favorite inventory items for the current user.
+export async function fetchFavorites(accessToken: string): Promise<number[]> {
+    return apiFetchJson<number[]>('/api/user/favorites', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+}
+
+export async function addFavorite(inventoryId: number, accessToken: string): Promise<{ inventory_id: number } | { message: string } > {
+    return apiFetchJson(`/api/user/favorites/${inventoryId}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+}
+
+export async function removeFavorite(inventoryId: number, accessToken: string): Promise<{ inventory_id: number }> {
+    return apiFetchJson(`/api/user/favorites/${inventoryId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${accessToken}` },
     });
 }
