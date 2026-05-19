@@ -7,7 +7,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import { fetchNotifications, markAllNotificationsRead, markNotificationRead } from '../api';
+import { fetchNotifications, markAllNotificationsRead, markNotificationRead, deleteNotification } from '../api';
 import { useApiAccessToken } from './useApiAccessToken';
 import type { Notification } from '../components/notifications';
 
@@ -99,6 +99,19 @@ export function useNotifications() {
         }
     }, [getApiAccessToken, refresh]);
 
+    const deleteOne = useCallback(async (notificationId: number) => {
+        setNotifications((prev) => prev.filter((notification) => notification.id !== notificationId));
+
+        try {
+            const token = await getApiAccessToken();
+            await deleteNotification(notificationId, token);
+            lastLoadedAtRef.current = Date.now();
+        } catch (error) {
+            setErrorMessage(error instanceof Error ? error.message : 'Kunne ikke slette varsel.');
+            await refresh({ force: true });
+        }
+    }, [getApiAccessToken, refresh]);
+
     useEffect(() => {
         void refresh({ force: true });
     }, [refresh]);
@@ -125,5 +138,6 @@ export function useNotifications() {
         refresh,
         markOneAsRead,
         markAllAsRead,
+        deleteOne,
     };
 }

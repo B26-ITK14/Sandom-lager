@@ -6,15 +6,16 @@
     * Author: Emil Berglund
 */
 
-import { AlertCircle, Clock, ShoppingCart, Package, Key, CheckCircle, Ban } from 'lucide-react';
+import { AlertCircle, Clock, ShoppingCart, Package, Key, CheckCircle, Ban, X } from 'lucide-react';
 import type { Notification } from './types';
 
 interface NotificationItemProps {
     notification: Notification;
     onClick: (notification: Notification) => void;
+    onDelete: (notificationId: number) => Promise<void>;
 }
 
-export function NotificationItem({ notification, onClick }: NotificationItemProps) {
+export function NotificationItem({ notification, onClick, onDelete }: NotificationItemProps) {
     const getNotificationIcon = (notification: Notification) => {
         const title = (notification.title || '').toLowerCase();
 
@@ -44,10 +45,20 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
         }
     };
 
+    const handleClick = async () => {
+        await onClick(notification);
+        await onDelete(notification.id);
+    };
+
+    const handleClose = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        await onDelete(notification.id);
+    };
+
     return (
         <li
-            onClick={() => onClick(notification)}
-            className={`p-4 hover:opacity-80 cursor-pointer transition-colors ${!notification.isRead ? 'bg-opacity-50' : ''
+            onClick={handleClick}
+            className={`p-4 hover:opacity-80 cursor-pointer transition-colors group ${!notification.isRead ? 'bg-opacity-50' : ''
                 }`}
             style={{
                 backgroundColor: !notification.isRead ? 'var(--color-primary-light)' : 'transparent',
@@ -66,12 +77,26 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
                         >
                             {notification.title}
                         </h3>
-                        {!notification.isRead && (
-                            <span
-                                className="w-2 h-2 rounded-full flex-shrink-0 ml-2"
-                                style={{ backgroundColor: 'var(--color-primary)' }}
-                            />
-                        )}
+                        <div className="flex items-center gap-2 ml-2">
+                            {!notification.isRead && (
+                                <span
+                                    className="w-2 h-2 rounded-full flex-shrink-0"
+                                    style={{ backgroundColor: 'var(--color-primary)' }}
+                                />
+                            )}
+                            <button
+                                onClick={handleClose}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 p-1 hover:bg-opacity-50 rounded"
+                                style={{
+                                    backgroundColor: 'transparent',
+                                    color: 'var(--color-text-secondary)',
+                                }}
+                                aria-label="Slett varsel"
+                                title="Slett varsel"
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
                     </div>
                     <p
                         className="text-sm mb-1"
