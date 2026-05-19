@@ -74,6 +74,44 @@ async function ensureInventoryItem(locationId, ingredientId) {
     );
 }
 
+async function insertShoppingListHistoryBatch(client, { locationId, userId, rows, actionType = "deleted" }) {
+    if (!rows || rows.length === 0) {
+        return null;
+    }
+
+    const batchResult = await client.query(
+        `INSERT INTO shopping_list_history_batches (location_id, deleted_by_user_id, action_type)
+         VALUES ($1, $2, $3)
+         RETURNING id`,
+        [locationId, userId, actionType]
+    );
+
+    const batchId = Number(batchResult.rows[0].id);
+
+    for (const row of rows) {
+        await client.query(
+            `INSERT INTO shopping_list_history_items (
+                batch_id,
+                ingredient_id,
+                ingredient_name_snapshot,
+                unit_snapshot,
+                needed_quantity_snapshot,
+                stock_quantity_snapshot
+            ) VALUES ($1, $2, $3, $4, $5, $6)`,
+            [
+                batchId,
+                row.ingredient_id,
+                row.ingredient,
+                row.unit,
+                row.needed_quantity,
+                row.stock_quantity,
+            ]
+        );
+    }
+
+    return batchId;
+}
+
 // GET /api/shopping-list - Get shopping list items for user's approved location
 async function getShoppingList(req, res) {
     const userId = req.user.id;
@@ -112,6 +150,7 @@ async function getShoppingListHistory(req, res) {
             b.id AS batch_id,
             b.deleted_at,
             b.deleted_by_user_id,
+            b.action_type,
             u.name AS deleted_by_name,
             i.ingredient_id,
             i.ingredient_name_snapshot AS ingredient,
@@ -183,50 +222,102 @@ async function updateShoppingListItem(req, res) {
     const { needed_quantity, unit } = req.body;
 
     const locationId = await getApprovedLocationId(userId);
+    const client = await pool.connect();
 
-    const fields = [];
-    const values = [];
-    let paramIndex = 1;
+    try {
+        await client.query("BEGIN");
 
-    if (needed_quantity !== undefined) {
-        const parsedQuantity = Number(needed_quantity);
-        if (!Number.isFinite(parsedQuantity) || parsedQuantity <= 0) {
-            throw new ApiError(400, "Invalid needed_quantity");
+        const currentResult = await client.query(
+            `SELECT
+                sl.id,
+                sl.ingredient_id,
+                sl.needed_quantity,
+                i.name AS ingredient,
+                COALESCE(sl.unit_override, i.unit) AS unit
+             FROM shopping_list sl
+             JOIN ingredients i ON sl.ingredient_id = i.id
+             WHERE sl.id = $1 AND sl.location_id = $2
+             FOR UPDATE`,
+            [id, locationId]
+        );
+
+        if (currentResult.rows.length === 0) {
+            throw new ApiError(404, "Shopping list item not found or access denied");
         }
-        fields.push(`needed_quantity = $${paramIndex}`);
-        values.push(parsedQuantity);
-        paramIndex += 1;
+
+        const currentRow = currentResult.rows[0];
+        const inventoryResult = await client.query(
+            `SELECT COALESCE(quantity, 0) AS stock_quantity
+             FROM inventory
+             WHERE location_id = $1 AND ingredient_id = $2`,
+            [locationId, currentRow.ingredient_id]
+        );
+
+        currentRow.stock_quantity = inventoryResult.rows.length > 0
+            ? inventoryResult.rows[0].stock_quantity
+            : 0;
+
+        const fields = [];
+        const values = [];
+        let paramIndex = 1;
+        let shouldRecordHistory = false;
+
+        if (needed_quantity !== undefined) {
+            const parsedQuantity = Number(needed_quantity);
+            if (!Number.isFinite(parsedQuantity) || parsedQuantity <= 0) {
+                throw new ApiError(400, "Invalid needed_quantity");
+            }
+
+            if (parsedQuantity !== Number(currentRow.needed_quantity)) {
+                shouldRecordHistory = true;
+            }
+
+            fields.push(`needed_quantity = $${paramIndex}`);
+            values.push(parsedQuantity);
+            paramIndex += 1;
+        }
+
+        if (unit !== undefined) {
+            fields.push(`unit_override = $${paramIndex}`);
+            values.push(unit || null);
+            paramIndex += 1;
+        }
+
+        if (fields.length === 0) {
+            throw new ApiError(400, "No updatable fields provided");
+        }
+
+        if (shouldRecordHistory) {
+            await insertShoppingListHistoryBatch(client, {
+                locationId,
+                userId,
+                rows: [currentRow],
+                actionType: "updated",
+            });
+        }
+
+        fields.push("updated_at = NOW()");
+
+        values.push(id);
+        values.push(locationId);
+
+        const result = await client.query(
+            `UPDATE shopping_list 
+             SET ${fields.join(", ")}
+             WHERE id = $${paramIndex} AND location_id = $${paramIndex + 1} 
+             RETURNING *`,
+            values
+        );
+
+        await client.query("COMMIT");
+
+        res.json(result.rows[0]);
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
     }
-
-    if (unit !== undefined) {
-        fields.push(`unit_override = $${paramIndex}`);
-        values.push(unit || null);
-        paramIndex += 1;
-    }
-
-    if (fields.length === 0) {
-        throw new ApiError(400, "No updatable fields provided");
-    }
-
-    fields.push("updated_at = NOW()");
-
-    values.push(id);
-    values.push(locationId);
-
-    // Only allow updating items in user's location
-    const result = await pool.query(
-        `UPDATE shopping_list 
-         SET ${fields.join(", ")}
-         WHERE id = $${paramIndex} AND location_id = $${paramIndex + 1} 
-         RETURNING *`,
-        values
-    );
-
-    if (result.rows.length === 0) {
-        throw new ApiError(404, "Shopping list item not found or access denied");
-    }
-
-    res.json(result.rows[0]);
 }
 
 // DELETE /api/shopping-list/:id - Delete a shopping list item
@@ -235,19 +326,67 @@ async function deleteShoppingListItem(req, res) {
     const { id } = req.params;
     const locationId = await getApprovedLocationId(userId);
 
-    // Only allow deleting items from user's location
-    const result = await pool.query(
-        `DELETE FROM shopping_list 
-         WHERE id = $1 AND location_id = $2 
-         RETURNING *`,
-        [id, locationId]
-    );
+    const client = await pool.connect();
 
-    if (result.rows.length === 0) {
-        throw new ApiError(404, "Shopping list item not found or access denied");
+    try {
+        await client.query("BEGIN");
+
+        const itemResult = await client.query(
+            `SELECT
+                sl.id,
+                sl.ingredient_id,
+                i.name AS ingredient,
+                COALESCE(sl.unit_override, i.unit) AS unit,
+                sl.needed_quantity
+             FROM shopping_list sl
+             JOIN ingredients i ON sl.ingredient_id = i.id
+             WHERE sl.id = $1 AND sl.location_id = $2
+             FOR UPDATE`,
+            [id, locationId]
+        );
+
+        if (itemResult.rows.length === 0) {
+            throw new ApiError(404, "Shopping list item not found or access denied");
+        }
+
+        const inventoryResult = await client.query(
+            `SELECT COALESCE(quantity, 0) AS stock_quantity
+             FROM inventory
+             WHERE location_id = $1 AND ingredient_id = $2`,
+            [locationId, itemResult.rows[0].ingredient_id]
+        );
+
+        itemResult.rows[0].stock_quantity = inventoryResult.rows.length > 0
+            ? inventoryResult.rows[0].stock_quantity
+            : 0;
+
+        await insertShoppingListHistoryBatch(client, {
+            locationId,
+            userId,
+            rows: itemResult.rows,
+            actionType: "deleted",
+        });
+
+        const result = await client.query(
+            `DELETE FROM shopping_list 
+             WHERE id = $1 AND location_id = $2 
+             RETURNING *`,
+            [id, locationId]
+        );
+
+        if (result.rows.length === 0) {
+            throw new ApiError(404, "Shopping list item not found or access denied");
+        }
+
+        await client.query("COMMIT");
+
+        res.json({ message: "Shopping list item deleted successfully", deleted: result.rows[0] });
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
     }
-
-    res.json({ message: "Shopping list item deleted successfully", deleted: result.rows[0] });
 }
 
 // DELETE /api/shopping-list - Delete all shopping list items for user's location
@@ -282,35 +421,12 @@ async function clearShoppingList(req, res) {
             });
         }
 
-        const batchResult = await client.query(
-            `INSERT INTO shopping_list_history_batches (location_id, deleted_by_user_id)
-             VALUES ($1, $2)
-             RETURNING id`,
-            [locationId, userId]
-        );
-
-        const batchId = Number(batchResult.rows[0].id);
-
-        for (const row of itemsResult.rows) {
-            await client.query(
-                `INSERT INTO shopping_list_history_items (
-                    batch_id,
-                    ingredient_id,
-                    ingredient_name_snapshot,
-                    unit_snapshot,
-                    needed_quantity_snapshot,
-                    stock_quantity_snapshot
-                ) VALUES ($1, $2, $3, $4, $5, $6)`,
-                [
-                    batchId,
-                    row.ingredient_id,
-                    row.ingredient,
-                    row.unit,
-                    row.needed_quantity,
-                    row.stock_quantity,
-                ]
-            );
-        }
+        await insertShoppingListHistoryBatch(client, {
+            locationId,
+            userId,
+            rows: itemsResult.rows,
+            actionType: "deleted",
+        });
 
         const result = await client.query(
             `DELETE FROM shopping_list

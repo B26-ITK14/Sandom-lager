@@ -173,6 +173,7 @@ CREATE TABLE IF NOT EXISTS shopping_list_history_batches (
     id SERIAL PRIMARY KEY,
     location_id INT REFERENCES locations(id) ON DELETE CASCADE,
     deleted_by_user_id INT REFERENCES users(id) ON DELETE SET NULL,
+    action_type TEXT NOT NULL DEFAULT 'deleted',
     deleted_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

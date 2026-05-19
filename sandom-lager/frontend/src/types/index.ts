@@ -94,6 +94,7 @@ export interface ShoppingListHistoryRow {
     deleted_at: string;
     deleted_by_user_id: number | null;
     deleted_by_name: string | null;
+    action_type: "deleted" | "updated";
     ingredient_id: number | null;
     ingredient: string;
     unit: IngredientUnit;

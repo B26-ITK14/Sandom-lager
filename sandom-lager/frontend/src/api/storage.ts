@@ -125,6 +125,7 @@ export async function fetchShoppingListHistory(accessToken: string): Promise<Sho
         ...row,
         batch_id: Number(row.batch_id),
         deleted_by_user_id: row.deleted_by_user_id === null ? null : Number(row.deleted_by_user_id),
+        action_type: row.action_type,
         ingredient_id: row.ingredient_id === null ? null : Number(row.ingredient_id),
         needed_quantity: Number(row.needed_quantity),
         stock_quantity: Number(row.stock_quantity),
@@ -163,7 +164,7 @@ export async function createInventory(
 export async function deleteInventoryItem(
     inventoryId: number,
     accessToken: string
-    ): Promise<void> {
+): Promise<void> {
     await apiFetchJson(`/api/inventory/${inventoryId}`, {
         method: "DELETE",
         headers: {

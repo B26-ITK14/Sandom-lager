@@ -6,6 +6,7 @@
 */
 
 import type { ShoppingListHistoryRow } from "../../types";
+import { useState } from "react";
 
 interface Props {
     rows: ShoppingListHistoryRow[];
@@ -16,6 +17,7 @@ interface HistoryBatch {
     batchId: number;
     deletedAt: string;
     deletedBy: string;
+    actionType: "deleted" | "updated";
     items: ShoppingListHistoryRow[];
 }
 
@@ -31,6 +33,7 @@ function groupRows(rows: ShoppingListHistoryRow[]): HistoryBatch[] {
                 batchId: row.batch_id,
                 deletedAt: row.deleted_at,
                 deletedBy,
+                actionType: row.action_type,
                 items: [row],
             });
             continue;
@@ -48,6 +51,7 @@ function formatNumber(value: number): string {
 
 export default function ShoppingListHistory({ rows, isLoading }: Props) {
     const batches = groupRows(rows);
+    const [isOpen, setIsOpen] = useState(true);
 
     return (
         <section
@@ -57,48 +61,69 @@ export default function ShoppingListHistory({ rows, isLoading }: Props) {
                 background: "var(--color-surface)",
                 border: "1px solid var(--color-border)",
             }}>
-            <h2 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
-                Historikk
-            </h2>
+            <div className="flex items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                    Historikk
+                </h2>
 
-            {isLoading ? (
+                <button
+                    type="button"
+                    onClick={() => setIsOpen((current) => !current)}
+                    aria-expanded={isOpen}
+                    aria-controls="shopping-list-history-content"
+                    className="rounded-md px-3 py-1.5 text-sm font-medium transition-opacity cursor-pointer hover:opacity-80"
+                    style={{
+                        background: "var(--color-secondary-surface)",
+                        color: "var(--color-text-primary)",
+                        border: "1px solid var(--color-border)",
+                    }}
+                >
+                    {isOpen ? "Skjul" : "Vis"}
+                </button>
+            </div>
+
+            {isOpen && isLoading ? (
                 <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
                     Laster historikk...
                 </p>
-            ) : batches.length === 0 ? (
-                <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                    Ingen tidligere slettede handlelister ennå.
-                </p>
-            ) : (
-                <div className="mt-4 flex flex-col gap-3">
-                    {batches.map((batch) => (
-                        <article
-                            key={batch.batchId}
-                            className="rounded-lg p-3"
-                            style={{
-                                background: "var(--color-secondary-surface)",
-                                border: "1px solid var(--color-border)",
-                            }}>
-                            <header className="mb-2">
-                                <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
-                                    Slettet: {new Date(batch.deletedAt).toLocaleString("nb-NO")}
-                                </p>
-                                <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                                    Av: {batch.deletedBy}
-                                </p>
-                            </header>
+            ) : isOpen ? (
+                <div id="shopping-list-history-content">
+                    {batches.length === 0 ? (
+                        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                            Ingen tidligere slettede handlelister ennå.
+                        </p>
+                    ) : (
+                        <div className="mt-4 flex flex-col gap-3">
+                            {batches.map((batch) => (
+                                <article
+                                    key={batch.batchId}
+                                    className="rounded-lg p-3"
+                                    style={{
+                                        background: "var(--color-secondary-surface)",
+                                        border: "1px solid var(--color-border)",
+                                    }}>
+                                    <header className="mb-2">
+                                        <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+                                            {batch.actionType === "updated" ? "Oppdatert" : "Slettet"}: {new Date(batch.deletedAt).toLocaleString("nb-NO")}
+                                        </p>
+                                        <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                                            Av: {batch.deletedBy}
+                                        </p>
+                                    </header>
 
-                            <ul className="flex flex-col gap-1">
-                                {batch.items.map((item, idx) => (
-                                    <li key={`${batch.batchId}-${idx}`} className="text-sm" style={{ color: "var(--color-text-primary)" }}>
-                                        {item.ingredient}: {formatNumber(item.needed_quantity)} {item.unit} (lager: {formatNumber(item.stock_quantity)} {item.unit})
-                                    </li>
-                                ))}
-                            </ul>
-                        </article>
-                    ))}
+                                    <ul className="flex flex-col gap-1">
+                                        {batch.items.map((item, idx) => (
+                                            <li key={`${batch.batchId}-${idx}`} className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+                                                {item.ingredient}: {formatNumber(item.needed_quantity)} {item.unit} (lager: {formatNumber(item.stock_quantity)} {item.unit})
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </article>
+                            ))}
+                        </div>
+                    )}
                 </div>
-            )}
+            ) : null}
         </section>
     );
 }
