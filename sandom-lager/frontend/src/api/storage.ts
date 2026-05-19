@@ -175,6 +175,8 @@ export async function deleteInventoryItem(
 }
 
 // Favorites API
+// The functions bellow interact with the favorites endpoints of the backend API
+// Allowing the frontend to fetch, add, and remove favorite inventory items for the current user.
 export async function fetchFavorites(accessToken: string): Promise<number[]> {
     return apiFetchJson<number[]>('/api/user/favorites', {
         headers: { Authorization: `Bearer ${accessToken}` },

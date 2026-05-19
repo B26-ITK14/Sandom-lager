@@ -1,6 +1,6 @@
 /*
     * favorites.controller.js
-    * Controller for managing user favorites (inventory items).
+    * Controller for managing users favorites inventory items
     * Author: Ida Tollaksen
 */
 const pool = require("../db/pool");
@@ -17,7 +17,6 @@ async function getUserFavorites(req, res) {
         [userId]
     );
 
-    // Return array of inventory ids
     res.json(result.rows.map((r) => Number(r.inventory_id)));
 }
 
@@ -30,7 +29,6 @@ async function addFavorite(req, res) {
         throw new ApiError(400, "Invalid inventory id");
     }
 
-    // Ensure user has an approved location
     const locRes = await pool.query(
         `SELECT location_id FROM user_locations WHERE user_id = $1 AND access_status = 'approved' LIMIT 1`,
         [userId]
@@ -40,7 +38,6 @@ async function addFavorite(req, res) {
         throw new ApiError(403, "No approved location found for user");
     }
 
-    // Ensure inventory exists and belongs to the user's location
     const invRes = await pool.query(
         `SELECT id, location_id FROM inventory WHERE id = $1`,
         [inventoryId]
@@ -63,7 +60,6 @@ async function addFavorite(req, res) {
     );
 
     if (result.rows.length === 0) {
-        // Already existed
         return res.status(200).json({ inventory_id: inventoryId, message: "Already favorited" });
     }
 
