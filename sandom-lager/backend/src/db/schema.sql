@@ -103,7 +103,7 @@ ALTER TABLE recipes
 ADD COLUMN IF NOT EXISTS image_public_id TEXT;
 
 -- RECIPE INGREDIENTS --
-CREATE TABLE recipe_ingredients (
+CREATE TABLE IF NOT EXISTS recipe_ingredients (
     id SERIAL PRIMARY KEY,
     recipe_id INT REFERENCES recipes(id) ON DELETE CASCADE,
     ingredient_id INT REFERENCES ingredients(id) ON DELETE CASCADE,
@@ -202,13 +202,6 @@ CREATE TABLE IF NOT EXISTS logs (
     action TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
-
-CREATE TABLE IF NOT EXISTS revoked_sessions (
-    id TEXT PRIMARY KEY,
-    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    revoked_at TIMESTAMP NOT NULL DEFAULT NOW()
-);
-
 
 -- NOTIFICATIONS --
 CREATE TABLE IF NOT EXISTS notifications(
