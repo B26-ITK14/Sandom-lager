@@ -6,12 +6,61 @@ Dette dokumentet beskriver hvilke verktøy, kontoer og tjenester som må settes 
 
 ## Innhold
 
+- [Overlevering av tjenester](#overlevering-av-tjenester)
 - [Lokale verktøy](#lokale-verktøy)
 - [Auth0](#auth0)
 - [Cloudinary](#cloudinary)
 - [Database (PostgreSQL)](#database-postgresql)
 - [Miljøvariabler](#miljøvariabler)
 - [Oppstartsrekkefølge](#oppstartsrekkefølge)
+
+---
+
+## Overlevering av tjenester
+
+### ✅ Kan overføres (eksisterende kontoer)
+
+**Auth0**
+1. Dashboard → øverst til høyre → tenant-innstillinger
+2. Settings → Subscriptions & Billing → inviter virksomhetens e-post som admin
+3. De aksepterer invitasjonen → dere fjerner dere selv som admin
+4. Tenant `sandomstiftelsen.eu.auth0.com` beholder samme domene — ingen kodeendringer nødvendig
+
+**Cloudinary**
+1. Dashboard → Settings → Users & Roles
+2. Inviter virksomhetens e-post som Admin
+3. Når akseptert → de går til Account → overfør primært eierskap til seg selv
+4. Dere kan deretter fjernes
+
+**GitHub-repo**
+1. Repo → Settings → Danger Zone → Transfer ownership
+2. Skriv inn virksomhetens GitHub-brukernavn eller organisasjon
+3. De aksepterer overføringen via e-post
+4. Oppdater eventuelle CI/CD- eller deploy-hooks som refererer til gammel repo-URL
+
+**Supabase**
+1. supabase.com → prosjektet → Settings → General
+2. Scroll til "Transfer project"
+3. Skriv inn virksomhetens Supabase-konto-e-post
+4. De må ha en Supabase-konto før overføring kan gjennomføres
+5. Ingen endringer i miljøvariabler nødvendig — prosjekt-URL og nøkler forblir de samme
+
+---
+
+### ❌ Må opprettes av virksomheten selv
+
+**Hostingplattform (frontend + backend)**
+1. Opprett konto på Render / Railway / Fly.io / VPS etter eget valg
+2. Deploy backend (Node/Express) — sett alle variabler fra `backend/.env.example`
+3. Deploy frontend (statisk Vite-bygg) — sett alle variabler fra `frontend/.env.example`
+4. Oppdater `VITE_API_BASE_URL` til å peke på ny backend-URL
+5. Oppdater Auth0 → Applications → Allowed Callbacks/Origins med nye URLer
+
+**Domene / DNS**
+1. Registrer domene via f.eks. Namecheap, Cloudflare eller GoDaddy
+2. Pek DNS til hostingplattformen
+3. Oppdater Auth0 Allowed Origins med nytt domene
+4. Oppdater Cloudinary CORS-innstillinger dersom disse er begrenset
 
 ---
 
