@@ -184,8 +184,8 @@ VALUES (
     'Pannekaker',
     (SELECT id FROM categories WHERE name = 'Frokost'),
     'Bland mel, melk og egg. Stek i panne med smør.',
-    'https://res.cloudinary.com/sandomlager/image/upload/v1778592904/recipe-images/recipe-1-1778592901805.jpg',
-    'recipe-images/recipe-1-1778592901805',
+    'https://res.cloudinary.com/sandomlager/image/upload/v1779143608/recipe-images/recipe-1-1779143607042.jpg',
+    'recipe-images/recipe-1-1779143607042',
     NOW() - INTERVAL '20 days'
 );
 
@@ -194,8 +194,8 @@ VALUES (
     'Kyllinggryte',
     (SELECT id FROM categories WHERE name = 'Middag'),
     'Stek kylling, løk og hvitløk. Tilsett tomater og paprika.',
-    'https://res.cloudinary.com/sandomlager/image/upload/v1778592892/recipe-images/recipe-2-1778592890749.jpg',
-    'recipe-images/recipe-2-1778592890749',
+    'https://res.cloudinary.com/sandomlager/image/upload/v1779143593/recipe-images/recipe-2-1779143593357.jpg',
+    'recipe-images/recipe-2-1779143593357',
     NOW() - INTERVAL '15 days'
 );
 
@@ -204,8 +204,8 @@ VALUES (
     'Ovnsbakt laks', 
     (SELECT id FROM categories WHERE name = 'Middag'),
     'Bak laks i ovn. Server med poteter og gulrøtter.', 
-    'https://res.cloudinary.com/sandomlager/image/upload/v1778592880/recipe-images/recipe-3-1778592877154.webp', 
-    'recipe-images/recipe-3-1778592877154', 
+    'https://res.cloudinary.com/sandomlager/image/upload/v1779143578/recipe-images/recipe-3-1779143578219.webp', 
+    'recipe-images/recipe-3-1779143578219', 
     NOW() - INTERVAL '10 days'
 );
 
@@ -214,8 +214,8 @@ VALUES (
     'Pasta med ostesaus', 
     (SELECT id FROM categories WHERE name = 'Middag'),
     'Kok pasta. Lag saus med smør, melk og ost.', 
-    'https://res.cloudinary.com/sandomlager/image/upload/v1778592867/recipe-images/recipe-4-1778592865733.webp', 
-    'recipe-images/recipe-4-1778592865733', 
+    'https://res.cloudinary.com/sandomlager/image/upload/v1779143566/recipe-images/recipe-4-1779143566331.webp', 
+    'recipe-images/recipe-4-1779143566331', 
     NOW() - INTERVAL '8 days'
 );
 
@@ -224,8 +224,8 @@ VALUES (
     'Overnight oats', 
     (SELECT id FROM categories WHERE name = 'Frokost'),
     'Bland havregryn, yoghurt og melk. La stå over natten.', 
-    'https://res.cloudinary.com/sandomlager/image/upload/v1778592853/recipe-images/recipe-5-1778592852513.jpg', 
-    'recipe-images/recipe-5-1778592852513', 
+    'https://res.cloudinary.com/sandomlager/image/upload/v1779143549/recipe-images/recipe-5-1779143548985.jpg', 
+    'recipe-images/recipe-5-1779143548985', 
     NOW() - INTERVAL '5 days'
 );
 
@@ -234,8 +234,8 @@ VALUES (
     'Kikertcurry',
     (SELECT id FROM categories WHERE name = 'Middag'),
     'Stek løk og hvitløk, tilsett kikerter og kokosmelk.',
-    'https://res.cloudinary.com/sandomlager/image/upload/v1778592841/recipe-images/recipe-6-1778592838438.webp',
-    'recipe-images/recipe-6-1778592838438',
+    'https://res.cloudinary.com/sandomlager/image/upload/v1779143530/recipe-images/recipe-6-1779143529537.webp',
+    'recipe-images/recipe-6-1779143529537',
     NOW() - INTERVAL '3 days'
 );
 
@@ -244,8 +244,8 @@ VALUES (
     'Asiatisk nudelsalat',
     (SELECT id FROM categories WHERE name = 'Lunsj'),
     'Bland nudler, grønnsaker, soyasaus, peanøtter og sesam.',
-    'https://res.cloudinary.com/sandomlager/image/upload/v1778592226/recipe-images/recipe-7-1778592223792.webp',
-    'recipe-images/recipe-7-1778592223792',
+    'https://res.cloudinary.com/sandomlager/image/upload/v1779143517/recipe-images/recipe-7-1779143516980.webp',
+    'recipe-images/recipe-7-1779143516980',
     NOW() - INTERVAL '1 day'
 );
 
