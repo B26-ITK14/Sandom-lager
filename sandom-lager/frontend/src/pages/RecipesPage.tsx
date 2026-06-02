@@ -89,12 +89,11 @@ export default function RecipesPage() {
                 onAddRecipe={() => setShowAddModal(true)}
             />
 
-            <p className="mb-4 text-sm flex gap-1" style={{ color: "var(--color-text-secondary)" }}>
-                <p>{selectedIds.size > 0 && `${selectedIds.size} ${selectedIds.size === 1 ? "oppskrift er" : "oppskrifter er"} valgt. Gå til handlelisten for å generere en handleliste basert på de valgte oppskriftene.`}</p>
-            </p>
-
-            <p className="mb-4 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-            </p>
+            {selectedIds.size > 0 && (
+                <p className="mb-4 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                    {selectedIds.size} {selectedIds.size === 1 ? "oppskrift er" : "oppskrifter er"} valgt. Gå til handlelisten for å generere en handleliste basert på de valgte oppskriftene.
+                </p>
+            )}
 
             {/* State handling */}
             {loading && (

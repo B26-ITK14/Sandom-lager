@@ -57,6 +57,8 @@ Prosjektet er utviklet som en bacheloroppgave ved Høgskolen i Østfold.
     - [Lager](#lager)
     - [Handleliste](#handleliste)
     - [Varslinger](#varslinger)
+    - [Brukeradministrasjon](#brukeradministrasjon)
+    - [Favoritter](#favoritter)
     - [Opplasting](#opplasting)
   - [Frontend-ruter](#frontend-ruter)
   - [Auth0](#auth0)
@@ -115,6 +117,8 @@ Systemet støtter blant annet:
 - profilside og kontoinnstillinger
 - bildeopplasting for profilbilder og oppskrifter
 - responsivt brukergrensesnitt for PC, nettbrett og mobil
+- lagring av favoritt-lagervarer
+- installbar webapp (PWA)
 
 ---
 
@@ -151,6 +155,7 @@ Systemet støtter blant annet:
 - Auth0
 - Cloudinary
 - pgAdmin
+- PWA (Service Worker, manifest.json)
 
 ---
 
@@ -254,6 +259,8 @@ En bruker kan søke om tilgang til en lokasjon. Administrator kan deretter godkj
 ---
 
 ## Forutsetninger
+
+> Detaljert oppsett av avhengigheter og eksterne tjenester: se [SETUP.md](SETUP.md)
 
 Før prosjektet kjøres lokalt må følgende være installert:
 
@@ -608,6 +615,7 @@ VITE_AUTH0_AUDIENCE=
 VITE_API_BASE_URL=
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
+VITE_APP_LAST_UPDATED=
 PORT=
 ```
 
@@ -621,6 +629,7 @@ Forklaring:
 | `VITE_API_BASE_URL` | URL til backend/API |
 | `VITE_SUPABASE_URL` | Eventuell Supabase URL for fremtidig realtime-funksjonalitet |
 | `VITE_SUPABASE_ANON_KEY` | Eventuell Supabase anon key |
+| `VITE_APP_LAST_UPDATED` | Dato for siste oppdatering av appen, vises i innstillinger |
 | `PORT` | Valgfri portinnstilling for Vite |
 
 Eksempel for lokal utvikling:
@@ -632,6 +641,7 @@ VITE_AUTH0_AUDIENCE=https://sandom-api
 VITE_API_BASE_URL=http://localhost:5000
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
+VITE_APP_LAST_UPDATED=
 PORT=5173
 ```
 
@@ -692,9 +702,11 @@ Databasen inneholder blant annet:
 - `allergens`
 - `recipe_allergens`
 - `inventory`
+- `categories`
 - `shopping_list`
 - `shopping_list_history_batches`
 - `shopping_list_history_items`
+- `user_favorites`
 - `notifications`
 - `logs`
 - `user_sessions`
@@ -729,6 +741,7 @@ Authorization: Bearer <access_token>
 | PATCH | `/api/me/username` | Oppdaterer brukernavn |
 | PATCH | `/api/me/email` | Oppdaterer e-post |
 | PATCH | `/api/me/profile-picture` | Oppdaterer profilbilde |
+| PATCH | `/api/me/notification-preferences` | Oppdaterer varslingsinnstillinger |
 | GET | `/api/profile-pictures/:filename` | Henter profilbilde |
 | GET | `/api/me/sessions` | Henter aktive økter |
 | DELETE | `/api/me/sessions/others` | Logger ut andre økter |
@@ -765,6 +778,9 @@ Oppskriftrutene er montert på `/api/recipes`.
 | PUT | `/api/recipes/:id` | Oppdaterer oppskrift |
 | DELETE | `/api/recipes/:id` | Sletter oppskrift |
 | PUT | `/api/recipes/:id/allergens` | Oppdaterer allergener for oppskrift |
+| GET | `/api/recipes/categories` | Henter kategorier |
+| POST | `/api/recipes/categories` | Oppretter kategori |
+| DELETE | `/api/recipes/categories/:id` | Sletter kategori |
 
 ### Ingredienser
 
@@ -812,8 +828,24 @@ Oppskriftrutene er montert på `/api/recipes`.
 |---|---|---|
 | GET | `/api/notifications` | Henter varslinger |
 | PATCH | `/api/notifications/:id/read` | Marker én varsling som lest |
+| DELETE | `/api/notifications/:id` | Sletter varsling |
 | PATCH | `/api/notifications/read-all` | Marker alle varslinger som lest |
 | POST | `/api/notifications/access-request` | Varsler admin om tilgangssøknad |
+
+### Brukeradministrasjon
+
+| Metode | Endepunkt | Beskrivelse |
+|---|---|---|
+| GET | `/api/admin/users` | Admin henter alle brukere |
+| PATCH | `/api/admin/users/:id/role` | Admin oppdaterer brukerrolle |
+
+### Favoritter
+
+| Metode | Endepunkt | Beskrivelse |
+|---|---|---|
+| GET | `/api/user/favorites` | Henter favoritter for innlogget bruker |
+| POST | `/api/user/favorites/:inventoryId` | Legger til lagervare som favoritt |
+| DELETE | `/api/user/favorites/:inventoryId` | Fjerner lagervare som favoritt |
 
 ### Opplasting
 

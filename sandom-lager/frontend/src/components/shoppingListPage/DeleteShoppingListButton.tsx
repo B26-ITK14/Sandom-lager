@@ -18,7 +18,7 @@ interface Props {
 }
 
 export default function DeleteShoppingListButton({ onDeleted }: Props) {
-    const { role } = useUser();
+    const { role, loading } = useUser();
     const { getAccessTokenSilently } = useAuth0();
 
     const [isOpen, setIsOpen] = useState(false);
@@ -26,6 +26,7 @@ export default function DeleteShoppingListButton({ onDeleted }: Props) {
     const [error, setError] = useState<string | null>(null);
 
     const canDeleteAll = role === "admin" || role === "manager";
+    const canOpenDeleteModal = !loading && canDeleteAll;
 
     const handleConfirmDelete = async () => {
         if (!canDeleteAll) return;
@@ -48,14 +49,24 @@ export default function DeleteShoppingListButton({ onDeleted }: Props) {
     return (
         <>
             <button
+                type="button"
                 onClick={() => {
+                    if (!canOpenDeleteModal) {
+                        setError("Kun manager eller admin kan slette hele handlelisten.");
+                        setIsOpen(true);
+                        return;
+                    }
+
                     setError(null);
                     setIsOpen(true);
                 }}
+                disabled={loading}
                 className="flex items-center gap-2 py-2 px-4 rounded-md font-medium transition-all hover:shadow-md cursor-pointer"
                 style={{
                     background: "var(--color-danger, #f44336)",
                     color: "white",
+                    opacity: loading ? 0.6 : 1,
+                    cursor: loading ? "not-allowed" : "pointer",
                 }}
                 title="Slett hele handlelisten"
             >
@@ -98,6 +109,7 @@ export default function DeleteShoppingListButton({ onDeleted }: Props) {
                         <footer className="mt-6 flex justify-end gap-3">
                             {canDeleteAll && (
                                 <button
+                                    type="button"
                                     onClick={handleConfirmDelete}
                                     disabled={isDeleting}
                                     className="py-2 px-4 rounded-md transition-opacity cursor-pointer disabled:cursor-not-allowed"
@@ -111,6 +123,7 @@ export default function DeleteShoppingListButton({ onDeleted }: Props) {
                             )}
 
                             <button
+                                type="button"
                                 onClick={() => setIsOpen(false)}
                                 disabled={isDeleting}
                                 className="py-2 px-4 rounded-md transition-opacity cursor-pointer disabled:cursor-not-allowed"
