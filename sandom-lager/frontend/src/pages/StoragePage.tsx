@@ -189,10 +189,6 @@ export default function StoragePage() {
         refresh();
     }
 
-    if (isLoading) {
-        return <LoadingSpinner />;
-    }
-
     const hasProducts = !errorMessage && filteredProducts.length > 0;
 
     return (
@@ -251,7 +247,13 @@ export default function StoragePage() {
             </header>
 
             <section>
-                {notice ? (
+                {isLoading && (
+                    <div className="flex justify-center mt-12">
+                        <LoadingSpinner />
+                    </div>
+                )}
+
+                {!isLoading && notice ? (
                     <article
                         className="mb-4 rounded-2xl border px-4 py-3"
                         style={{ borderColor: "var(--color-border)", backgroundColor: "var(--color-secondary-surface)" }}
@@ -276,7 +278,7 @@ export default function StoragePage() {
                     </article>
                 ) : null}
 
-                {errorMessage ? (
+                {!isLoading && errorMessage ? (
                     <p
                         className="rounded-2xl border px-4 py-5 text-sm"
                         style={{
@@ -289,7 +291,7 @@ export default function StoragePage() {
                     </p>
                 ) : null}
 
-                {!errorMessage && filteredProducts.length === 0 ? (
+                {!isLoading && !errorMessage && filteredProducts.length === 0 ? (
                     <p
                         className="rounded-2xl border px-4 py-5 text-sm"
                         style={{
@@ -302,7 +304,7 @@ export default function StoragePage() {
                     </p>
                 ) : null}
 
-                {hasProducts ? (
+                {!isLoading && hasProducts ? (
                     <div
                         className="overflow-hidden rounded-2xl border"
                         style={{ borderColor: "var(--color-border)", backgroundColor: "var(--color-surface)" }}
