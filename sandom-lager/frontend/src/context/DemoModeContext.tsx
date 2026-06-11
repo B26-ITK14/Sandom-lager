@@ -154,13 +154,9 @@ export function DemoModeProvider({ children }: { children: React.ReactNode }) {
 
     const goTo = useCallback((index: number) => {
         if (index < 0) return;
-        if (index >= steps.length) {
-            stop();
-            navigate(ROUTES.DASHBOARD.path);
-            return;
-        }
-        setStepIndex(index);
-    }, [steps.length, stop, navigate]);
+        // Loop continuously: wrap back to the first step until the user cancels.
+        setStepIndex(index % steps.length);
+    }, [steps.length]);
 
     const next = useCallback(() => goTo(stepIndex + 1), [goTo, stepIndex]);
     const prev = useCallback(() => goTo(stepIndex - 1), [goTo, stepIndex]);
