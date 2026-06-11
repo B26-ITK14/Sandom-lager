@@ -9,7 +9,9 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { SelectedRecipesProvider } from "./context/SelectedRecipesContext";
 import { UserProvider } from "./context/UserContext";
 import { AuthErrorProvider } from "./context/AuthErrorContext";
+import { DemoModeProvider } from "./context/DemoModeContext";
 import { ProtectedRoute } from "./auth";
+import { DemoOverlay } from "./components/demo";
 import LoadingSpinner from "./components/LoadingSpinner";
 
 // Lazy load page components to reduce initial bundle size
@@ -50,6 +52,7 @@ export default function App() {
         <AuthErrorProvider>
           <UserProvider>
             <SelectedRecipesProvider>
+              <DemoModeProvider>
               <Suspense fallback={<PageFallback />}>
                 <Routes>
                   {/* Public route */}
@@ -171,6 +174,8 @@ export default function App() {
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </Suspense>
+              <DemoOverlay />
+              </DemoModeProvider>
             </SelectedRecipesProvider>
           </UserProvider>
         </AuthErrorProvider>

@@ -5,13 +5,14 @@
     * Author: Emil Berglund
 */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Bell, ArrowLeft } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
 import { NavFlyout } from './NavFlyout';
 import { NotificationFlyout } from './notifications';
 import { getDisplayName } from '../router/nav';
+import { DEMO_ACTION_EVENT, type DemoAction } from '../context/DemoModeContext';
 
 interface HeaderSectionProps {
     notifications?: boolean | true;
@@ -36,6 +37,32 @@ export default function HeaderSection({ notifications, backMenu }: HeaderSection
 
     // Get page name from current URL path
     const currentPage = getDisplayName(location.pathname);
+
+    // Let demo mode drive the header flyouts via window events.
+    useEffect(() => {
+        const handler = (e: Event) => {
+            const action = (e as CustomEvent<DemoAction>).detail;
+            switch (action) {
+                case 'open-nav':
+                    setIsNotificationOpen(false);
+                    setIsMenuOpen(true);
+                    break;
+                case 'close-nav':
+                    setIsMenuOpen(false);
+                    break;
+                case 'open-notifications':
+                    setIsMenuOpen(false);
+                    setIsNotificationOpen(true);
+                    void refresh({ force: false });
+                    break;
+                case 'close-notifications':
+                    setIsNotificationOpen(false);
+                    break;
+            }
+        };
+        window.addEventListener(DEMO_ACTION_EVENT, handler);
+        return () => window.removeEventListener(DEMO_ACTION_EVENT, handler);
+    }, [refresh]);
 
     const handleMenuClick = () => {
         setIsMenuOpen(!isMenuOpen);
